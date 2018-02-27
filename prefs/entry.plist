@@ -1,0 +1,10 @@
+{
+   entry = {
+     bundle = MASQPrefs;
+     cell = PSLinkCell;
+     detail = MASQPrefsController;
+     icon = Icon.png;
+     isController = 1;
+     label = Masq;
+   };
+}

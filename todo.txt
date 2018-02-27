@@ -1,0 +1,13 @@
+src:
+
+prefs: share extension nneds to go above!
+
+ios 10; test / background styling
+
+maize: test
+
+ios 11: FIX BG not updating with skips
+
+music: hide after show
+
+spotify : premium genius bug

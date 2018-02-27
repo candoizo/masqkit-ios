@@ -1,0 +1,90 @@
+title = "";
+items = (
+   {
+      cell = PSSwitchCell;
+      cellClass = MASQSwitchCell;
+      default = 1;
+      defaults = ca.ndoizo.masq;
+      key = enable;
+      label = ENABLE;
+      hint = "All changes apply instantly!";
+   },
+   {
+      cell = PSGroupCell;
+      label = "Theme Pickers:";
+   },
+   {
+      cell = PSLinkCell;
+      cellClass = MASQThemeLinkCell;
+      label = LS_LABEL;
+      themeKey = LS;
+      detail = MASQThemePicker;
+   },
+   {
+      cell = PSLinkCell;
+      cellClass = MASQThemeLinkCell;
+      label = CC_LABEL;
+      themeKey = CC;
+      detail = MASQThemePicker;
+   },
+   {
+      cell = PSLinkCell;
+      cellClass = MASQThemeLinkCell;
+      label = MP_LABEL;
+      themeKey = MP;
+      detail = MASQThemePicker;
+   },
+   {
+      cellClass = MASQSwitchCell;
+      default = 1;
+      defaults = "ca.ndoizo.masq";
+      key = sharing;
+      label = SHARE_LABEL;
+      hint = SHARE_HINT;
+      icon = Comment.png;
+   },
+   {
+      cell = PSGroupCell;
+      label = "Lockscreen Background Styles:";
+   },
+   {
+      cell = PSSegmentCell;
+      cellClass = MASQSegmentCell;
+      tintKey = LS;
+      default = 3;
+      defaults = ca.ndoizo.masq;
+      key = CCStyle;
+      validValues = (
+                     1,
+                     2,
+                     3
+                     );
+      validTitles = (
+                     "Light",
+                     "Vibrant",
+                     "Dark"
+                     );
+   },
+   {
+      cell = PSGroupCell;
+      label = "Control Center Background Styles:";
+   },
+   {
+      cell = PSSegmentCell;
+      cellClass = MASQSegmentCell;
+      tintKey = CC;
+      default = 3;
+      defaults = ca.ndoizo.masq;
+      key = CCStyle;
+      validValues = (
+                     1,
+                     2,
+                     3
+                     );
+      validTitles = (
+                     "Light",
+                     "Vibrant",
+                     "Dark"
+                     );
+   }
+);

@@ -1,0 +1,16 @@
+"CREATOR" = "made by @candoizo";
+"ENABLE" = "Enable";
+"ENABLE_HINT" = "Does this need a respring?";
+"PATH_TEXT" = "Path: /Library/Application Support/MASQ/Themes/";
+"DYNA_FOOTER_TEXT" = "Path: /Library/Application Support/MASQ/Themes/
+
+Themes prefixed with an Emoji use dynamic effects:
+🌀 = Spin animation while playing.";
+
+"LS_LABEL" = "Lock Screen";
+"CC_LABEL" = "Control Center";
+"MP_LABEL" = "Music Players";
+"SP_LABEL" = "Spotify.App";
+"SC_LABEL" = "SoundCloud.App";
+"SHARE_LABEL" = "Share Extension";
+"SHARE_HINT" = "Long hold to share your music setup socially!";

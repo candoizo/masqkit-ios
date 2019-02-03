@@ -1,0 +1,9 @@
+Package: masq.extension.11
+Name: MASQ11
+Depends: ca.ndoizo.masq
+Version: 1.0
+Architecture: iphoneos-arm
+Description: iOS 11 Springboard extension for MASQKit!
+Maintainer: candoizo
+Author: candoizo
+Section: Extensions

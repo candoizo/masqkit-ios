@@ -1,0 +1,10 @@
+items = (
+    {
+       cell = PSLinkCell;
+       cellClass = MASQSubPageLinkCell;
+       iconBundle = "com.apple.Music";
+       label = "Music (Swift)";
+       detail = MASQSubPageController;
+       specs = MASQMusic.page;
+    }
+);

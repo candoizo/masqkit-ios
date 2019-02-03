@@ -1,0 +1,10 @@
+items = (
+    {
+       cell = PSLinkCell;
+       cellClass = MASQSubPageLinkCell;
+       iconBundle = "com.spotify.client";
+       label = "Spotify (8.4.46)";
+       detail = MASQSubPageController;
+       specs = MASQSpotify.page;
+    }
+);

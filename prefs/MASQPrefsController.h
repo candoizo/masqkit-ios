@@ -1,10 +1,4 @@
-#import <Social/Social.h>
 #import <Preferences/PSListController.h>
-#import <Preferences/PSSwitchTableCell.h>
-#import <Preferences/PSSegmentTableCell.h>
-#import <Preferences/PSEditableTableCell.h>
-#import <Preferences/PSSpecifier.h>
-#import <AudioToolbox/AudioToolbox.h>
 
 @interface MASQPrefsController : PSListController
 @property (nonatomic) NSUserDefaults * prefs;

@@ -1,0 +1,11 @@
+title = "Music Settings";
+items = (
+    {
+       cell = PSLinkCell;
+       cellClass = MASQThemeLinkCell;
+       label = "Theme Picker";
+       themeKey = MP;
+       tint = "#e8507f";
+       detail = MASQThemePicker;
+    }
+);

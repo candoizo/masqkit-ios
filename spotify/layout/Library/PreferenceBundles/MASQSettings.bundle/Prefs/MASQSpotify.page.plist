@@ -1,0 +1,11 @@
+title = "Spotify Settings";
+items = (
+    {
+       cell = PSLinkCell;
+       cellClass = MASQThemeLinkCell;
+       label = "Spotify Picker";
+       themeKey = MP;
+       tint = "#1db954";
+       detail = MASQThemePicker;
+    }
+);

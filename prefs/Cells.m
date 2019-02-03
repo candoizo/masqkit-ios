@@ -1,5 +1,7 @@
-#import "PrefUtils.h"
-#import "../src/MASQThemeManager.h"
+#import <Preferences/PSSpecifier.h>
+#import <Preferences/PSSwitchTableCell.h>
+#import <Preferences/PSSegmentTableCell.h>
+#import "../src/MASQHousekeeper.h"
 
 @interface MASQSwitchCell : PSSwitchTableCell
 @end
@@ -9,16 +11,18 @@
 	self = [super initWithStyle:arg1 reuseIdentifier:arg2 specifier:arg3];
 	if (self) {
 
-		NSString * identifier = [arg3 propertyForKey:@"key"];
-		if ([identifier hasPrefix:@"CC"]) [((UISwitch *)[self control]) setOnTintColor:kCCTintColor];
-		else if ([identifier hasPrefix:@"LS"]) [((UISwitch *)[self control]) setOnTintColor:kLSTintColor];
-		else if ([identifier hasPrefix:@"MP"]) [((UISwitch *)[self control]) setOnTintColor:kMPTintColor];
-		else [((UISwitch *)[self control]) setOnTintColor:[kCustomTint colorWithAlphaComponent:0.8]];
+		NSString * tintHex = [arg3 propertyForKey:@"tint"];
+		if (tintHex) [((UISwitch *)[self control]) setOnTintColor:[NSClassFromString(@"MASQHousekeeper") hexToRGB:tintHex]];
+		else [((UISwitch *)[self control]) setOnTintColor:[NSClassFromString(@"MASQHousekeeper") masqTintWithAlpha:0.8]]; //?TODO
 
 		if ([arg3 propertyForKey:@"hint"])	{
 			self.detailTextLabel.text = [arg3 propertyForKey:@"hint"];
 			self.detailTextLabel.textAlignment = 4;
 			self.detailTextLabel.font = [self.detailTextLabel.font fontWithSize:12];
+			if (tintHex) {
+				self.detailTextLabel.textColor = [[NSClassFromString(@"MASQHousekeeper") hexToRGB:tintHex] colorWithAlphaComponent:0.7];
+			}
+			else self.detailTextLabel.textColor = [NSClassFromString(@"MASQHousekeeper") masqTintWithAlpha:0.7];
 		}
 	}
 	return self;
@@ -28,8 +32,8 @@
 	[super layoutSubviews];
 
 	if ([self.specifier propertyForKey:@"hint"]) {
-	  self.titleLabel.center = CGPointMake(self.titleLabel.center.x, self.titleLabel.center.y - 7.5);
-   	self.detailTextLabel.frame = CGRectMake(self.titleLabel.frame.origin.x,self.frame.size.height-17.5, self.detailTextLabel.intrinsicContentSize.width,15);
+	  self.titleLabel.center = CGPointMake(self.titleLabel.center.x, self.bounds.size.height*0.35);
+   	self.detailTextLabel.frame = CGRectMake(self.titleLabel.frame.origin.x,self.frame.size.height*0.6, self.detailTextLabel.intrinsicContentSize.width,15);
 	}
 }
 @end
@@ -40,13 +44,11 @@
 @implementation MASQThemeLinkCell
 - (void)refreshCellContentsWithSpecifier:(id)arg1 {
 	[super refreshCellContentsWithSpecifier:arg1];
+
 	self.detailTextLabel.font = [self.detailTextLabel.font fontWithSize:12];
-	self.detailTextLabel.center = CGPointMake(self.detailTextLabel.center.x, self.accessoryView.center.y - 5);
-	if ([[NSClassFromString(@"MASQThemeManager") sharedPrefs] valueForKey:[arg1 propertyForKey:@"themeKey"]])	{
-		NSString * tname = [[[NSClassFromString(@"MASQThemeManager") sharedPrefs] valueForKey:[arg1 propertyForKey:@"themeKey"]] componentsSeparatedByString:@"@"].firstObject;
-		self.detailTextLabel.text = tname;
-	}
-	else self.detailTextLabel.text = @"Default";
+	NSString * tintHex = [arg1 propertyForKey:@"tint"];
+	if (tintHex) self.detailTextLabel.textColor = [[NSClassFromString(@"MASQHousekeeper") hexToRGB:tintHex] colorWithAlphaComponent:0.7];
+	else self.detailTextLabel.textColor = [NSClassFromString(@"MASQHousekeeper") masqTintWithAlpha:0.7];
 }
 
 -(void)layoutSubviews {
@@ -55,6 +57,11 @@
 	if ([self.specifier propertyForKey:@"themeKey"]) {
 		UIView * acc = [self valueForKey:@"_accessoryView"];
    	self.detailTextLabel.center = CGPointMake(self.detailTextLabel.center.x, acc.center.y);
+	}
+
+	if ([[NSClassFromString(@"MASQHousekeeper") sharedPrefs] valueForKey:[self.specifier propertyForKey:@"themeKey"]])	{
+		NSString * tname = [[[NSClassFromString(@"MASQHousekeeper") sharedPrefs] valueForKey:[self.specifier propertyForKey:@"themeKey"]] componentsSeparatedByString:@"@"].firstObject;
+		self.detailTextLabel.text = tname;
 	}
 }
 @end
@@ -68,12 +75,31 @@
 	self = [super initWithStyle:arg1 reuseIdentifier:arg2 specifier:arg3];
 	if (self) {
 
-		NSString * identifier = [arg3 propertyForKey:@"tintKey"];
-		if ([identifier hasPrefix:@"CC"]) self.tintColor = kCCTintColor;
-		else if ([identifier hasPrefix:@"LS"]) self.tintColor = kLSTintColor;
-		else if ([identifier hasPrefix:@"MP"]) self.tintColor = kMPTintColor;
-		else self.tintColor = [kCustomTint colorWithAlphaComponent:0.8];
+		NSString * tintHex = [arg3 propertyForKey:@"tint"];
+		if (tintHex) self.tintColor = [NSClassFromString(@"MASQHousekeeper") hexToRGB:tintHex];
+		else self.tintColor = [NSClassFromString(@"MASQHousekeeper") masqTintWithAlpha:0.8];
 	}
 	return self;
+}
+@end
+
+@interface MASQSubPageLinkCell : PSTableCell
+@end
+
+@interface UIImage (Private)
++ (id)_applicationIconImageForBundleIdentifier:(id)arg1 format:(int)arg2 scale:(CGFloat)arg3;
++(id)imageNamed:(id)arg1 inBundle:(id)arg2;
+@end
+
+@implementation MASQSubPageLinkCell
+- (void)refreshCellContentsWithSpecifier:(id)arg1 {
+	[super refreshCellContentsWithSpecifier:arg1];
+	if (!self.imageView.image && [self.specifier propertyForKey:@"iconBundle"]) {
+		self.imageView.image = [UIImage _applicationIconImageForBundleIdentifier:[self.specifier propertyForKey:@"iconBundle"] format:0 scale:UIScreen.mainScreen.scale];
+	}
+	else if (!self.imageView.image && [self.specifier propertyForKey:@"iconPath"]) {
+		NSString * path = [self.specifier propertyForKey:@"iconPath"];
+		self.imageView.image = [UIImage imageNamed:path.lastPathComponent inBundle:[NSBundle bundleWithPath:[path stringByDeletingLastPathComponent]]];
+	}
 }
 @end

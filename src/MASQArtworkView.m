@@ -1,19 +1,18 @@
 #import "MASQArtworkView.h"
-#import "MASQThemeManager.h"
-#import "objc/runtime.h"
-#import "MediaRemote/MediaRemote.h"
+#import "MASQHousekeeper.h"
+
+#define _c(c) NSClassFromString(c)
 
 @implementation MASQArtworkView
 -(id)initWithThemeKey:(NSString *)key {
-     if (self = [super init]) {
-        _identifier = key;
-
-        [self addSubview:[self underlayView]];
-        [self addSubview:[self containerView]];
-        [self addSubview:[self overlayView]];
-        [self updateTheme];
-     }
-   return self;
+    if (self = [super init]) {
+     [self addSubview:[self underlayView]];
+     [self addSubview:[self containerView]];
+     [self addSubview:[self overlayView]];
+      _identifier = key;
+      [self updateTheme];
+    }
+  return self;
 }
 
 -(id)initWithThemeKey:(NSString *)arg1 frameHost:(id)arg2 imageHost:(id)arg3 {
@@ -25,25 +24,33 @@
 }
 
 -(void)updateTheme {
-    if (self.identifier) {
-        if ([MASQThemeManager.sharedPrefs valueForKey:self.identifier]) {
-            NSString * theme = [MASQThemeManager.sharedPrefs valueForKey:self.identifier]; //the key hols the name of the theme for the users chosen
-            self.currentTheme = [NSBundle bundleWithURL:[[self themePath] URLByAppendingPathComponent:theme]];
-        } else { //maybe sandboxed, use backing file
-            NSString *plistPath = [[NSBundle bundleWithPath:@"/private/var/mobile/Library/Preferences/"] pathForResource:@"ca.ndoizo.masq" ofType:@"plist"];
-            NSMutableDictionary *pref = [NSMutableDictionary dictionaryWithContentsOfFile:plistPath];
-            NSString * theme = pref[self.identifier]; //the key holds the folder name of the theme for the users chosen
-            self.currentTheme = [NSBundle bundleWithURL:[[self themePath] URLByAppendingPathComponent:theme]];
-            HBLogDebug(@"SANDBOXED! Latest theme value: %@", pref[self.identifier]);
+  if (self.identifier) {
+        NSString * theme = [[_c(@"MASQHousekeeper") sharedPrefs] valueForKey:self.identifier];
+        if (!theme) { //maybe sandboxed
+          NSString *plistPath = [[NSBundle bundleWithPath:@"/private/var/mobile/Library/Preferences/"] pathForResource:@"ca.ndoizo.masq" ofType:@"plist"];
+          theme = [NSDictionary dictionaryWithContentsOfFile:plistPath][self.identifier];
         }
-
+        if (self.disabled && self.currentTheme) {
+          self.currentTheme = nil;
+          HBLogDebug(@"updateTheme\n self.disabled = YES, setting shit visible");
+          ((UIImageView *)_containerView.maskView).image = nil;
+          [_overlayView setBackgroundImage:nil forState:UIControlStateNormal];
+          [_underlayView setBackgroundImage:nil forState:UIControlStateNormal];
+          self.imageHost.alpha = 1;
+          self.imageHost.hidden = NO;
+          self.frameHost.alpha  = 1;
+          self.frameHost.hidden = NO;
+          return;
+        }
+        self.currentTheme = [NSBundle bundleWithURL:[[self themePath] URLByAppendingPathComponent:theme]];
         if (self.currentTheme) {
             ((UIImageView *)_containerView.maskView).image = [self maskImage];
             [_overlayView setBackgroundImage:[self overlayImage] forState:UIControlStateNormal];
             [_underlayView setBackgroundImage:[self underlayImage] forState:UIControlStateNormal];
         }
-   }
-   else HBLogError(@"Not registered for any valid themeKey, options: \"LS\" , \"CC\", \"MP\". current: %@", self.identifier);
+        else HBLogError(@"Could not apply theme, does the themeKey hold a theme value that matches an existing theme? %@ ", theme);
+  }
+  else HBLogError(@"A themeKey was not supplied, please refer to documentation.");
 }
 
 -(void)updateFrame {
@@ -68,8 +75,8 @@
 }
 
 -(void)updateArtwork:(UIImage *)img {
-    if ([img isKindOfClass:objc_getClass("UIImage")]) self.artworkImageView.image = img;
-    else if ([self.imageHost isKindOfClass:objc_getClass("UIImageView")]) self.artworkImageView.image = self.imageHost.image;
+    if ([img isKindOfClass:_c(@"UIImage")]) self.artworkImageView.image = img;
+    else if ([self.imageHost isKindOfClass:_c(@"UIImageView")]) self.artworkImageView.image = self.imageHost.image;
     else HBLogError(@"imageHost is not type UIImageView, and no UIImage was offered so artwork was NOT updated.");
 }
 
@@ -94,9 +101,11 @@
 #define arrayContainsKindOfClass(a, c) [a filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self isKindOfClass: %@", c]]
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-  // HBLogDebug(@"args of observeValueForKeyPath:\n%@ , object:%@ \n\nchanges: %@", keyPath, object, change);
-  //id change = change[@"new"];
-  if ([self themeUpdated]) [self updateTheme];
+
+  BOOL updated = [self themeUpdated];
+  HBLogDebug(@"Was the theme updated ? %@ \n\nSet theme name is %@ \nRequested theme name for value is %@", updated ? @"YES" : @"NO", self.currentTheme.resourcePath.lastPathComponent, [MASQHousekeeper.sharedPrefs valueForKey:self.identifier]);
+  if (updated) [self updateTheme];
+  if (self.disabled) return;
 
   if ([keyPath isEqualToString:@"frame"]) {
     if (!CGRectEqualToRect(self.frameHost.frame, self.frame)) [self updateFrame];
@@ -131,7 +140,15 @@
 }
 
 -(BOOL)themeUpdated {
-  return ![self.currentTheme.resourcePath.lastPathComponent isEqualToString:[MASQThemeManager.sharedPrefs valueForKey:self.identifier]];
+  NSString * theme = [MASQHousekeeper.sharedPrefs valueForKey:self.identifier];
+  self.disabled = [theme hasPrefix:@"Disabled"];
+  return ![self.currentTheme.resourcePath.lastPathComponent isEqualToString:theme];
+}
+
+-(void)tapArtwork:(id)sender {
+  if (_c(@"SBMediaController"))
+  [UIApplication.sharedApplication launchApplicationWithIdentifier:[_c(@"SBMediaController") sharedInstance].nowPlayingApplication.bundleIdentifier suspended:NO];
+  else return;
 }
 
 -(id)containerView {
@@ -151,6 +168,7 @@
 
 -(id)overlayView {
    _overlayView = [[UIButton alloc] initWithFrame:self.bounds];
+   [_overlayView addTarget:self action:@selector(tapArtwork:) forControlEvents:UIControlEventTouchUpInside];
    _overlayView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight; //resize to super width
    _overlayView.center = self.center;
    return _overlayView;

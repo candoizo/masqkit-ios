@@ -1,48 +1,55 @@
 #import "MASQBlurredImageView.h"
-#import "MASQThemeManager.h"
+#import "MASQHousekeeper.h"
+#import "MediaRemote/MediaRemote.h"
 
 @implementation MASQBlurredImageView
--(id)initWithFrame:(CGRect)arg1 layer:(CALayer *)arg2 {
+-(id)initWithFrame:(CGRect)arg1 {
   if (self = [super initWithFrame:arg1]) {
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.clipsToBounds = YES;
     self.contentMode = UIViewContentModeScaleAspectFill;
-    self.layer.cornerRadius = arg2.cornerRadius;
+  }
+  return self;
+}
+-(id)initWithFrame:(CGRect)arg1 layer:(CALayer *)arg2 {
+  if (self = [super initWithFrame:arg1]) {
+    self.clipsToBounds = YES;
+    if (arg2.cornerRadius) [self _setContinuousCornerRadius:(arg2.cornerRadius*0.85)];
   }
   return self;
 }
 
 -(UIVisualEffectView *)effectViewWithEffect:(id)arg1 {
    UIVisualEffectView * v = [[UIVisualEffectView alloc] initWithEffect:arg1];
-   v.bounds = self.bounds;
-   v.center = self.center;
+   v.frame = CGRectMake(0,0,self.bounds.size.width, self.bounds.size.height);
    v.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
    return v;
 }
 
 -(void)updateEffectWithKey {
-  [self updateEffectWithStyle:[[MASQThemeManager.sharedPrefs valueForKey:self.styleKey] intValue]];
+  int style = [[MASQHousekeeper.sharedPrefs valueForKey:self.styleKey] intValue];
+  self.alpha = !(style == 0);
+  if (style != 0) [self updateEffectWithStyle:style];
 }
 
 -(void)updateEffectWithStyle:(int)style {
+  // self.hidden = (style == 0); /* maybe don't need but double check */
   UIBlurEffect * eff; switch (style) {
     case 1: eff = [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight]; break;
     case 2: eff = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight]; break;
     case 3: eff = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark]; break;
   }
-
-  // NSMutableArray * otemp = [self.effectView.contentView.subviews mutableCopy];
-  // [self.effectView.contentView.subviews filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self removeFromSuperview"]];
-  NSMutableArray * temp;
-     for (id view in self.effectView.contentView.subviews) {
-        [temp addObject:view];
-        [view removeFromSuperview];
-     }
-  [self.effectView removeFromSuperview];
-  self.effectView = [self effectViewWithEffect:eff];
-  for (id view in temp) {
-      [self.effectView.contentView addSubview:view];
+  if (eff) {
+    [self.effectView removeFromSuperview];
+    self.effectView = [self effectViewWithEffect:eff];
+    [self addSubview:self.effectView];
   }
-  [self addSubview:self.effectView];
+}
+
+-(void)loadArtwork {
+  MRMediaRemoteGetNowPlayingInfo( dispatch_get_main_queue(), ^(CFDictionaryRef information) {
+  NSDictionary *dict = (__bridge NSDictionary *)(information);
+  if ([UIImage imageWithData:dict[@"kMRMediaRemoteNowPlayingInfoArtworkData"]])
+  self.image = [UIImage imageWithData:dict[@"kMRMediaRemoteNowPlayingInfoArtworkData"]];
+  });
 }
 @end

@@ -1,0 +1,11 @@
+title = "SoundCloud Settings";
+items = (
+    {
+       cell = PSLinkCell;
+       cellClass = MASQThemeLinkCell;
+       label = "SoundCloud Picker";
+       themeKey = MP;
+       tint = "#ff8800";
+       detail = MASQThemePicker;
+    }
+);

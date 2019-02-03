@@ -1,0 +1,9 @@
+Package: masq.extension.music.swifty
+Name: MASQMusic
+Depends: ca.ndoizo.masq
+Version: 1.0a
+Architecture: iphoneos-arm
+Description: Music.app extension (iOS 10+ / Swift) for MASQKit!
+Maintainer: candoizo
+Author: candoizo
+Section: Extensions

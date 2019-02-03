@@ -1,0 +1,71 @@
+title = "SpringBoard Settings";
+items = (
+  {
+     cell = PSGroupCell;
+     label = "Theme Pickers:";
+  },
+  {
+     cell = PSLinkCell;
+     cellClass = MASQThemeLinkCell;
+     label = LS_LABEL;
+     themeKey = LS;
+     tint = "#007AFF";
+     detail = MASQThemePicker;
+  },
+  {
+     cell = PSLinkCell;
+     cellClass = MASQThemeLinkCell;
+     label = CC_LABEL;
+     themeKey = CC;
+     tint = "#7f6bda";
+     detail = MASQThemePicker;
+  },
+  {
+     cell = PSGroupCell;
+     label = "Lockscreen Background Style:";
+  },
+  {
+     cell = PSSegmentCell;
+     cellClass = MASQSegmentCell;
+     tint = "#007AFF";
+     default = 3;
+     defaults = ca.ndoizo.masq;
+     key = LSStyle;
+     validValues = (
+                    0,
+                    1,
+                    2,
+                    3
+                    );
+     validTitles = (
+                    "Disable",
+                    "Light",
+                    "Vibrant",
+                    "Dark"
+                    );
+  },
+  {
+     cell = PSGroupCell;
+     label = "Control Center Background Style:";
+  },
+  {
+     cell = PSSegmentCell;
+     cellClass = MASQSegmentCell;
+     tint = "#7f6bda";
+     default = 3;
+     defaults = ca.ndoizo.masq;
+     key = CCStyle;
+     validValues = (
+                    0,
+                    1,
+                    2,
+                    3
+                    );
+     validTitles = (
+                    "Disable",
+                    "Light",
+                    "Vibrant",
+                    "Dark"
+                    );
+  }
+);

@@ -1,21 +1,41 @@
 #import "MASQSocialExtendedController.h"
+#import "../src/MASQHousekeeper.h"
 
 @implementation MASQSocialExtendedController
 +(id)composeViewControllerForServiceType:(id)arg1 {
-  if (self) {
     MASQSocialExtendedController * c = [super composeViewControllerForServiceType:arg1];
     if (c.view) {
-      [c.view addSubview:[c topPlatter]];
+      c.platterView = [c topPlatter];
+      c.showPoint = CGPointMake(c.platterView.center.x, c.platterView.center.y);
+      c.platterView.center = CGPointMake(c.platterView.center.x, c.platterView.center.y-150);
+    	c.gonePoint = CGPointMake(c.platterView.center.x, c.platterView.center.y);
+      [((UIWindow *)[UIApplication.sharedApplication valueForKey:@"_statusBarWindow"]) insertSubview:c.platterView atIndex:0];
       [c setInitialText:[c tweetText]];
-      c.view.tintColor = [UIColor colorWithRed:0.87 green:0.25 blue:0.40 alpha:1.0];
+      c.view.tintColor = [NSClassFromString(@"MASQHousekeeper") masqTintWithAlpha:1];
+      c.remoteViewController.view.tintColor = [NSClassFromString(@"MASQHousekeeper") masqTintWithAlpha:1];
     }
     return c;
-  }
-  return nil;
+}
+
+-(void)showPlatter {
+  [UIView animateWithDuration:0.25 animations:^{
+       self.platterView.center = self.showPoint;
+     } completion:nil];
+}
+
+- (void)viewWillDisappear:(BOOL)arg1 {
+  [super viewWillDisappear:arg1];
+  if (arg1) [self dismissPlatter];
+}
+
+-(void)dismissPlatter {
+    [UIView animateWithDuration:0.2
+     animations:^{self.platterView.center = self.gonePoint;}
+     completion:^(BOOL finished){ [self.platterView removeFromSuperview]; }];
 }
 
 -(NSString *)tweetText {
-  return @"Im using Masq² by @candoizo, get the source at https://candoizo.gitlab.io/masq";
+  return @"Im loving MASQKit by @candoizo! 🎭 join the party, free at https://candoizo.gitlab.io/masq";
 }
 
 -(id)topPlatter {
@@ -31,9 +51,9 @@
 
   UIView * donate = [self buttonViewWithTitle:@"☕ Coffee" selector:@selector(donateAction) iconBundle:@"com.apple.mobileme.fmf1"];
   UIView * twitter = [self buttonViewWithTitle:@"🐦 Twitter" selector:@selector(profileAction) iconBundle:@"com.atebits.Tweetie2"];
-  UIView * support = [self buttonViewWithTitle:@"📬 Support" selector:@selector(supportAction) iconBundle:@"com.saurik.Cydia"];
-  twitter.center = CGPointMake(v.bounds.size.width*0.5, v.bounds.size.height * 0.7);
-  donate.center = CGPointMake(v.bounds.size.width*0.2, v.bounds.size.height * 0.7);
+  UIView * support = [self buttonViewWithTitle:@"📬 Support" selector:@selector(supportAction) iconBundle:@"com.apple.mobilemail"];
+  twitter.center = CGPointMake(v.bounds.size.width*0.2, v.bounds.size.height * 0.7);
+  donate.center = CGPointMake(v.bounds.size.width*0.5, v.bounds.size.height * 0.7);
   support.center = CGPointMake(v.bounds.size.width*0.8, v.bounds.size.height * 0.7);
 
   [v addSubview:donate];

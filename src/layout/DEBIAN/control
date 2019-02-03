@@ -1,0 +1,9 @@
+Package: ca.ndoizo.masq
+Name: MASQKit
+Depends: preferenceloader
+Version: 1.0a
+Architecture: iphoneos-arm
+Description: Core functionality & preference management for MASQKit extensions.
+Maintainer: candoizo
+Author: candoizo
+Section: Core

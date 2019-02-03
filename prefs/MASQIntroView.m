@@ -1,11 +1,11 @@
 #import "MASQIntroView.h"
-#import "../src/MASQThemeManager.h"
+#import "../src/MASQHousekeeper.h"
 
-static NSString * const kWelcome = @"Welcome to MASQ²";
-static NSString * const kDesc = @"A powerful music aesthetic enhancer for iOS!";
-static NSString * const kSectionOne = @"Customize your look with creative themes from amazing designers";
+static NSString * const kWelcome = @"Welcome to MASQKit";
+static NSString * const kDesc = @"An versatile runtime library for customizing media players on iOS!";
+static NSString * const kSectionOne = @"Customize your setup with creative themes from amazing designers";
 static NSString * const kSectionTwo = @"Peep your music at it's best without compromising performance";
-static NSString * const kSectionThree = @"Plugins let you bring the experience everywhere";
+static NSString * const kSectionThree = @"Extensions let you bring the experience everywhere";
 
 @implementation MASQIntroView
 -(id)init {
@@ -45,24 +45,24 @@ static NSString * const kSectionThree = @"Plugins let you bring the experience e
   if (arg1) {
     UIImageView * iv = [[UIImageView alloc] initWithFrame:CGRectMake(0,0 ,sec.bounds.size.height/1.82, sec.bounds.size.height/1.82)];
     iv.image = arg1;
-    iv.center = sec.center;
+    iv.center = CGPointMake(sec.bounds.size.width * 0.25,sec.center.y);
     [sec addSubview:iv];
   }
 
   if (arg2) {
     UILabel * label = [[UILabel alloc] initWithFrame:CGRectMake(0,0,sec.frame.size.width/2, sec.frame.size.height)];
-  	label.font = [label.font fontWithSize:14];
+  	label.font = [label.font fontWithSize:13];
   	label.textColor = [UIColor.blackColor colorWithAlphaComponent:0.55];
   	label.numberOfLines = 0;
   	label.text = arg2;
-    label.center = sec.center;
+    label.center = CGPointMake(sec.bounds.size.width * 0.75,sec.center.y);
     [sec addSubview:label];
   }
   return sec;
 }
 
 -(id)welcomeLabel {
-  CGRect f = CGRectMake(0, self.bounds.size.height/7, self.bounds.size.width, 30);
+  CGRect f = CGRectMake(0, self.bounds.size.height/6.5, self.bounds.size.width, 30);
   UILabel * welcome = [[UILabel alloc] initWithFrame:f];
 	welcome.font = [UIFont fontWithName:@".SFUIDisplay-Light" size:28];
 	welcome.textColor = [UIColor.blackColor colorWithAlphaComponent:0.8];
@@ -86,7 +86,7 @@ static NSString * const kSectionThree = @"Plugins let you bring the experience e
 
 -(id)continueButton {
   UIButton * cont = [[UIButton alloc] initWithFrame:CGRectMake(0, self.bounds.size.height *0.85, self.bounds.size.width/1.4 , self.bounds.size.width/8)];
-	cont.backgroundColor = [UIColor colorWithRed:0.87 green:0.25 blue:0.40 alpha:1.0];
+	cont.backgroundColor = [NSClassFromString(@"MASQHousekeeper") masqTintWithAlpha:0.9];
 	cont.layer.masksToBounds = YES;
 	cont.layer.cornerRadius = 10;
 	cont.center = CGPointMake(self.center.x, cont.center.y);
@@ -96,7 +96,7 @@ static NSString * const kSectionThree = @"Plugins let you bring the experience e
 }
 
 -(void)dismiss {
-	[[NSClassFromString(@"MASQThemeManager") sharedPrefs] setBool:YES forKey:@"firstTime"];
+	[[NSClassFromString(@"MASQHousekeeper") sharedPrefs] setBool:YES forKey:@"firstTime"];
 	 [UIView animateWithDuration:.35 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
 				self.alpha = 0;
 			}  completion:^(BOOL finished) {

@@ -1,13 +1,40 @@
-src:
-
-prefs: share extension nneds to go above!
-
-ios 10; test / background styling
+ios 10; CC background doesnt update
 
 maize: test
 
-ios 11: FIX BG not updating with skips
+music: consider fade
 
-music: hide after show
+spotify : rap caviar bug (FUCKED UP WHACK)
 
-spotify : premium genius bug
+ReadMe:
+
+MASQArtworkView Public Documentation / Usage:
+
+-(id)initWithThemeKey:(NSString *)key frameHost:(UIView *)host imageHost(UIImageView *)imgView;
+
+"key" represents the theme key as a string in which the artwork view registers itself to listen for updates to the user's configured theme.
+Recommmended Keys fp
+
+"frameHost" represents the view's frame you would like to follow, with greater needs than a plain CGRect,
+generally this would be the UIImageView with your artwork/ the highest super in your stack that matches the artwork view frame.
+
+"imageHost", rather straightforward is the UIImageView which contains the artwork image already, a handy helper to our own purposes.
+
+For some convoluted situations, you may find yourself in-need of private methods to achieve your ideal result.
+I am happy to expand on their usage in corressondence at masqsubmissions @ gmail . com ,
+but are cautiously without guaruntee to works the same way and therefore not recommended/supported for long-term stability / expectations.
+
+MASQBlurredImageView Public Documentation / Usage:
+
+-(id)initWithThemeKey:(NSString *)key;
+
+"key" similar to above, represents the key associated with the desired style for this view.
+
+Else, it is recommended you utilize one of the two current supported keys from the Core Preferences, and direct users accordingly;
+@"CC" /* Control Center type plugins */ @"LS" /*  Lockscreen type plugins */
+
+-(void)updateThemeForStyle:(int)
+
+Thanks for your interest, and submit plugins for official co-maintenence at masqsubmissions @ gmail . com ,
+you are always welcome to forge your own path but for the occasional low-maintence tweak I'm happy to collaborate & expand the audience
+to your plugin if appropriate for mass-adoption.

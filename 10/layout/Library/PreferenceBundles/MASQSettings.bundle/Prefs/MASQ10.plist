@@ -1,0 +1,10 @@
+items = (
+    {
+       cell = PSLinkCell;
+       cellClass = MASQSubPageLinkCell;
+       iconBundle = "com.apple.Preferences";
+       label = "SpringBoard (iOS 10)";
+       detail = MASQSubPageController;
+       specs = MASQ10.page;
+    }
+);

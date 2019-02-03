@@ -1,5 +1,4 @@
 #import "../src/MASQArtworkView.h"
-#import "dlfcn.h"
 
 @interface MZEMediaMetaDataView : UIView
 @property (nonatomic, retain) MASQArtworkView * masqArtwork;
@@ -12,7 +11,7 @@
 
 %ctor {
     dlopen("/Library/Maize/Bundles/com.ioscreatix.maize.MediaModule.bundle/MediaModule", RTLD_NOW);
-    if (!%c(MASQArtworkView)) dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
+    if (!%c(MASQHousekeeper)) dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
 }
 
 %hook MZEMediaMetaDataView
@@ -30,7 +29,7 @@
   %orig;
   if (self.masqArtwork) {
     self.masqArtwork.hidden = !self.expanded;
-    for (UIView * v in self.masqArtwork.frameHost.subviews) {v.hidden = YES;} //workaround reshowing background
+    if (!self.masqArtwork.disabled) for (UIView * v in self.masqArtwork.frameHost.subviews) {v.hidden = YES;} //workaround reshowing background andy pls tell me direct view tho thxbro
   }
 }
 %end

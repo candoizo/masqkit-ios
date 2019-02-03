@@ -5,4 +5,5 @@
 -(id)effectViewWithEffect:(id)arg1;
 -(void)updateEffectWithKey;
 -(void)updateEffectWithStyle:(int)arg1;
+-(void)loadArtwork;
 @end

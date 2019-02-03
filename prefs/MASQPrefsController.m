@@ -1,37 +1,65 @@
-#import "PrefUtils.h"
 #import "MASQPrefsController.h"
 #import "MASQLocalizer.h"
 #import "MASQIntroView.h"
 #import "MASQHeaderView.h"
 #import "MASQSocialExtendedController.h"
-#import "../src/MASQThemeManager.h"
+#import "../src/MASQHousekeeper.h"
 
 @implementation MASQPrefsController
 +(void)clearPrefs { [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:@"ca.ndoizo.masq"]; }
 
 - (NSArray *)specifiers {
 	if (!_specifiers)	{
-		_specifiers = [self loadSpecifiersFromPlistName:@"Root" target:self];
+		NSMutableArray * root = [[self loadSpecifiersFromPlistName:@"Root" target:self] mutableCopy];
+		NSMutableArray * subprefs = [self buildForeignPrefs];
+		!subprefs.count ? [self popMissingAlert] : [root addObjectsFromArray:subprefs];
+		_specifiers = root;
 		[NSClassFromString(@"MASQLocalizer") parseSpecifiers:_specifiers];
 	}
 	return _specifiers;
 }
 
+-(NSMutableArray *)buildForeignPrefs {
+	NSString * subpath = [NSString stringWithFormat:@"%@/Prefs/", [self bundle].bundlePath];
+	NSMutableArray * plugins = [NSMutableArray new];
+	for (NSString * list in [NSFileManager.defaultManager contentsOfDirectoryAtPath:subpath error:nil]) {
+		if (![list hasSuffix:@"page.plist"]) [plugins addObjectsFromArray:[self loadSpecifiersFromPlistName:[NSString stringWithFormat:@"Prefs/%@", [list stringByDeletingPathExtension]] target:self]];
+	}
+	return plugins;
+}
+
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	self.prefs = [NSClassFromString(@"MASQThemeManager") sharedPrefs];
+	self.prefs = [NSClassFromString(@"MASQHousekeeper") sharedPrefs];
 	self.navigationItem.rightBarButtonItem = [self loveButton];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-	//obv fix before release
-	if ([self.prefs boolForKey:@"firstTime"]) [self.prefs setBool:NO forKey:@"firstTime"];
+	if ([self.prefs boolForKey:@"firstTime"]) [self.prefs setBool:NO forKey:@"firstTime"]; 	//obv fix before release
 	else [self.view addSubview:[[MASQIntroView alloc] init]];
 
 	[super viewWillAppear:animated];
 	[self reloadSpecifiers];
-	self.navigationController.navigationController.navigationBar.barTintColor = kCustomTint;
+	self.navigationController.navigationController.navigationBar.barTintColor = [NSClassFromString(@"MASQHousekeeper") masqTintWithAlpha:1];
 	self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
+}
+
+-(void)popMissingAlert {
+			UIAlertController * alert=   [UIAlertController alertControllerWithTitle:@"No Plug-Ins Detected!"
+			message:@"MASQKit found no Plug-Ins installed on your device, and therefore has no options to offer you, yet! \n\n Visit https://candoizo.gitlab.io/masq to download a few (save a trip by grabbing a theme pack as well)!"
+			preferredStyle:UIAlertControllerStyleAlert];
+
+			UIAlertAction* cancel = [NSClassFromString(@"UIAlertAction") actionWithTitle:@"Dismiss" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * action){
+																[alert dismissViewControllerAnimated:YES completion:nil];
+															}];
+
+			UIAlertAction* repo = [NSClassFromString(@"UIAlertAction") actionWithTitle:@"Open in Cydia" style:UIAlertActionStyleCancel handler:^(UIAlertAction * action){
+															[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"cydia://url/https://cydia.saurik.com/api/share#?source=https://candoizo.gitlab.io/masq/"]];
+															}];
+
+			[alert addAction:repo];
+			[alert addAction:cancel];
+			[self presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -45,8 +73,8 @@
 		CGFloat sectionH = [self tableView:tableView heightForHeaderInSection:section];
 		return [[MASQHeaderView alloc]
 		initWithFrame:CGRectMake(0,0,self.view.bounds.size.width, sectionH)
-		tweakTitle:@"MASQ²"
-		iconImage:[self imageFromPrefsWithName:@"Icon"]];
+		tweakTitle:@"MASQ"
+		iconImage:[self imageFromPrefsWithName:@"Assets/Icon"]];
 	}
 	else return [super tableView:tableView viewForHeaderInSection:section];
 }
@@ -71,11 +99,11 @@
 				}
 			}
 		}];
-
-		[self presentViewController:contr animated:YES completion:nil];
+	[self presentViewController:contr animated:YES completion:nil];
+	[contr showPlatter];
 }
 
 -(UIImage *)imageFromPrefsWithName:(NSString *)n {
-	return [UIImage imageNamed:n inBundle:[NSBundle bundleWithPath:@"/Library/PreferenceBundles/MASQPrefs.bundle"]];
+	return [UIImage imageNamed:n inBundle:[self bundle]];
 }
 @end

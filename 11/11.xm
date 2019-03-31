@@ -69,14 +69,14 @@
 
 -(id)artworkBackgroundView {return nil;}
 
--(void)layoutSubviews {
-  %orig;
-  self.artworkView.hidden = !self.masqArtwork.disabled;
-}
+// -(void)layoutSubviews {
+//   %orig;
+//   self.artworkView.hidden = !self.masqArtwork.disabled;
+// }
 
 -(id)artworkView {
   UIView * orig = %orig;
-  orig.hidden = YES;
+  orig.hidden = self.masqArtwork.currentTheme ? YES : NO;
   return orig;
 }
 %end

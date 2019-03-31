@@ -25,6 +25,49 @@
   return self;
 }
 
+-(void)wantsHostsVisible:(BOOL)arg1 {
+  self.imageHost.hidden = !arg1;
+  self.imageHost.alpha = arg1;
+}
+
+#define arrayContainsKindOfClass(a, c) [a filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self isKindOfClass: %@", c]]
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+  // UIView * frameHost = self.frameHost;
+  if (self.disabled)
+  {
+    // opposite visibility
+    [self wantsHostsVisible:YES];
+    return; //exit because we're disabled so theres nothing to do
+  }
+  // if not disabled, lets check that the themes match & update if not
+  if ([MASQThemeManager themeBundleForKey:self.identifier] != self.currentTheme)
+  [self updateTheme];
+
+  // perhaps I could put the wantsHostsVisible part here
+
+  if ([keyPath isEqualToString:@"frame"])
+  { //if the frames of our host change
+    // if ours isnt already matching the frame host, update it!
+    if (!CGRectEqualToRect(self.frameHost.frame, self.frame)) [self updateFrame];
+
+    //since we arent disabled, we should call stuff to hide our image host
+    // also maybe this can be called before the If "frame"
+    [self wantsHostsVisible:NO];
+
+  }
+
+  else if ([keyPath isEqualToString:@"image"])
+  {
+    UIImageView * imageHost = self.imageHost;
+    if (imageHost.image.hash != self.hashCache)
+    {
+      self.hashCache = imageHost.image.hash;
+      [self updateArtwork:imageHost.image];
+    }
+  }
+}
+
 -(void)themeUpdating {
   if (self.currentTheme)
   {
@@ -88,7 +131,7 @@
 -(void)updateArtwork:(UIImage *)img {
     if ([img isKindOfClass:_c(@"UIImage")]) self.artworkImageView.image = img;
     else if ([self.imageHost isKindOfClass:_c(@"UIImageView")]) self.artworkImageView.image = self.imageHost.image;
-    else HBLogError(@"imageHost is not type UIImageView, and no UIImage was offered so artwork was NOT updated.");
+    else HBLogError(@"imageHost is not type UIImageView, and no UIImage was offered so artwork is NOT being updated, perhaps you will need a different imageHost?");
 }
 
 -(void)setImageHost:(id)arg1 {
@@ -109,42 +152,11 @@
  }
 }
 
-#define arrayContainsKindOfClass(a, c) [a filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self isKindOfClass: %@", c]]
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-
-  self.imageHost.hidden = !self.disabled;
-  if (self.disabled) return;
-  if ([MASQThemeManager themeBundleForKey:self.identifier] != self.currentTheme)
-  [self updateTheme];
-
-  // below is scary
-  if ([keyPath isEqualToString:@"frame"]) {
-    if (!CGRectEqualToRect(self.frameHost.frame, self.frame)) [self updateFrame];
-    //should keep the original imageHost hidden
-    if (self.imageHost) {
-      self.imageHost.hidden = YES;
-      self.imageHost.alpha = 0;
-
-      //if the frame contains our masq artwork, the frameHost cannot be obscured and requires special attention
-      if (!arrayContainsKindOfClass(self.frameHost.subviews, self.class)) {
-        self.frameHost.hidden = YES;
-        self.frameHost.alpha = 0;
-      }
-    }
-  }
-  else if ([keyPath isEqualToString:@"image"]) {
-      if (self.imageHost.image.hash != self.hashCache) {
-        self.hashCache = self.imageHost.image.hash;
-        [self updateArtwork:self.imageHost.image];
-    }
-  }
-}
-
 -(float)ratio {
    return self.currentTheme ? [[[[self.currentTheme bundlePath] lastPathComponent] componentsSeparatedByString:@"@"].lastObject floatValue] / 100 : 1;
 }
 
+// layers
 -(id)containerView {
    UIView * c = [[UIView alloc] initWithFrame:self.bounds];
    c.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight; //resize to super width
@@ -160,6 +172,13 @@
    return _containerView = c;
 }
 
+-(id)underlayView {
+   UIButton * u = [[UIButton alloc] initWithFrame:self.bounds];
+   u.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight; //resize to super width
+   u.center = self.center;
+   return _underlayView = u;
+}
+
 -(id)overlayView {
    _overlayView = [[UIButton alloc] initWithFrame:self.bounds];
    [_overlayView addTarget:self action:@selector(tapArtwork:) forControlEvents:UIControlEventTouchUpInside];
@@ -168,28 +187,30 @@
    return _overlayView;
 }
 
--(id)underlayView {
-   UIButton * u = [[UIButton alloc] initWithFrame:self.bounds];
-   u.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight; //resize to super width
-   u.center = self.center;
-   return _underlayView = u;
-}
-
 -(void)tapArtwork:(id)sender {
-  if (_c(@"SBMediaController"))
+  if (_c(@"SBMediaController") && [UIApplication.sharedApplication respondsToSelector:@selector(launchApplicationWithIdentifier:suspended:)])
   [UIApplication.sharedApplication launchApplicationWithIdentifier:MASQMediaStateManager.playerBundleID suspended:NO];
 }
 
+/// images
 -(UIImage *)maskImage {
-   return self.currentTheme ? [UIImage imageWithContentsOfFile:[self.currentTheme pathForResource:@"Mask" ofType:@"png"]] : nil;
+   return self.currentTheme ?
+   [UIImage imageWithContentsOfFile:[self.currentTheme pathForResource:@"Mask" ofType:@"png"]]
+   : nil;
 }
 
--(UIImage *)overlayImage {
-   return self.currentTheme ? [UIImage imageWithContentsOfFile:[self.currentTheme pathForResource:@"Overlay" ofType:@"png"]] : nil;
+-(UIImage *)overlayImage
+{
+   return self.currentTheme ?
+   [UIImage imageWithContentsOfFile:[self.currentTheme pathForResource:@"Overlay" ofType:@"png"]]
+   : nil;
 }
 
--(UIImage *)underlayImage {
-   return self.currentTheme ? [UIImage imageWithContentsOfFile:[self.currentTheme pathForResource:@"Underlay" ofType:@"png"]] : nil;
+-(UIImage *)underlayImage
+{
+   return self.currentTheme ?
+   [UIImage imageWithContentsOfFile:[self.currentTheme pathForResource:@"Underlay" ofType:@"png"]]
+   : nil;
 }
 
 // -(BOOL)themeUpdated {

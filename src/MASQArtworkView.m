@@ -31,6 +31,8 @@
     ((UIImageView *)_containerView.maskView).image = [self maskImage];
     [_overlayView setBackgroundImage:[self overlayImage] forState:UIControlStateNormal];
     [_underlayView setBackgroundImage:[self underlayImage] forState:UIControlStateNormal];
+    float ratio = [self ratio];
+    _artworkImageView.transform = CGAffineTransformMakeScale(ratio, ratio);
   }
 }
 
@@ -72,25 +74,47 @@
 
 -(void)updateFrame {
   float ratio = [self ratio];
-  HBLogWarn(@"%f", ratio);
-  if (self.frameHost.bounds.size.width >= UIScreen.mainScreen.bounds.size.width || self.frameHost.bounds.size.width >= UIScreen.mainScreen.bounds.size.height) {
-     // HBLogWarn(@"width of artwork view is bigger than screen, arbitrarily centering.");
-     [UIView animateWithDuration:0/*CGRectEqualToRect(self.frame, CGRectZero) ? 0 : 0.3*/ animations:^{
-        self.bounds = CGRectMake(0,0,self.frameHost.bounds.size.width/1.5,self.frameHost.bounds.size.width/1.5);
-        self.center = CGPointMake(UIScreen.mainScreen.bounds.size.width/2, self.frameHost.center.y-100);
-        self.containerView.maskView.frame = _containerView.frame;
-        self.artworkImageView.bounds = CGRectMake(_containerView.bounds.origin.x,_containerView.bounds.origin.y,self.bounds.size.width * [self ratio], self.frame.size.height * [self ratio]);
-        self.artworkImageView.center = _containerView.center;
-      } completion:nil];
-  } else {
-      [UIView animateWithDuration:0/*CGRectEqualToRect(self.frame, CGRectZero) ? 0 : 0.3*/ animations:^{
-        self.bounds = self.frameHost.bounds;
-        self.center = self.frameHost.center;
-        _containerView.maskView.frame = _containerView.frame;
-        _artworkImageView.bounds = CGRectMake(_containerView.bounds.origin.x,_containerView.bounds.origin.y,self.bounds.size.width * [self ratio], self.frame.size.height * [self ratio]);
-        _artworkImageView.center = _containerView.center;
-      } completion:nil];
-  }
+  [UIView animateWithDuration:0/*CGRectEqualToRect(self.frame, CGRectZero) ? 0 : 0.3*/ animations:^
+  {
+    self.bounds = self.frameHost.bounds;
+    self.center = self.frameHost.center;
+    _containerView.maskView.frame = _containerView.frame;
+    int ow = _containerView.frame.size.width * ratio;
+
+    int offset = _containerView.frame.size.width - ow;
+      HBLogWarn(@"ow %d", offset);
+    // CGRect imgRect = CGRectMake(
+    //    _containerView.frame.size.width - ow, _containerView.frame.size.width - ow,
+    //   ow, ow
+    // );
+    // _artworkImageView.frame = imgRect;
+    _artworkImageView.bounds = _containerView.bounds;
+    _artworkImageView.center = _containerView.center;
+    _artworkImageView.transform = CGAffineTransformMakeScale(ratio, ratio);
+
+    // CGRectMake(_containerView.bounds.origin.x,_containerView.bounds.origin.y,self.bounds.size.width * [self ratio], self.frame.size.height * [self ratio]);
+    // _artworkImageView.center = _containerView.center;
+  } completion:nil];
+
+  // HBLogWarn(@"%f", ratio);
+  // if (self.frameHost.bounds.size.width >= UIScreen.mainScreen.bounds.size.width || self.frameHost.bounds.size.width >= UIScreen.mainScreen.bounds.size.height) {
+  //    // HBLogWarn(@"width of artwork view is bigger than screen, arbitrarily centering.");
+  //    [UIView animateWithDuration:0/*CGRectEqualToRect(self.frame, CGRectZero) ? 0 : 0.3*/ animations:^{
+  //       self.bounds = CGRectMake(0,0,self.frameHost.bounds.size.width/1.5,self.frameHost.bounds.size.width/1.5);
+  //       self.center = CGPointMake(UIScreen.mainScreen.bounds.size.width/2, self.frameHost.center.y-100);
+  //       self.containerView.maskView.frame = _containerView.frame;
+  //       self.artworkImageView.bounds = CGRectMake(_containerView.bounds.origin.x,_containerView.bounds.origin.y,self.bounds.size.width * [self ratio], self.frame.size.height * [self ratio]);
+  //       self.artworkImageView.center = _containerView.center;
+  //     } completion:nil];
+  // } else {
+  //     [UIView animateWithDuration:0/*CGRectEqualToRect(self.frame, CGRectZero) ? 0 : 0.3*/ animations:^{
+  //       self.bounds = self.frameHost.bounds;
+  //       self.center = self.frameHost.center;
+  //       _containerView.maskView.frame = _containerView.frame;
+  //       _artworkImageView.bounds = CGRectMake(_containerView.bounds.origin.x,_containerView.bounds.origin.y,self.bounds.size.width * [self ratio], self.frame.size.height * [self ratio]);
+  //       _artworkImageView.center = _containerView.center;
+  //     } completion:nil];
+  // }
 }
 
 -(void)updateArtwork:(UIImage *)img {

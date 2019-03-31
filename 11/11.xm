@@ -50,16 +50,17 @@
   // 0x1 mini thing visible
 }
 
-// -(void)setMediaControlsPlayerState:(long long)arg1 {
-//   %orig;
-//   %log;
-// }
-//
 -(void)viewWillAppear:(BOOL)arg1 { //cc present
   %orig;
   if (self.headerView.masqArtwork)
   [self.headerView.masqArtwork updateTheme];
 }
+
+// -(void)setMediaControlsPlayerState:(long long)arg1 {
+//   %orig;
+//   %log;
+// }
+//
 %end
 
 %hook MediaControlsHeaderView
@@ -71,5 +72,11 @@
 -(void)layoutSubviews {
   %orig;
   self.artworkView.hidden = !self.masqArtwork.disabled;
+}
+
+-(id)artworkView {
+  UIView * orig = %orig;
+  orig.hidden = YES;
+  return orig;
 }
 %end

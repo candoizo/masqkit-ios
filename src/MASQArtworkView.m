@@ -1,5 +1,6 @@
 #import "MASQArtworkView.h"
 #import "MASQHousekeeper.h"
+#import "MASQThemeManager.h"
 
 #define _c(c) NSClassFromString(c)
 
@@ -23,34 +24,77 @@
   return self;
 }
 
--(void)updateTheme {
-  if (self.identifier) {
-        NSString * theme = [[_c(@"MASQHousekeeper") sharedPrefs] valueForKey:self.identifier];
-        if (!theme) { //maybe sandboxed
-          NSString *plistPath = [[NSBundle bundleWithPath:@"/private/var/mobile/Library/Preferences/"] pathForResource:@"ca.ndoizo.masq" ofType:@"plist"];
-          theme = [NSDictionary dictionaryWithContentsOfFile:plistPath][self.identifier];
-        }
-        if (self.disabled && self.currentTheme) {
-          self.currentTheme = nil;
-          HBLogDebug(@"updateTheme\n self.disabled = YES, setting shit visible");
-          ((UIImageView *)_containerView.maskView).image = nil;
-          [_overlayView setBackgroundImage:nil forState:UIControlStateNormal];
-          [_underlayView setBackgroundImage:nil forState:UIControlStateNormal];
-          self.imageHost.alpha = 1;
-          self.imageHost.hidden = NO;
-          self.frameHost.alpha  = 1;
-          self.frameHost.hidden = NO;
-          return;
-        }
-        self.currentTheme = [NSBundle bundleWithURL:[[self themePath] URLByAppendingPathComponent:theme]];
-        if (self.currentTheme) {
-            ((UIImageView *)_containerView.maskView).image = [self maskImage];
-            [_overlayView setBackgroundImage:[self overlayImage] forState:UIControlStateNormal];
-            [_underlayView setBackgroundImage:[self underlayImage] forState:UIControlStateNormal];
-        }
-        else HBLogError(@"Could not apply theme, does the themeKey hold a theme value that matches an existing theme? %@ ", theme);
+-(void)themeUpdating {
+  if (self.currentTheme)
+  {
+    ((UIImageView *)_containerView.maskView).image = [self maskImage];
+    [_overlayView setBackgroundImage:[self overlayImage] forState:UIControlStateNormal];
+    [_underlayView setBackgroundImage:[self underlayImage] forState:UIControlStateNormal];
   }
-  else HBLogError(@"A themeKey was not supplied, please refer to documentation.");
+}
+
+-(void)forceDisable {
+  if (self.disabled)
+  {
+    self.currentTheme = nil;
+    HBLogDebug(@"updateTheme\n self.disabled = YES, setting shit visible");
+    ((UIImageView *)_containerView.maskView).image = nil;
+    [_overlayView setBackgroundImage:nil forState:UIControlStateNormal];
+    [_underlayView setBackgroundImage:nil forState:UIControlStateNormal];
+    self.imageHost.alpha = 1;
+    self.imageHost.hidden = NO;
+    self.frameHost.alpha  = 1;
+    self.frameHost.hidden = NO;
+  }
+}
+
+-(void)updateTheme {
+  if (self.identifier)
+  {
+    NSBundle * currentTheme = [MASQThemeManager themeBundleForKey:self.identifier];
+    if (currentTheme == self.currentTheme) return;
+
+    if ([[currentTheme.bundlePath lastPathComponent] isEqualToString:@"Disabled"] || !currentTheme)
+    {
+      HBLogDebug(@"No theme chosen? %@", currentTheme);
+      self.currentTheme = nil;
+      self.disabled = YES;
+      [self forceDisable];
+      return;
+    }
+    // must have chosen a theme
+    if (self.disabled) self.disabled = NO;
+    self.currentTheme = currentTheme;
+    [self themeUpdating];
+  }
+  // if (self.identifier) {
+  //   // self.currentTheme = [MASQThemeManager themeForKey:self.ide]
+  //       NSString * theme = [[_c(@"MASQHousekeeper") sharedPrefs] valueForKey:self.identifier];
+  //       if (!theme) { //maybe sandboxed
+  //         NSString *plistPath = [[NSBundle bundleWithPath:@"/private/var/mobile/Library/Preferences/"] pathForResource:@"ca.ndoizo.masq" ofType:@"plist"];
+  //         theme = [NSDictionary dictionaryWithContentsOfFile:plistPath][self.identifier];
+  //       }
+  //       if (self.disabled && self.currentTheme) {
+  //         self.currentTheme = nil;
+  //         HBLogDebug(@"updateTheme\n self.disabled = YES, setting shit visible");
+  //         ((UIImageView *)_containerView.maskView).image = nil;
+  //         [_overlayView setBackgroundImage:nil forState:UIControlStateNormal];
+  //         [_underlayView setBackgroundImage:nil forState:UIControlStateNormal];
+  //         self.imageHost.alpha = 1;
+  //         self.imageHost.hidden = NO;
+  //         self.frameHost.alpha  = 1;
+  //         self.frameHost.hidden = NO;
+  //         return;
+  //       }
+  //       self.currentTheme = [NSBundle bundleWithURL:[[self themePath] URLByAppendingPathComponent:theme]];
+  //       if (self.currentTheme) {
+  //           ((UIImageView *)_containerView.maskView).image = [self maskImage];
+  //           [_overlayView setBackgroundImage:[self overlayImage] forState:UIControlStateNormal];
+  //           [_underlayView setBackgroundImage:[self underlayImage] forState:UIControlStateNormal];
+  //       }
+  //       else HBLogError(@"Could not apply theme, does the themeKey hold a theme value that matches an existing theme? %@ ", theme);
+  // }
+  // else HBLogError(@"A themeKey was not supplied, please refer to documentation.");
 }
 
 -(void)updateFrame {
@@ -102,9 +146,6 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 
-  BOOL updated = [self themeUpdated];
-  HBLogDebug(@"Was the theme updated ? %@ \n\nSet theme name is %@ \nRequested theme name for value is %@", updated ? @"YES" : @"NO", self.currentTheme.resourcePath.lastPathComponent, [MASQHousekeeper.sharedPrefs valueForKey:self.identifier]);
-  if (updated) [self updateTheme];
   if (self.disabled) return;
 
   if ([keyPath isEqualToString:@"frame"]) {
@@ -122,7 +163,6 @@
       }
     }
   }
-
   else if ([keyPath isEqualToString:@"image"]) {
       if (self.imageHost.image.hash != self.hashCache) {
         self.hashCache = self.imageHost.image.hash;

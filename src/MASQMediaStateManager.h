@@ -1,9 +1,10 @@
-@interface MASQMediaStateManager
-+(id)sharedInstance;
-+(BOOL)artworkChanging;
+@interface MASQMediaStateManager : NSObject
++(NSString *)playerBundleID;
+// +(id)sharedInstance;
+// +(BOOL)artworkChanging;
 
 
-+(NSArray *)listeners;
-+(NSArray *)infoChangedListeners;
-+(NSArray *)
+// +(NSArray *)listeners;
+// +(NSArray *)infoChangedListeners;
+// +(NSArray *)
 @end

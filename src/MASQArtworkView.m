@@ -1,6 +1,7 @@
 #import "MASQArtworkView.h"
 #import "MASQHousekeeper.h"
 #import "MASQThemeManager.h"
+#import "MASQMediaStateManager.h"
 
 #define _c(c) NSClassFromString(c)
 
@@ -67,37 +68,11 @@
     self.currentTheme = currentTheme;
     [self themeUpdating];
   }
-  // if (self.identifier) {
-  //   // self.currentTheme = [MASQThemeManager themeForKey:self.ide]
-  //       NSString * theme = [[_c(@"MASQHousekeeper") sharedPrefs] valueForKey:self.identifier];
-  //       if (!theme) { //maybe sandboxed
-  //         NSString *plistPath = [[NSBundle bundleWithPath:@"/private/var/mobile/Library/Preferences/"] pathForResource:@"ca.ndoizo.masq" ofType:@"plist"];
-  //         theme = [NSDictionary dictionaryWithContentsOfFile:plistPath][self.identifier];
-  //       }
-  //       if (self.disabled && self.currentTheme) {
-  //         self.currentTheme = nil;
-  //         HBLogDebug(@"updateTheme\n self.disabled = YES, setting shit visible");
-  //         ((UIImageView *)_containerView.maskView).image = nil;
-  //         [_overlayView setBackgroundImage:nil forState:UIControlStateNormal];
-  //         [_underlayView setBackgroundImage:nil forState:UIControlStateNormal];
-  //         self.imageHost.alpha = 1;
-  //         self.imageHost.hidden = NO;
-  //         self.frameHost.alpha  = 1;
-  //         self.frameHost.hidden = NO;
-  //         return;
-  //       }
-  //       self.currentTheme = [NSBundle bundleWithURL:[[self themePath] URLByAppendingPathComponent:theme]];
-  //       if (self.currentTheme) {
-  //           ((UIImageView *)_containerView.maskView).image = [self maskImage];
-  //           [_overlayView setBackgroundImage:[self overlayImage] forState:UIControlStateNormal];
-  //           [_underlayView setBackgroundImage:[self underlayImage] forState:UIControlStateNormal];
-  //       }
-  //       else HBLogError(@"Could not apply theme, does the themeKey hold a theme value that matches an existing theme? %@ ", theme);
-  // }
-  // else HBLogError(@"A themeKey was not supplied, please refer to documentation.");
 }
 
 -(void)updateFrame {
+  float ratio = [self ratio];
+  HBLogWarn(@"%f", ratio);
   if (self.frameHost.bounds.size.width >= UIScreen.mainScreen.bounds.size.width || self.frameHost.bounds.size.width >= UIScreen.mainScreen.bounds.size.height) {
      // HBLogWarn(@"width of artwork view is bigger than screen, arbitrarily centering.");
      [UIView animateWithDuration:0/*CGRectEqualToRect(self.frame, CGRectZero) ? 0 : 0.3*/ animations:^{
@@ -146,11 +121,14 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 
+  self.imageHost.hidden = !self.disabled;
   if (self.disabled) return;
+  if ([MASQThemeManager themeBundleForKey:self.identifier] != self.currentTheme)
+  [self updateTheme];
 
+  // below is scary
   if ([keyPath isEqualToString:@"frame"]) {
     if (!CGRectEqualToRect(self.frameHost.frame, self.frame)) [self updateFrame];
-
     //should keep the original imageHost hidden
     if (self.imageHost) {
       self.imageHost.hidden = YES;
@@ -171,23 +149,19 @@
   }
 }
 
--(NSURL *)themePath {
-   return [NSURL fileURLWithPath:@"/Library/Application Support/MASQ/Themes"];
-}
-
 -(float)ratio {
    return self.currentTheme ? [[[[self.currentTheme bundlePath] lastPathComponent] componentsSeparatedByString:@"@"].lastObject floatValue] / 100 : 1;
 }
 
--(BOOL)themeUpdated {
-  NSString * theme = [MASQHousekeeper.sharedPrefs valueForKey:self.identifier];
-  self.disabled = [theme hasPrefix:@"Disabled"];
-  return ![self.currentTheme.resourcePath.lastPathComponent isEqualToString:theme];
-}
+// -(BOOL)themeUpdated {
+//   NSString * theme = [MASQHousekeeper.sharedPrefs valueForKey:self.identifier];
+//   self.disabled = [theme hasPrefix:@"Disabled"];
+//   return ![self.currentTheme.resourcePath.lastPathComponent isEqualToString:theme];
+// }
 
 -(void)tapArtwork:(id)sender {
   if (_c(@"SBMediaController"))
-  [UIApplication.sharedApplication launchApplicationWithIdentifier:[_c(@"SBMediaController") sharedInstance].nowPlayingApplication.bundleIdentifier suspended:NO];
+  [UIApplication.sharedApplication launchApplicationWithIdentifier:MASQMediaStateManager.playerBundleID suspended:NO];
 }
 
 -(id)containerView {

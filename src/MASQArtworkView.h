@@ -27,9 +27,8 @@
 -(void)updateFrame;
 -(void)updateArtwork:(UIImage *)img;
 
--(NSURL *)themePath;
 -(float)ratio;
--(BOOL)themeUpdated;
+// -(BOOL)themeUpdated;
 
 -(UIView *)containerView;
 -(UIButton *)overlayView;

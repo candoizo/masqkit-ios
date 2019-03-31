@@ -1,13 +1,3 @@
-ios 10; CC background doesnt update
-
-maize: test
-
-music: consider fade
-
-spotify : rap caviar bug (FUCKED UP WHACK)
-
-ReadMe:
-
 MASQArtworkView Public Documentation / Usage:
 
 -(id)initWithThemeKey:(NSString *)key frameHost:(UIView *)host imageHost(UIImageView *)imgView;

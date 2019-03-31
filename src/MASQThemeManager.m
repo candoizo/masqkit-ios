@@ -5,8 +5,6 @@
 +(NSBundle *)themeBundleForKey:(NSString *)arg1 {
   if (!arg1) return nil;
 
-  NSURL * themeD = [self themeDir];
-  HBLogDebug(@"%@", themeD);
   NSUserDefaults * prefs = [NSClassFromString(@"MASQHousekeeper") sharedPrefs];
   NSString * themeId = nil;
   if ([prefs valueForKey:arg1])
@@ -18,10 +16,7 @@
     return nil;
   }
 
-  NSURL * tPath = [themeD URLByAppendingPathComponent:themeId];
-  HBLogDebug(@"%@", tPath);
-  // if (key isEqualToString:@"Disabled")
-  // check this from the returned bundle
+  NSURL * tPath = [[self themeDir] URLByAppendingPathComponent:themeId];
   return [NSBundle bundleWithURL:tPath];
 }
 

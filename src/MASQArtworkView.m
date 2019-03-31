@@ -34,12 +34,12 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
   // UIView * frameHost = self.frameHost;
-  if (self.disabled && !self.currentTheme)
-  {
-    // opposite visibility
-    [self wantsHostsVisible:YES];
-    return; //exit because we're disabled so theres nothing to do
-  }
+  // if (self.disabled && !self.currentTheme)
+  // {
+  //   // opposite visibility
+  //   [self wantsHostsVisible:YES];
+  //   return; //exit because we're disabled so theres nothing to do
+  // }
   // if not disabled, lets check that the themes match & update if not
   if ([MASQThemeManager themeBundleForKey:self.identifier] != self.currentTheme)
   [self updateTheme];
@@ -82,20 +82,20 @@
   }
 }
 
--(void)forceDisable {
-  if (self.disabled)
-  {
-    self.currentTheme = nil;
-    HBLogDebug(@"updateTheme\n self.disabled = YES, setting shit visible");
-    ((UIImageView *)_containerView.maskView).image = nil;
-    [_overlayView setBackgroundImage:nil forState:UIControlStateNormal];
-    [_underlayView setBackgroundImage:nil forState:UIControlStateNormal];
-    self.imageHost.alpha = 1;
-    self.imageHost.hidden = NO;
-    self.frameHost.alpha  = 1;
-    self.frameHost.hidden = NO;
-  }
-}
+// -(void)forceDisable {
+//   if (self.disabled)
+//   {
+//     self.currentTheme = nil;
+//     HBLogDebug(@"updateTheme\n self.disabled = YES, setting shit visible");
+//     ((UIImageView *)_containerView.maskView).image = nil;
+//     [_overlayView setBackgroundImage:nil forState:UIControlStateNormal];
+//     [_underlayView setBackgroundImage:nil forState:UIControlStateNormal];
+//     self.imageHost.alpha = 1;
+//     self.imageHost.hidden = NO;
+//     self.frameHost.alpha  = 1;
+//     self.frameHost.hidden = NO;
+//   }
+// }
 
 -(void)updateTheme {
   if (self.identifier)
@@ -104,16 +104,16 @@
     HBLogDebug(@"id %@, theme b %@", self.identifier, currentTheme);
     if (currentTheme == self.currentTheme) return;
 
-    if ([[currentTheme.bundlePath lastPathComponent] isEqualToString:@"Disabled"] || !currentTheme)
-    {
-      HBLogDebug(@"No theme chosen? %@", currentTheme);
-      self.currentTheme = nil;
-      self.disabled = YES;
-      [self forceDisable];
-      return;
-    }
+    // if ([[currentTheme.bundlePath lastPathComponent] isEqualToString:@"Disabled"] || !currentTheme)
+    // {
+    //   HBLogDebug(@"No theme chosen? %@", currentTheme);
+    //   self.currentTheme = nil;
+    //   self.disabled = YES;
+    //   [self forceDisable];
+    //   return;
+    // }
     // must have chosen a theme
-    if (self.disabled) self.disabled = NO;
+    // if (self.disabled) self.disabled = NO;
     self.currentTheme = currentTheme;
     [self themeUpdating];
   }

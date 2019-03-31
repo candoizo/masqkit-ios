@@ -17,8 +17,8 @@
 
 - (void)updateThemeList {
 	 // create the theme list, starting with the default theme
-	NSMutableArray *themes = [@[@{@"bundle":@"Disabled@100", @"name":@"Disabled", @"scale":@"100"}] mutableCopy];
-
+	// NSMutableArray *themes = [@[@{@"bundle":@"Disabled@100", @"name":@"Disabled", @"scale":@"100"}] mutableCopy];
+	NSMutableArray * themes = [NSMutableArray new];
 	NSString * themePath = [self themePath];
 	HBLogDebug(@"Theme path: %@", [self themePath]);
 	// for all the installed bundles in /Application Support/MASQ/Themes/x.bundle

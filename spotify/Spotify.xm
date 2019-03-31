@@ -18,6 +18,12 @@
   // orig.hidden = YES;
   return orig;
 }
+
+-(id)placeholderImageView {
+    UIView * orig = %orig;
+    orig.hidden = YES;
+    return orig;
+}
 %end
 
 %hook SPTNowPlayingContentView

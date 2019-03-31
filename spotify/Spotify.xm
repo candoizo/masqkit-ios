@@ -10,6 +10,7 @@
 -(BOOL)shouldContentProvidersReplaceCoverArt;
 
 -(UIImageView *)coverArtContent;
+-(UIView *)contentUnitView; // this is the view that's centered
 @end
 
 @interface SPTNowPlayingCoverArtViewCell : UIView
@@ -48,6 +49,8 @@
 -(BOOL)isShowingOverlayForCurrentPage;
 @end
 
+%hook SPTNowPLayingContentCell
+
 %hook SPTNowPlayingContentView
 %property (nonatomic, retain) MASQArtworkView * masqArtwork;
 %new
@@ -60,19 +63,40 @@
 -(void)addMasq {
   if (!self.masqArtwork)
   {
-    MASQArtworkView * art = [[%c(MASQArtworkView) alloc] initWithThemeKey:@"MP" frameHost:[self activeContentHost].placeholderImageView imageHost:[self activeContentHost].coverArtContent];
-    art.usesDirectImage = YES;
+    SPTNowPlayingContentCell * act = [self activeContentHost];
+    MASQArtworkView * art = [[%c(MASQArtworkView) alloc] initWithThemeKey:@"MP" frameHost:act.placeholderImageView imageHost:act.coverArtContent];
+    // art.usesDirectImage = YES;
     self.masqArtwork = art;
+    self.masqArtwork.center = act.contentUnitView.center;
     [self addSubview:art];
 
-    UIImage * img = [[self activeContentHost] spt_imageRepresentation];
-    [self.masqArtwork updateArtwork:img];
+    // UIImage * img = [[self activeContentHost] spt_imageRepresentation];
+    // [self.masqArtwork updateArtwork:img];
     // [self.masqArtwork updateTheme];
   }
 }
+
+-(void)updateCoverArtsAnimated:(BOOL)arg1 includeVideo:(BOOL)arg2
+{
+  %orig;
+  if (self.masqArtwork)
+  {
+    SPTNowPlayingContentCell * act = [self activeContentHost];
+    [self.masqArtwork updateArtwork:act.coverArtContent.image];
+  }
+}
+// [SPTNowPlayingContentView updateCoverArtsAnimated:0x1 includeVideo:0x1]
 %end
 
 %hook SPTNowPlayingDefaultContentViewController
+// -(void)shouldUpdateBlurConstituentForRelativePosition:(id)arg1 toImage:(id)arg2 withURL:(id)arg3 {
+  // %orig;
+  // if (self.contentView.masqArtwork && arg2)
+  // {
+  //   HBLogDebug(@"arg2 %@", arg2);
+  //   // if (arg2) [self.contentView.masqArtwork updateArtwork:arg2];
+  // }
+// }
 // %property (nonatomic, retain) MASQArtworkView * masqArtwork;
 // -(void)viewWillAppear:(BOOL)arg1 {
 //   if (!self.masqArtwork)
@@ -95,8 +119,14 @@
 //   }
 // }
 
-// -(void)contentViewDidReloadData:(id)arg1 {
+// -(void)contentViewDidReloadData:(SPTNowPlayingContentView *)arg1 {
 //   %orig;
+//   if (self.masqArtwork)
+//   {
+//     // SPTNowPlayingContentCell * act = arg1.activeContentHost;
+//     // self.masqArtwork.imageHost = act.coverArtContent;
+//     [self.masqArtwork updateArtwork:nil];
+//   }
 //   // %log;
 //
 // }
@@ -106,7 +136,7 @@
 // }
 %end
 
-// %hook SPTNowPLayingContentCell
+// %hook SPTNowPlayingContentCell
 // -(void)setCoverArtContent:(id)arg1 hideCoverArt:(BOOL)arg2 isVideo:(BOOL)arg3 track:(id)arg4 imageURL:(id)arg5 animated:(BOOL)arg6 {
 //   %orig;
 // }

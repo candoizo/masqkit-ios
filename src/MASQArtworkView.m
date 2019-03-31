@@ -55,7 +55,7 @@
 
 -(void)updateFrame {
   if (self.frameHost.bounds.size.width >= UIScreen.mainScreen.bounds.size.width || self.frameHost.bounds.size.width >= UIScreen.mainScreen.bounds.size.height) {
-     HBLogWarn(@"width of artwork view is bigger than screen, arbitrarily centering.");
+     // HBLogWarn(@"width of artwork view is bigger than screen, arbitrarily centering.");
      [UIView animateWithDuration:0/*CGRectEqualToRect(self.frame, CGRectZero) ? 0 : 0.3*/ animations:^{
         self.bounds = CGRectMake(0,0,self.frameHost.bounds.size.width/1.5,self.frameHost.bounds.size.width/1.5);
         self.center = CGPointMake(UIScreen.mainScreen.bounds.size.width/2, self.frameHost.center.y-100);
@@ -148,7 +148,6 @@
 -(void)tapArtwork:(id)sender {
   if (_c(@"SBMediaController"))
   [UIApplication.sharedApplication launchApplicationWithIdentifier:[_c(@"SBMediaController") sharedInstance].nowPlayingApplication.bundleIdentifier suspended:NO];
-  else return;
 }
 
 -(id)containerView {

@@ -1,14 +1,14 @@
 title = "";
 items = (
-   {
-      cell = PSSwitchCell;
-      cellClass = MASQSwitchCell;
-      default = 1;
-      defaults = ca.ndoizo.masq;
-      key = enable;
-      label = ENABLE;
-      hint = "Use this to globally disable all extensions.";
-   },
+   // {
+   //    cell = PSSwitchCell;
+   //    cellClass = MASQSwitchCell;
+   //    default = 1;
+   //    defaults = ca.ndoizo.masq;
+   //    key = enable;
+   //    label = ENABLE;
+   //    hint = "Use this to globally disable all extensions.";
+   // },
    {
       cell = PSGroupCell;
       label = "Extensions:";

@@ -1,7 +1,12 @@
 #import <Preferences/PSSpecifier.h>
 #import <Preferences/PSSwitchTableCell.h>
-#import <Preferences/PSSegmentTableCell.h>
+// #import <Preferences/PSSegmentTableCell.h>
 #import "../src/MASQHousekeeper.h"
+
+@interface PSSegmentTableCell : NSObject
+@property (nonatomic) UIColor * tintColor;
+- (id)initWithStyle:(int)arg1 reuseIdentifier:(id)arg2 specifier:(PSSpecifier *)arg3;
+@end
 
 @interface MASQSwitchCell : PSSwitchTableCell
 @end

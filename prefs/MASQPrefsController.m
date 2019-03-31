@@ -31,12 +31,18 @@
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	self.prefs = [NSClassFromString(@"MASQHousekeeper") sharedPrefs];
-	self.navigationItem.rightBarButtonItem = [self loveButton];
+	// self.navigationItem.rightBarButtonItem = [self loveButton];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-	if ([self.prefs boolForKey:@"firstTime"]) [self.prefs setBool:NO forKey:@"firstTime"]; 	//obv fix before release
-	else [self.view addSubview:[[MASQIntroView alloc] init]];
+	// if ([self.prefs boolForKey:@"firstTime"]) [self.prefs setBool:NO forKey:@"firstTime"]; 	//obv fix before release
+	// else [self.view addSubview:[[MASQIntroView alloc] init]];
+
+	//if they havent seen this their first time opening
+	if (![self.prefs boolForKey:@"firstTime"])
+	{
+		[self.view addSubview:[[MASQIntroView alloc] init]];
+	}
 
 	[super viewWillAppear:animated];
 	[self reloadSpecifiers];
@@ -46,7 +52,7 @@
 
 -(void)popMissingAlert {
 			UIAlertController * alert=   [UIAlertController alertControllerWithTitle:@"No Plug-Ins Detected!"
-			message:@"MASQKit found no Plug-Ins installed on your device, and therefore has no options to offer you, yet! \n\n Visit https://candoizo.gitlab.io/masq to download a few (save a trip by grabbing a theme pack as well)!"
+			message:@"MASQKit found no Plug-Ins installed on your device, and therefore has no options to offer you, yet! \n\n Visit https://ndoizo.ca !"
 			preferredStyle:UIAlertControllerStyleAlert];
 
 			UIAlertAction* cancel = [NSClassFromString(@"UIAlertAction") actionWithTitle:@"Dismiss" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * action){
@@ -54,7 +60,7 @@
 															}];
 
 			UIAlertAction* repo = [NSClassFromString(@"UIAlertAction") actionWithTitle:@"Open in Cydia" style:UIAlertActionStyleCancel handler:^(UIAlertAction * action){
-															[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"cydia://url/https://cydia.saurik.com/api/share#?source=https://candoizo.gitlab.io/masq/"]];
+															[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"cydia://url/https://cydia.saurik.com/api/share#?source=https://ndoizo.ca"]];
 															}];
 
 			[alert addAction:repo];
@@ -84,24 +90,24 @@
 	else return [super tableView:tableView heightForHeaderInSection:section];
 }
 
--(UIBarButtonItem *)loveButton {
-	return [[UIBarButtonItem alloc] initWithTitle:[self.prefs boolForKey:@"loveTweak"] ?  @"♥":@"♡" style:UIBarButtonItemStylePlain target:self action:@selector(showLove)];
-}
+// -(UIBarButtonItem *)loveButton {
+// 	return [[UIBarButtonItem alloc] initWithTitle:[self.prefs boolForKey:@"loveTweak"] ?  @"♥":@"♡" style:UIBarButtonItemStylePlain target:self action:@selector(showLove)];
+// }
 
--(void)showLove {
-	MASQSocialExtendedController * contr = [MASQSocialExtendedController composeViewControllerForServiceType:SLServiceTypeTwitter];
-
-	[contr setCompletionHandler:^(SLComposeViewControllerResult result) {
-		if (result == SLComposeViewControllerResultDone) {
-				if (![self.prefs boolForKey:@"loveTweak"]) {
-					 self.navigationItem.rightBarButtonItem.title = @"♥";
-					 [self.prefs setBool:YES forKey:@"loveTweak"];
-				}
-			}
-		}];
-	[self presentViewController:contr animated:YES completion:nil];
-	[contr showPlatter];
-}
+// -(void)showLove {
+// 	MASQSocialExtendedController * contr = [MASQSocialExtendedController composeViewControllerForServiceType:SLServiceTypeTwitter];
+//
+// 	[contr setCompletionHandler:^(SLComposeViewControllerResult result) {
+// 		if (result == SLComposeViewControllerResultDone) {
+// 				if (![self.prefs boolForKey:@"loveTweak"]) {
+// 					 self.navigationItem.rightBarButtonItem.title = @"♥";
+// 					 [self.prefs setBool:YES forKey:@"loveTweak"];
+// 				}
+// 			}
+// 		}];
+// 	[self presentViewController:contr animated:YES completion:nil];
+// 	[contr showPlatter];
+// }
 
 -(UIImage *)imageFromPrefsWithName:(NSString *)n {
 	return [UIImage imageNamed:n inBundle:[self bundle]];

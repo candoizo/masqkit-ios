@@ -18,13 +18,48 @@
 - (void)updateThemeList {
 	 // create the theme list, starting with the default theme
 	NSMutableArray *themes = [@[@{@"bundle":@"Disabled@100", @"name":@"Disabled", @"scale":@"100"}] mutableCopy];
-  for (NSString * themeid in [NSFileManager.defaultManager contentsOfDirectoryAtPath:[self themePath] error:nil]) {
-      NSArray * theme = [themeid componentsSeparatedByString:@"@"];
-    	NSString *named = theme.firstObject;
-    	NSString *scaling = theme.lastObject;
-			NSString *credit = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Credit.txt", [self themePath], themeid] encoding:NSUTF8StringEncoding error:nil];
-			[themes addObject:@{ @"bundle":themeid, @"name":named, @"scale":scaling, @"author":credit ?: @""}];
-  }
+
+	NSString * themePath = [self themePath];
+	HBLogDebug(@"Theme path: %@", [self themePath]);
+	// for all the installed bundles in /Application Support/MASQ/Themes/x.bundle
+	for (NSString * bundles in [NSFileManager.defaultManager contentsOfDirectoryAtPath:themePath error:nil])
+	{
+		// Path to theme bundle
+		NSString * tbPath = [NSString stringWithFormat:@"%@/%@", themePath, bundles];
+		HBLogDebug(@"tbPath: %@", tbPath);
+		// for all themes or theme installed in the bundle
+		for (NSString * themeid in [NSFileManager.defaultManager contentsOfDirectoryAtPath:tbPath error:nil])
+		{
+			// if (![themes containsObject:@"@"]) //coult implement plist dict
+
+			//old simple way by path
+			NSArray * theme = [themeid componentsSeparatedByString:@"@"];
+			NSString * bthemeId = [NSString stringWithFormat:@"%@/%@", bundles, themeid];
+			NSString * name = theme.firstObject;
+			NSString * scale = theme.lastObject;
+
+			NSString * credPath = [NSString stringWithFormat:@"%@/%@/Credit.txt",
+			tbPath, themeid];
+			if ([NSFileManager.defaultManager fileExistsAtPath:credPath])
+			{
+				NSString * credit = [NSString stringWithContentsOfFile:credPath encoding:NSUTF8StringEncoding error:nil];
+				[themes addObject:@{ @"bundle":bthemeId, @"name":name, @"scale":scale, @"author":credit ?: @""}];
+			}
+			else {
+				// no credit exists
+				[themes addObject:@{ @"bundle":bthemeId, @"name":name, @"scale":scale, @"author":@""}];
+			}
+		}
+	}
+
+	//
+  // for (NSString * themeid in [NSFileManager.defaultManager contentsOfDirectoryAtPath:[self themePath] error:nil]) {
+  //     NSArray * theme = [themeid componentsSeparatedByString:@"@"];
+  //   	NSString *named = theme.firstObject;
+  //   	NSString *scaling = theme.lastObject;
+	// 		NSString *credit = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Credit.txt", [self themePath], themeid] encoding:NSUTF8StringEncoding error:nil];
+	// 		[themes addObject:@{ @"bundle":themeid, @"name":named, @"scale":scaling, @"author":credit ?: @""}];
+  // }
 	self.themes = themes;
 }
 
@@ -75,6 +110,8 @@
 
 		// save selection to prefs
 		self.selectedTheme = self.themes[indexPath.row][@"bundle"];
+
+		HBLogDebug(@"self.selectedTheme %@", self.selectedTheme);
 		[self.prefs setValue:self.selectedTheme forKey:[self themeKey]];
 	}
 }

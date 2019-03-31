@@ -1,0 +1,2 @@
+@interface MASQThemeManager : NSObject
+@end

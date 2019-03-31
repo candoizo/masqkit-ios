@@ -4,8 +4,8 @@
 @property (nonatomic) NSUserDefaults * prefs;
 +(void)clearPrefs;
 
--(UIBarButtonItem *)loveButton;
-- (void)showLove;
+// -(UIBarButtonItem *)loveButton;
+// - (void)showLove;
 -(UIImage *)imageFromPrefsWithName:(NSString *)n;
 
 - (void)viewDidLoad;

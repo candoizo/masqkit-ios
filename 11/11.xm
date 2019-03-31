@@ -2,82 +2,77 @@
 #import "../src/MASQBlurredImageView.h"
 #import "Interfaces.h"
 
+/***
+
+medialibraryd
+mediaserverd
+mediaremoted -- has the artowkr stuff!
+***/
+
 %ctor {
   if (!%c(MASQHousekeeper)) dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
 }
 
-%hook MediaControlsPanelViewController
-%property (nonatomic, assign) float trueWidth;
-%property (nonatomic, retain) MASQBlurredImageView * masqBackground;
 
--(void)setBackgroundView:(UIView *)arg1 {
-  %orig;
-  if (!self.masqBackground) {
-    CALayer * l = [arg1 valueForKeyPath:@"_backdropView.layer"];
-    [arg1 addSubview:self.masqBackground = [[%c(MASQBlurredImageView) alloc] initWithFrame:arg1.bounds layer:l]];
-    self.masqBackground.styleKey = @"CCStyle";
-    self.masqBackground.hidden = YES;
-    [self.masqBackground updateEffectWithKey];
-  }
-}
+%hook MediaControlsHeaderView
+%property (nonatomic, retain) MASQArtworkView * masqArtwork;
+//
+-(id)shadow {return nil;}
+%end
+
+%hook MediaControlsPanelViewController
 
 -(void)setMediaControlsPlayerState:(long long)arg1 {
   %orig;
-  if (self.masqBackground) {
-    self.masqBackground.hidden = arg1 == 0; //if not playing
-    if (!self.masqBackground.image) [self.masqBackground loadArtwork];
-  }
-}
-
--(void)viewWillAppear:(BOOL)arg1 { //cc present
-  if (self.masqBackground) {
-    [self.masqBackground loadArtwork];
-    if ([self.masqBackground.styleKey hasPrefix:@"CC"])self.masqBackground.hidden = (self.mediaControlsPlayerState == 0);
-    [self.masqBackground updateEffectWithKey];
-  }
-  if (!self.masqBackground && !self.backgroundView) { //lockscreen does not set it for some reason
-    CGRect r = CGRectMake(self.view.bounds.origin.x, self.view.bounds.origin.y, self.trueWidth, self.view.bounds.size.height);
-    [self.view insertSubview:self.masqBackground = [[%c(MASQBlurredImageView) alloc] initWithFrame:r layer:nil] atIndex:0];
-    self.masqBackground.styleKey = @"LSStyle";
-    self.masqBackground.hidden = YES;
-    self.masqBackground.clipsToBounds = YES;
-    [self.masqBackground _setContinuousCornerRadius:12];
-    [self.masqBackground updateEffectWithKey];
-  }
-  %orig;
-}
-
--(id)headerView {
-  MediaControlsHeaderView * orig = %orig;
-  self.trueWidth = self.trueWidth < self.view.superview.superview.bounds.size.width ? self.view.superview.superview.bounds.size.width : self.trueWidth;
-  orig.artworkBackgroundView.hidden = YES;
-    if (orig.artworkView && !orig.masqArtwork && [self.delegate isKindOfClass:%c(MediaControlsEndpointsViewController)]) {
-      orig.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:@"CC" frameHost:orig.artworkView imageHost:orig.artworkView];
-      [orig addSubview:orig.masqArtwork];
-    }
-    else if (orig.artworkView && !orig.masqArtwork && [self.delegate isKindOfClass:%c(SBDashBoardMediaControlsViewController)]) {
-      orig.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:@"LS" frameHost:orig.artworkView imageHost:orig.artworkView];
-      [orig addSubview:orig.masqArtwork];
-    }
-  return orig;
+  %log;
 }
 
 -(void)_updateOnScreenForStyle:(long long)arg1 {
   %orig;
-  if (self.headerView.masqArtwork) self.headerView.masqArtwork.hidden = ((arg1 == 0) || self.headerView.masqArtwork.disabled); //if not expanded / disbled
+
 }
 
--(void)viewDidLayoutSubviews {
+
+-(void)viewWillAppear:(BOOL)arg1 { //cc present
   %orig;
-  if (!self.backgroundView && self.masqBackground) {
-    CGRect propose = CGRectMake(self.masqBackground.bounds.origin.x, self.masqBackground.bounds.origin.y, self.trueWidth, self.masqBackground.bounds.size.height);
-    if (!CGRectEqualToRect(self.masqBackground.bounds, propose)) self.masqBackground.bounds = propose; //jumpy without this if
-    self.masqBackground.center = CGPointMake(self.headerView.center.x,self.masqBackground.center.y);
-  }
+  %log;
 }
-%end
 
-%hook MediaControlsHeaderView
-%property (nonatomic, retain) MASQArtworkView * masqArtwork;
--(id)shadow {return nil;}
+-(id)headerView {
+  MediaControlsHeaderView * orig = %orig;
+  if ([orig artworkView] && !orig.masqArtwork)
+  {
+    NSString * key;
+    if ([self.delegate isKindOfClass:%c(MediaControlsEndpointsViewController))
+    key = @"CC";
+    else if ([self.delegate isKindOfClass:%c(SBDashBoardMediaControlsViewController)])
+    key = @"LS"
+    if (key)
+    {
+      MASQArtworkView * m = [[%c(MASQArtworkView) alloc] initWithKey:key];
+      [m registerHost:orig.artworkView];
+      [m regist]
+      //adds it to the MediaControlsHeaderView
+      [orig addSubview:m];
+    }
+    else HBLogError(@"No Theme Key? key:%@", key);
+  }
+  return orig;
+}
+
+
+  // self.trueWidth = self.trueWidth < self.view.superview.superview.bounds.size.width ? self.view.superview.superview.bounds.size.width : self.trueWidth;
+  //
+  //
+  // orig.artworkBackgroundView.hidden = YES;
+  //   if (orig.artworkView && !orig.masqArtwork && [self.delegate isKindOfClass:%c(MediaControlsEndpointsViewController)]) {
+  //     orig.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:@"CC" frameHost:orig.artworkView imageHost:orig.artworkView];
+  //     [orig addSubview:orig.masqArtwork];
+  //   }
+  //   else if (orig.artworkView && !orig.masqArtwork && [self.delegate isKindOfClass:%c(SBDashBoardMediaControlsViewController)]) {
+  //     orig.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:@"LS" frameHost:orig.artworkView imageHost:orig.artworkView];
+  //     [orig addSubview:orig.masqArtwork];
+  //   }
+  // return orig;
+// }
 %end

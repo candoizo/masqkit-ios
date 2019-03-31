@@ -1,13 +1,13 @@
-include $(THEOS)/makefiles/common.mk
-
 TWEAK_NAME = MASQKit
-MASQKit_FILES = $(wildcard *.m)
-MASQKit_FRAMEWORKS = UIKit CoreGraphics QuartzCore
-MASQKit_PRIVATE_FRAMEWORKS = MediaRemote
-MASQKit_CFLAGS = -fobjc-arc
+
+$(TWEAK_NAME)_FILES = $(wildcard *.m)
+$(TWEAK_NAME)_FRAMEWORKS = UIKit CoreGraphics QuartzCore
+$(TWEAK_NAME)_PRIVATE_FRAMEWORKS = MediaRemote
+$(TWEAK_NAME)_CFLAGS = -fobjc-arc
+include $(THEOS)/makefiles/common.mk
 include $(THEOS_MAKE_PATH)/tweak.mk
 
-SUBPROJECTS += ../prefs
+SUBPROJECTS += ../prefs masqremoted
 include $(THEOS_MAKE_PATH)/aggregate.mk
 
 after-install::

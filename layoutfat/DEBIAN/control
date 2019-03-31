@@ -1,0 +1,9 @@
+Package: ca.ndoizo.masq
+Name: Masq
+Depends:
+Version: 2.0alpha
+Architecture: iphoneos-arm
+Description: Artwork themeing & music aesthetics everywhere!
+Maintainer: candoizo
+Author: candoizo
+Section: Tweaks

@@ -1,9 +1,9 @@
 Package: ca.ndoizo.masq
-Name: Masq
+Name: MasqKit
 Depends:
-Version: 2.0a
+Version: 1.0b
 Architecture: iphoneos-arm
-Description: Artwork themeing & music aesthetics everywhere!
+Description: DEVELOPER BUNDLE, BUILD PUBLIC FROM src!
 Maintainer: candoizo
 Author: candoizo
 Section: Tweaks

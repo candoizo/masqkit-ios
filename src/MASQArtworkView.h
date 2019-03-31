@@ -10,6 +10,7 @@
 @end
 
 @interface MASQArtworkView : UIView
+@property (nonatomic, assign) BOOL usesDirectImage;
 @property (nonatomic, assign) BOOL disabled;
 @property (nonatomic, assign) NSString * identifier; //themeKey
 @property (nonatomic, assign) NSBundle * currentTheme;

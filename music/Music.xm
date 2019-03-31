@@ -4,6 +4,19 @@
 #define _c(s) NSClassFromString(s) // %_-
 #define arrayOfClass(a, c) [a filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self isKindOfClass: %@", c]]
 
+%hook MRNowPlayingPlayerClient
+-(void)setNowPlayingArtwork:(NSData *)arg1 {
+  %log;
+  %orig;
+}
+
+
+-(void)setPlaybackState:(long long)arg1 {
+  %log;
+  %orig;
+}
+%end
+
 // %hook Artwork
 // %property (nonatomic, retain) MASQArtworkView * masqArtwork;
 // -(void)layoutSubviews {

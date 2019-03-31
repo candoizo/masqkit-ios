@@ -6,13 +6,13 @@
     static id prefs;
     dispatch_once(&once, ^{
         prefs = [[NSUserDefaults alloc] initWithSuiteName:@"ca.ndoizo.masq"];
-        [((NSUserDefaults *)prefs) registerDefaults:@{
-           @"CC" : @"Ripped@100",
-           @"LS" : @"Circled@100",
-           @"MP" : @"Vinyl@71",
-           @"CCStyle" : @2,
-           @"LSStyle" : @2,
-        }];
+        // [((NSUserDefaults *)prefs) registerDefaults:@{
+           // @"CC" : @"Ripped@100",
+           // @"LS" : @"Circled@100",
+           // @"MP" : @"Vinyl@71"
+           // @"CCStyle" : @2,
+           // @"LSStyle" : @2,
+        // }];
     });
     return prefs;
 }

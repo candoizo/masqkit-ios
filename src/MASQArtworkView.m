@@ -57,7 +57,7 @@
 
   }
 
-  else if ([keyPath isEqualToString:@"image"])
+  else if ([keyPath isEqualToString:@"image"] && !self.usesDirectImage)
   {
     UIImageView * imageHost = self.imageHost;
     if (imageHost.image.hash != self.hashCache)
@@ -98,6 +98,7 @@
   if (self.identifier)
   {
     NSBundle * currentTheme = [MASQThemeManager themeBundleForKey:self.identifier];
+    HBLogDebug(@"id %@, theme b %@", self.identifier, currentTheme);
     if (currentTheme == self.currentTheme) return;
 
     if ([[currentTheme.bundlePath lastPathComponent] isEqualToString:@"Disabled"] || !currentTheme)
@@ -129,9 +130,10 @@
 }
 
 -(void)updateArtwork:(UIImage *)img {
-    if ([img isKindOfClass:_c(@"UIImage")]) self.artworkImageView.image = img;
-    else if ([self.imageHost isKindOfClass:_c(@"UIImageView")]) self.artworkImageView.image = self.imageHost.image;
-    else HBLogError(@"imageHost is not type UIImageView, and no UIImage was offered so artwork is NOT being updated, perhaps you will need a different imageHost?");
+  HBLogDebug(@"arg1: %@", img);
+  if ([img isKindOfClass:_c(@"UIImage")]) self.artworkImageView.image = img;
+  else if ([self.imageHost isKindOfClass:_c(@"UIImageView")]) self.artworkImageView.image = self.imageHost.image;
+  else HBLogError(@"imageHost is not type UIImageView, and no UIImage was offered so artwork is NOT being updated, perhaps you will need a different imageHost?");
 }
 
 -(void)setImageHost:(id)arg1 {
@@ -188,7 +190,7 @@
 }
 
 -(void)tapArtwork:(id)sender {
-  if (_c(@"SBMediaController") && [UIApplication.sharedApplication respondsToSelector:@selector(launchApplicationWithIdentifier:suspended:)])
+  if (NSClassFromString(@"SBMediaController") && [UIApplication.sharedApplication respondsToSelector:@selector(launchApplicationWithIdentifier:suspended:)])
   [UIApplication.sharedApplication launchApplicationWithIdentifier:MASQMediaStateManager.playerBundleID suspended:NO];
 }
 
@@ -212,10 +214,4 @@
    [UIImage imageWithContentsOfFile:[self.currentTheme pathForResource:@"Underlay" ofType:@"png"]]
    : nil;
 }
-
-// -(BOOL)themeUpdated {
-//   NSString * theme = [MASQHousekeeper.sharedPrefs valueForKey:self.identifier];
-//   self.disabled = [theme hasPrefix:@"Disabled"];
-//   return ![self.currentTheme.resourcePath.lastPathComponent isEqualToString:theme];
-// }
 @end

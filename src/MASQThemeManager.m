@@ -7,16 +7,23 @@
 
   NSUserDefaults * prefs = [NSClassFromString(@"MASQHousekeeper") sharedPrefs];
   NSString * themeId = nil;
-  if ([prefs valueForKey:arg1])
-  themeId = [prefs valueForKey:arg1];
-  else if ([self directDict][arg1])
-  themeId = [self directDict][arg1];
+  NSDictionary * dir = [self directDict];
+  HBLogDebug(@"dir %@, %@", dir, dir[arg1]);
+  if (!themeId && [prefs valueForKey:arg1]) {
+    themeId = [prefs valueForKey:arg1];
+    if (![themeId containsString:@"bundle"]) themeId = nil;
+  }
+
+  if (!themeId && dir[arg1])
+  themeId = dir[arg1];
   else {
     HBLogError(@"No key found.");
     return nil;
   }
+  HBLogDebug(@"themeID %@", themeId);
 
   NSURL * tPath = [[self themeDir] URLByAppendingPathComponent:themeId];
+  HBLogDebug(@"tpath%@", tPath);
   return [NSBundle bundleWithURL:tPath];
 }
 

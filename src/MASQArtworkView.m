@@ -34,7 +34,7 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
   // UIView * frameHost = self.frameHost;
-  if (self.disabled)
+  if (self.disabled && !self.currentTheme)
   {
     // opposite visibility
     [self wantsHostsVisible:YES];
@@ -71,11 +71,14 @@
 -(void)themeUpdating {
   if (self.currentTheme)
   {
+    // unset the scale so when we change it isnt messed
+    // _artworkImageView.transform = CGAffineTransformMakeScale(1, 1);
     ((UIImageView *)_containerView.maskView).image = [self maskImage];
     [_overlayView setBackgroundImage:[self overlayImage] forState:UIControlStateNormal];
     [_underlayView setBackgroundImage:[self underlayImage] forState:UIControlStateNormal];
-    float ratio = [self ratio];
-    _artworkImageView.transform = CGAffineTransformMakeScale(ratio, ratio);
+
+    // float ratio = [self ratio];
+    // _artworkImageView.transform = CGAffineTransformMakeScale(ratio, ratio);
   }
 }
 
@@ -117,20 +120,24 @@
 }
 
 -(void)updateFrame {
-  float ratio = [self ratio];
   [UIView animateWithDuration:0/*CGRectEqualToRect(self.frame, CGRectZero) ? 0 : 0.3*/ animations:^
   {
     self.bounds = self.frameHost.bounds;
     self.center = self.frameHost.center;
+    // float ratio = [self ratio];
     _containerView.maskView.frame = _containerView.frame;
-    _artworkImageView.frame = _containerView.frame;
-    _artworkImageView.transform = CGAffineTransformMakeScale(ratio, ratio);
+    // _artworkImageView.frame = _containerView.frame;
+    // _artworkImageView.transform = CGAffineTransformMakeScale(ratio, ratio);
+
+    _artworkImageView.bounds = CGRectMake(_containerView.bounds.origin.x,_containerView.bounds.origin.y,self.bounds.size.width * [self ratio], self.frame.size.height * [self ratio]);
+        _artworkImageView.center = _containerView.center;
+    _artworkImageView.center = _containerView.center;
 
   } completion:nil];
 }
 
 -(void)updateArtwork:(UIImage *)img {
-  HBLogDebug(@"arg1: %@", img);
+  // HBLogDebug(@"arg1: %@", img);
   if ([img isKindOfClass:_c(@"UIImage")]) self.artworkImageView.image = img;
   else if ([self.imageHost isKindOfClass:_c(@"UIImageView")]) self.artworkImageView.image = self.imageHost.image;
   else HBLogError(@"imageHost is not type UIImageView, and no UIImage was offered so artwork is NOT being updated, perhaps you will need a different imageHost?");

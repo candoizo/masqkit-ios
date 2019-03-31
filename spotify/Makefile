@@ -1,9 +1,9 @@
-include $(THEOS)/makefiles/common.mk
-
 TWEAK_NAME = MASQSpotify
-MASQSpotify_FILES = Spotify.xm
+$(TWEAK_NAME)_FILES = Spotify.xm
 $(TWEAK_NAME)_FRAMEWORKS = UIKit CoreGraphics
-MASQSpotify_CFLAGS = -fobjc-arc
+$(TWEAK_NAME)_CFLAGS = -fobjc-arc
+
+include $(THEOS)/makefiles/common.mk
 include $(THEOS_MAKE_PATH)/tweak.mk
 
 after-install::

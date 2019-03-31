@@ -79,42 +79,10 @@
     self.bounds = self.frameHost.bounds;
     self.center = self.frameHost.center;
     _containerView.maskView.frame = _containerView.frame;
-    int ow = _containerView.frame.size.width * ratio;
-
-    int offset = _containerView.frame.size.width - ow;
-      HBLogWarn(@"ow %d", offset);
-    // CGRect imgRect = CGRectMake(
-    //    _containerView.frame.size.width - ow, _containerView.frame.size.width - ow,
-    //   ow, ow
-    // );
-    // _artworkImageView.frame = imgRect;
-    _artworkImageView.bounds = _containerView.bounds;
-    _artworkImageView.center = _containerView.center;
+    _artworkImageView.frame = _containerView.frame;
     _artworkImageView.transform = CGAffineTransformMakeScale(ratio, ratio);
 
-    // CGRectMake(_containerView.bounds.origin.x,_containerView.bounds.origin.y,self.bounds.size.width * [self ratio], self.frame.size.height * [self ratio]);
-    // _artworkImageView.center = _containerView.center;
   } completion:nil];
-
-  // HBLogWarn(@"%f", ratio);
-  // if (self.frameHost.bounds.size.width >= UIScreen.mainScreen.bounds.size.width || self.frameHost.bounds.size.width >= UIScreen.mainScreen.bounds.size.height) {
-  //    // HBLogWarn(@"width of artwork view is bigger than screen, arbitrarily centering.");
-  //    [UIView animateWithDuration:0/*CGRectEqualToRect(self.frame, CGRectZero) ? 0 : 0.3*/ animations:^{
-  //       self.bounds = CGRectMake(0,0,self.frameHost.bounds.size.width/1.5,self.frameHost.bounds.size.width/1.5);
-  //       self.center = CGPointMake(UIScreen.mainScreen.bounds.size.width/2, self.frameHost.center.y-100);
-  //       self.containerView.maskView.frame = _containerView.frame;
-  //       self.artworkImageView.bounds = CGRectMake(_containerView.bounds.origin.x,_containerView.bounds.origin.y,self.bounds.size.width * [self ratio], self.frame.size.height * [self ratio]);
-  //       self.artworkImageView.center = _containerView.center;
-  //     } completion:nil];
-  // } else {
-  //     [UIView animateWithDuration:0/*CGRectEqualToRect(self.frame, CGRectZero) ? 0 : 0.3*/ animations:^{
-  //       self.bounds = self.frameHost.bounds;
-  //       self.center = self.frameHost.center;
-  //       _containerView.maskView.frame = _containerView.frame;
-  //       _artworkImageView.bounds = CGRectMake(_containerView.bounds.origin.x,_containerView.bounds.origin.y,self.bounds.size.width * [self ratio], self.frame.size.height * [self ratio]);
-  //       _artworkImageView.center = _containerView.center;
-  //     } completion:nil];
-  // }
 }
 
 -(void)updateArtwork:(UIImage *)img {
@@ -177,17 +145,6 @@
    return self.currentTheme ? [[[[self.currentTheme bundlePath] lastPathComponent] componentsSeparatedByString:@"@"].lastObject floatValue] / 100 : 1;
 }
 
-// -(BOOL)themeUpdated {
-//   NSString * theme = [MASQHousekeeper.sharedPrefs valueForKey:self.identifier];
-//   self.disabled = [theme hasPrefix:@"Disabled"];
-//   return ![self.currentTheme.resourcePath.lastPathComponent isEqualToString:theme];
-// }
-
--(void)tapArtwork:(id)sender {
-  if (_c(@"SBMediaController"))
-  [UIApplication.sharedApplication launchApplicationWithIdentifier:MASQMediaStateManager.playerBundleID suspended:NO];
-}
-
 -(id)containerView {
    UIView * c = [[UIView alloc] initWithFrame:self.bounds];
    c.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight; //resize to super width
@@ -218,6 +175,11 @@
    return _underlayView = u;
 }
 
+-(void)tapArtwork:(id)sender {
+  if (_c(@"SBMediaController"))
+  [UIApplication.sharedApplication launchApplicationWithIdentifier:MASQMediaStateManager.playerBundleID suspended:NO];
+}
+
 -(UIImage *)maskImage {
    return self.currentTheme ? [UIImage imageWithContentsOfFile:[self.currentTheme pathForResource:@"Mask" ofType:@"png"]] : nil;
 }
@@ -229,4 +191,10 @@
 -(UIImage *)underlayImage {
    return self.currentTheme ? [UIImage imageWithContentsOfFile:[self.currentTheme pathForResource:@"Underlay" ofType:@"png"]] : nil;
 }
+
+// -(BOOL)themeUpdated {
+//   NSString * theme = [MASQHousekeeper.sharedPrefs valueForKey:self.identifier];
+//   self.disabled = [theme hasPrefix:@"Disabled"];
+//   return ![self.currentTheme.resourcePath.lastPathComponent isEqualToString:theme];
+// }
 @end

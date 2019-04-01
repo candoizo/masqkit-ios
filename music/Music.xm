@@ -23,7 +23,6 @@
     UIView * se = self;
     UIView * is = [se imageSub];
     se.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:@"MP" frameHost:is imageHost:is];
-    se.masqArtwork.userInteractionEnabled = NO;
     [se addSubview:se.masqArtwork];
   }
 }

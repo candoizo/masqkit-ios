@@ -12,17 +12,18 @@
   MediaControlsHeaderView * orig = %orig;
   if ([orig artworkView] && !orig.masqArtwork)
   {
-    NSString * key; //here
+
     Class cc = %c(MediaControlsEndpointsViewController);
     Class ls = %c(SBDashBoardMediaControlsViewController);
     // assign the key based on where it's from
-    if ([self.delegate isKindOfClass:cc])
-    key = @"CC";
-    else if ([self.delegate isKindOfClass:ls])
-    key = @"LS";
+    NSString * key; //here
+    if ([self.delegate isKindOfClass:cc]) key = @"CC";
+    else if ([self.delegate isKindOfClass:ls]) key = @"LS";
+
     if (key)
     { // load it in assuming we expected it
       orig.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:key frameHost:orig.artworkView imageHost:orig.artworkView];
+      orig.masqArtwork.userInteractionEnabled = YES;
       [orig addSubview:orig.masqArtwork];
     }
     else HBLogError(@"No Theme Key? key:%@", key);

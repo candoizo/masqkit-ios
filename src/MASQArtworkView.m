@@ -11,6 +11,7 @@
 {
   if (self = [super init])
   {
+    self.userInteractionEnabled = NO;
     [self addSubview:[self underlayView]];
     [self addSubview:[self containerView]];
     [self addSubview:[self overlayView]];

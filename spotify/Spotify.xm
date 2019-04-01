@@ -7,8 +7,8 @@
 }
 
 %hook SPTNowPlayingContentView
+// %property (nonatomic, assign) CGPoint original
 %property (nonatomic, retain) MASQArtworkView * masqArtwork;
-
 %new
 -(void)addMasq {
   if (!self.masqArtwork)
@@ -16,7 +16,6 @@
     SPTNowPlayingContentCell * act = [self activeContentHost];
     self.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:@"MP" frameHost:act.placeholderImageView imageHost:act.coverArtContent];
     self.masqArtwork.center = act.contentUnitView.center;
-    self.masqArtwork.userInteractionEnabled = NO;
     [self addSubview:self.masqArtwork];
   }
 }
@@ -31,12 +30,13 @@
 -(void)setAppearanceForCell:(id)arg1 isVideo:(BOOL)arg2 trackBelongsToContext:(BOOL)arg3 {
   %orig;
 
-    if (arg1 && self.masqArtwork && arg1 == [self activeContentHost])
-    {
-      SPTNowPlayingContentCell * act = [self activeContentHost];
-      [self.masqArtwork updateArtwork:act.coverArtContent.image];
-      // [self.masqArtwork updateTheme];
-    }
+  SPTNowPlayingContentCell * act = [self activeContentHost];
+  if (arg1 && self.masqArtwork && arg1 == act)
+  {
+    [self.masqArtwork updateArtwork:act.coverArtContent.image];
+    self.masqArtwork.center = act.contentUnitView.center;
+  }
+
 }
 
 %new
@@ -46,7 +46,7 @@
 }
 %end
 
-//hide artwork
+//hide artwork stuff
 %hook SPTNowPlayingContentCell
 -(id)coverArtContent {
   UIView * orig = %orig;

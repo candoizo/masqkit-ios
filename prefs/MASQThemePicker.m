@@ -1,6 +1,11 @@
 #import "MASQThemePicker.h"
 #import "../src/MASQHousekeeper.h"
 
+@interface _CFXPreferences : NSObject
++ (_CFXPreferences *)copyDefaultPreferences;
+- (void)flushCachesForAppIdentifier:(CFStringRef)arg1 user:(CFStringRef)arg2;
+@end
+
 @implementation MASQThemePicker
 - (void)viewDidLoad {
 	[super viewDidLoad];
@@ -113,6 +118,13 @@
 
 		HBLogDebug(@"self.selectedTheme %@", self.selectedTheme);
 		[self.prefs setValue:self.selectedTheme forKey:[self themeKey]];
+
+		Class _cfx = NSClassFromString(@"_CFXPreferences");
+		if (_cfx)
+		{
+			_CFXPreferences *prefs = [_cfx copyDefaultPreferences];
+			[prefs flushCachesForAppIdentifier:(__bridge CFStringRef)@"ca.ndoizo.masq" user:(__bridge CFStringRef)@"/User"];
+		}
 	}
 }
 

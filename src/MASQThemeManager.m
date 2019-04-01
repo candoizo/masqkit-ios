@@ -22,9 +22,8 @@
   if (!themeId && [self backingDict][arg1])
   themeId = [self backingDict][arg1];
 
-  if (!themeId){
-    // HBLogError(@"No key found.");
-    // return nil;
+  if (!themeId)
+  { //error probably
     themeId = @"Default.bundle/Default@100";
   }
   NSURL * tPath = [[self themeDir] URLByAppendingPathComponent:themeId];

@@ -52,6 +52,10 @@
 			}
 			else {
 				// no credit exists
+				if ([bthemeId isEqualToString:@"Default.bundle/Default@100"])
+				[themes insertObject:@{ @"bundle":bthemeId, @"name":name, @"scale":scale, @"author":@""} atIndex:0];
+
+				else //if not the default add normally
 				[themes addObject:@{ @"bundle":bthemeId, @"name":name, @"scale":scale, @"author":@""}];
 			}
 		}

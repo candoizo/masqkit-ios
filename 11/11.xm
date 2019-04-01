@@ -6,6 +6,7 @@
   if (!%c(MASQHousekeeper)) dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
 }
 
+
 %hook MediaControlsPanelViewController
 -(id)headerView {
   MediaControlsHeaderView * orig = %orig;
@@ -37,6 +38,7 @@
   // 0x3 paused expanded?
   if (self.headerView.masqArtwork)
   {
+    self.headerView.masqArtwork.hidden = !([%c(SBMediaController) sharedInstance].nowPlayingApplication);
     if ([self.headerView.masqArtwork.identifier isEqualToString:@"CC"])
     { // hiding of the cc modes
       if (arg1 == 0x3 || arg1 == 0x1)

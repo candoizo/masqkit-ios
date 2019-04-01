@@ -37,7 +37,7 @@
   {
     [self.masqArtwork updateArtwork:act.coverArtContent.image];
   }
-
+  // @TODO might need another updater here cus it doesnt work too well
 }
 %new
 -(SPTNowPlayingContentCell *)activeContentHost {

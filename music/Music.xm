@@ -4,18 +4,53 @@
 #define _c(s) NSClassFromString(s) // %_-
 #define arrayOfClass(a, c) [a filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self isKindOfClass: %@", c]]
 
-%hook MRNowPlayingPlayerClient
--(void)setNowPlayingArtwork:(NSData *)arg1 {
-  %log;
-  %orig;
+@interface UIView (MASQ)
+@property (nonatomic, retain) MASQArtworkView * masqArtwork;
+-(id)imageSub;
+@end
+
+@interface ArtworkComponent : UIView
+
+@end
+
+%hook Artwork
+%property (nonatomic, retain) MASQArtworkView * masqArtwork;
+%new
+-(void)addMasq {
+  if (!((UIView*)self).masqArtwork)
+  {
+    UIView * se = self;
+    UIView * is = [se imageSub];
+    se.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:@"MP" frameHost:is imageHost:is];
+    se.masqArtwork.userInteractionEnabled = NO;
+    [se addSubview:se.masqArtwork];
+  }
 }
 
 
--(void)setPlaybackState:(long long)arg1 {
+ %new
+-(id)imageSub {
+  UIView * i = arrayOfClass(((UIView *)self).subviews, _c(@"Music.ArtworkComponentImageView"))[0];
+  if (i) ((UIView *)i).hidden = YES;
+  return i;
+}
+%end
+
+%group grp
+%hook MPMediaLibraryArtwork
+-(void)setArtwork:(id)arg1 {
   %log;
   %orig;
 }
 %end
+%end
+
+%ctor {
+  if (!%c(MASQHousekeeper)) dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
+  %init(Artwork = _c(@"Music.NowPlayingContentView"));
+  %init(grp);
+}
+
 
 // %hook Artwork
 // %property (nonatomic, retain) MASQArtworkView * masqArtwork;
@@ -71,7 +106,16 @@
 // }
 // %end
 
-%ctor {
-  if (!%c(MASQHousekeeper)) dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
-  // %init(Artwork = _c(@"Music.NowPlayingContentView"), Mini = _c(@"Music.MiniPlayerViewController"));
-}
+
+// %hook MRNowPlayingPlayerClient
+// -(void)setNowPlayingArtwork:(NSData *)arg1 {
+//   %log;
+//   %orig;
+// }
+//
+//
+// -(void)setPlaybackState:(long long)arg1 {
+//   %log;
+//   %orig;
+// }
+// %end

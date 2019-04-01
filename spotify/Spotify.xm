@@ -6,6 +6,8 @@
   dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
 }
 
+// make something so that it updates the theme ???
+
 %hook SPTNowPlayingContentCell
 -(id)coverArtContent {
   UIView * orig = %orig;
@@ -42,6 +44,7 @@
     SPTNowPlayingContentCell * act = [self activeContentHost];
     self.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:@"MP" frameHost:act.placeholderImageView imageHost:act.coverArtContent];
     self.masqArtwork.center = act.contentUnitView.center;
+    self.masqArtwork.userInteractionEnabled = NO;
     [self addSubview:self.masqArtwork];
   }
 }
@@ -62,8 +65,24 @@
 
 }
 
--(void)viewWillAppear:(BOOL)arg1 {
+-(void)setAppearanceForCell:(id)arg1 isVideo:(BOOL)arg2 trackBelongsToContext:(BOOL)arg3 {
   %orig;
-  if (self.masqArtwork) [self.masqArtwork updateTheme];
+
+    if (arg1 && self.masqArtwork)
+    {
+      SPTNowPlayingContentCell * act = [self activeContentHost];
+      [self.masqArtwork updateArtwork:act.coverArtContent.image];
+      // [self.masqArtwork updateTheme];
+    }
 }
+
+// -(void)setVisible:(BOOL)arg1 {
+//   %orig;
+//   if (arg1 && self.masqArtwork)
+//   {
+//     SPTNowPlayingContentCell * act = [self activeContentHost];
+//     [self.masqArtwork updateArtwork:act.coverArtContent.image];
+//     // [self.masqArtwork updateTheme];
+//   }
+// }
 %end

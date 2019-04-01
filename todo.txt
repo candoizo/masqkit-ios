@@ -1,3 +1,34 @@
+### Contributing:
+
+MasqKit features a handful of extensions that touch many different devices & services, such that one person can seldom test every case.
+
+As a developer, you are welcome to contribute improvments to any extension found here if you feel you will positively impact the majority without adding friction.
+
+Pull requests will be reviewed by trusted maintainers before implementation to avoid the introduction of new issues.
+
+Interested in maintaining an extension? Check out the contribution guide for the rest of the details
+
+### Themeing:
+
+MasqKit is designed for themers, and for them to be happy they need themes to install.
+
+Are you a theme creator? Check out the Default.bundle for an example on the Masq theme structure.
+
+## Lisence: SA by NC 4.0
+
+This library is free to use when the conditions below are followed:
+You are free to integrate this into your project provided you meet the provisions laid out in this lisence.
+
+##### You agree that:
+
+- Extensions are free to use and cannot be gated by any form of payment, no exceptions.
+
+- You agree to prefix your extension following the prevalent scheme of `MASQTweakTarget`
+
+
+
+#### Documentation:
+
 MASQArtworkView Public Documentation / Usage:
 
 -(id)initWithThemeKey:(NSString *)key frameHost:(UIView *)host imageHost(UIImageView *)imgView;
@@ -28,3 +59,20 @@ Else, it is recommended you utilize one of the two current supported keys from t
 Thanks for your interest, and submit plugins for official co-maintenence at masqsubmissions @ gmail . com ,
 you are always welcome to forge your own path but for the occasional low-maintence tweak I'm happy to collaborate & expand the audience
 to your plugin if appropriate for mass-adoption.
+
+
+
+
+Tweet:
+
+Developing a music tweak? Check out extension source code for a demonstration of integrating Masq themeing into your project, guarunteed 100 lines or less
+
+Found bugs?: Submit an issue repest with relevant information about the extensison you were using and on what app version
+
+Overview:
+
+Welcome to the public repository of offical MASQKit extensions. Official simply means they were created by the creator of MASQKit.
+
+This exists to serve as a guide for implementing your own MASQKit extensions into whatever app / tweak you are interested in.
+
+This also servers as a centralized area where app-lovers versed in runtime development can submit bugfixes / improvements to the officail extensions.

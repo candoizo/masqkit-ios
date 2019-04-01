@@ -16,8 +16,16 @@
     [self addSubview:[self overlayView]];
     _identifier = key;
     [self updateTheme];
+
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTheme)  name:UIApplicationDidBecomeActiveNotification object:nil];
   }
   return self;
+}
+
+-(void)dealloc {
+  [[NSNotificationCenter defaultCenter] removeObserver:self
+    name:UIApplicationDidBecomeActiveNotification object:nil];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 -(id)initWithThemeKey:(NSString *)arg1 frameHost:(id)arg2 imageHost:(id)arg3
@@ -62,6 +70,8 @@
     [_overlayView setBackgroundImage:[self overlayImage] forState:UIControlStateNormal];
     [_underlayView setBackgroundImage:[self underlayImage] forState:UIControlStateNormal];
 
+    // fixup the artwork scale by updating hte frame
+    [self updateFrame];
     // float ratio = [self ratio];
     // _artworkImageView.transform = CGAffineTransformMakeScale(ratio, ratio);
   }
@@ -87,11 +97,11 @@
     self.bounds = self.frameHost.bounds;
     self.center = self.frameHost.center;
     _containerView.maskView.frame = _containerView.frame;
-    // float ratio = [self ratio];
+    float ratio = [self ratio];
     // _artworkImageView.frame = _containerView.frame;
     // _artworkImageView.transform = CGAffineTransformMakeScale(ratio, ratio);
 
-    _artworkImageView.bounds = CGRectMake(_containerView.bounds.origin.x,_containerView.bounds.origin.y,self.bounds.size.width * [self ratio], self.frame.size.height * [self ratio]);
+    _artworkImageView.bounds = CGRectMake(_containerView.bounds.origin.x,_containerView.bounds.origin.y,self.bounds.size.width * ratio, self.frame.size.height * ratio);
     _artworkImageView.center = _containerView.center;
   } completion:nil];
 }
@@ -99,7 +109,8 @@
 -(void)updateArtwork:(UIImage *)img
 {
   if ([img isKindOfClass:_c(@"UIImage")]) self.artworkImageView.image = img;
-  else if ([self.imageHost isKindOfClass:_c(@"UIImageView")]) self.artworkImageView.image = self.imageHost.image;
+  else if ([self.imageHost isKindOfClass:_c(@"UIImageView")])
+  self.artworkImageView.image = self.imageHost.image;
   else HBLogError(@"imageHost is not type UIImageView, and no UIImage was offered so artwork is NOT being updated, perhaps you will need a different imageHost?");
 }
 
@@ -126,7 +137,8 @@
 
 -(float)ratio
 {
-  return self.currentTheme ? [[[[self.currentTheme bundlePath] lastPathComponent] componentsSeparatedByString:@"@"].lastObject floatValue] / 100 : 1;
+  NSBundle * cur = self.currentTheme;
+  return cur ? [[[[cur bundlePath] lastPathComponent] componentsSeparatedByString:@"@"].lastObject floatValue] / 100 : 1;
 }
 
 // layers
@@ -179,7 +191,6 @@
 
 -(UIImage *)overlayImage
 {
-  HBLogDebug(@"Self.current theme %@", self.currentTheme);
   return self.currentTheme ?
   [UIImage imageWithContentsOfFile:[self.currentTheme pathForResource:@"Overlay" ofType:@"png"]]
   : nil;

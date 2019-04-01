@@ -2,7 +2,7 @@
 #import "../src/MASQBlurredImageView.h"
 #import "Interfaces.h"
 
-// All extensions need this to load the kit in
+// All extensions need this to make sure the kit is loaded first
 %ctor {
   if (!%c(MASQHousekeeper)) dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
 }
@@ -12,16 +12,18 @@
   MediaControlsHeaderView * orig = %orig;
   if ([orig artworkView] && !orig.masqArtwork)
   {
-    NSString * key;
-    if ([self.delegate isKindOfClass:%c(MediaControlsEndpointsViewController)])
+    NSString * key; //here
+    Class cc = %c(MediaControlsEndpointsViewController);
+    Class ls = %c(SBDashBoardMediaControlsViewController);
+    // assign the key based on where it's from
+    if ([self.delegate isKindOfClass:cc])
     key = @"CC";
-    else if ([self.delegate isKindOfClass:%c(SBDashBoardMediaControlsViewController)])
+    else if ([self.delegate isKindOfClass:ls])
     key = @"LS";
     if (key)
-    {
-      MASQArtworkView * m = [[%c(MASQArtworkView) alloc] initWithThemeKey:key frameHost:orig.artworkView imageHost:orig.artworkView];
-      orig.masqArtwork = m;
-      [orig addSubview:m];
+    { // load it in assuming we expected it
+      orig.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:key frameHost:orig.artworkView imageHost:orig.artworkView];
+      [orig addSubview:orig.masqArtwork];
     }
     else HBLogError(@"No Theme Key? key:%@", key);
   }
@@ -36,47 +38,33 @@
   if (self.headerView.masqArtwork)
   {
     if ([self.headerView.masqArtwork.identifier isEqualToString:@"CC"])
-    { // tighter hiding of the cc
-      if (arg1 == 0x3 || arg1 == 0x1) {
-        self.headerView.masqArtwork.hidden = YES;
-      }
+    { // hiding of the cc modes
+      if (arg1 == 0x3 || arg1 == 0x1)
+      self.headerView.masqArtwork.hidden = YES;
       else if (arg1 == 0x0)
-        self.headerView.masqArtwork.hidden = NO;
-      else {
-        HBLogWarn(@"unknown case %d", (int)arg1);
-      }
+      self.headerView.masqArtwork.hidden = NO;
     }
   }
-  // 0x1 mini thing visible
 }
 
--(void)viewWillAppear:(BOOL)arg1 { //cc present
+-(void)viewWillAppear:(BOOL)arg1
+{
   %orig;
   if (self.headerView.masqArtwork)
   [self.headerView.masqArtwork updateTheme];
 }
-
-// -(void)setMediaControlsPlayerState:(long long)arg1 {
-//   %orig;
-//   %log;
-// }
-//
 %end
 
+// hide artwork assets
 %hook MediaControlsHeaderView
 %property (nonatomic, retain) MASQArtworkView * masqArtwork;
 -(id)shadow {return nil;}
 
 -(id)artworkBackgroundView {return nil;}
 
-// -(void)layoutSubviews {
-//   %orig;
-//   self.artworkView.hidden = !self.masqArtwork.disabled;
-// }
-
 -(id)artworkView {
   UIView * orig = %orig;
-  orig.hidden = self.masqArtwork.currentTheme ? YES : NO;
+  orig.hidden = YES;
   return orig;
 }
 %end

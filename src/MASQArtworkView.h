@@ -29,7 +29,6 @@
 -(void)updateArtwork:(UIImage *)img;
 
 -(float)ratio;
-// -(BOOL)themeUpdated;
 
 -(UIView *)containerView;
 -(UIButton *)overlayView;

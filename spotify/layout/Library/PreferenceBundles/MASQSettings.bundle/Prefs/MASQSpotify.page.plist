@@ -3,7 +3,7 @@ items = (
     {
        cell = PSLinkCell;
        cellClass = MASQThemeLinkCell;
-       label = "Spotify Picker";
+       label = "Theme Picker";
        themeKey = MP;
        tint = "#1db954";
        detail = MASQThemePicker;

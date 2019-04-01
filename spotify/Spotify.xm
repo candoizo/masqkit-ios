@@ -6,6 +6,7 @@
   dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
 }
 
+// ios 11+
 %hook SPTNowPlayingContentView
 // %property (nonatomic, assign) CGPoint original
 %property (nonatomic, retain) MASQArtworkView * masqArtwork;
@@ -59,5 +60,32 @@
     UIView * orig = %orig;
     orig.hidden = YES;
     return orig;
+}
+%end
+
+// ios 10? old devices? dunno
+@interface SPTNowPlayingViewController : UIViewController
+@property (nonatomic, retain) MASQArtworkView * masqArtwork;
+-(SPTNowPlayingContentView *)spt_nowPlayingCoverArtView;
+-(SPTNowPlayingContentCell *)activeContentHost;
+@end
+%hook SPTNowPlayingViewController
+%property (nonatomic, retain) MASQArtworkView * masqArtwork;
+%new
+-(void)addMasq {
+  if (!self.masqArtwork)
+  {
+    self.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:@"Spotify" frameHost:[self spt_nowPlayingCoverArtView] imageHost:[self activeContentHost].coverArtContent];
+
+    // only needed for especially difficult views that pretend to be at 0,0
+    self.masqArtwork.centerHost = [self activeContentHost].contentUnitView;
+    [self.view addSubview:self.masqArtwork];
+  }
+}
+
+%new
+-(SPTNowPlayingContentCell *)activeContentHost {
+  SPTNowPlayingContentView * cell = [self spt_nowPlayingCoverArtView];
+  return [cell cellAtRelativePage:0];
 }
 %end

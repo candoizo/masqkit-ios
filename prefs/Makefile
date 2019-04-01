@@ -1,3 +1,4 @@
+FINAL_PACKAGE=1
 include $(THEOS)/makefiles/common.mk
 
 BUNDLE_NAME = MASQSettings

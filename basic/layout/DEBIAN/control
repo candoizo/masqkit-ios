@@ -1,6 +1,6 @@
 Package: masq.theme.basic
 Name: Basic Masqpack
-Version: 1.0b
+Version: 1.0
 Architecture: iphoneos-arm
 Description: Some basic examples of Masq themes.
 Maintainer: candoizo

@@ -5,7 +5,7 @@
   if (self = [super initWithFrame:arg1]) {
     [self addSubview:[self tweakTitleWithName:arg2]];
     [self addSubview:[self tweakIconWithImage:arg3]];
-    [self addSubview:[self creditViewWithText:@"a candoizo production\n💻 w ♥ in 🍁\n©hirp ©hirp"]];
+    [self addSubview:[self creditViewWithText:@"a candoizo production\n\n©hirp ©hirp"]];
 
   // Set vertical effect
   UIInterpolatingMotionEffect *verticalMotionEffect = [[UIInterpolatingMotionEffect alloc] initWithKeyPath:@"center.y" type:UIInterpolatingMotionEffectTypeTiltAlongVerticalAxis];

@@ -39,12 +39,21 @@
   if (self.headerView.masqArtwork)
   {
     self.headerView.masqArtwork.hidden = !([%c(SBMediaController) sharedInstance].nowPlayingApplication);
-    if ([self.headerView.masqArtwork.identifier isEqualToString:@"CC"])
-    { // hiding of the cc modes
-      if (arg1 == 0x3 || arg1 == 0x1)
-      self.headerView.masqArtwork.hidden = YES;
-      else if (arg1 == 0x0)
-      self.headerView.masqArtwork.hidden = NO;
+
+    if ([%c(UIDevice) currentDevice].systemVersion.doubleValue < 11.2)
+    {
+      HBLogDebug(@"below v 11.2");
+      self.headerView.masqArtwork.hidden = (arg1 == 0) || (arg1 == 3);
+    }
+    else
+    {
+          if ([self.headerView.masqArtwork.identifier isEqualToString:@"CC"])
+          { // hiding of the cc modes
+            if (arg1 == 0x3 || arg1 == 0x1)
+            self.headerView.masqArtwork.hidden = YES;
+            else if (arg1 == 0x0)
+            self.headerView.masqArtwork.hidden = NO;
+          }
     }
   }
 }

@@ -79,7 +79,8 @@
 	self.navigationController.navigationController.navigationBar.barTintColor = nil;
 }
 
-- (id)tableView:(id)tableView viewForHeaderInSection:(NSInteger)section {
+- (id)tableView:(id)tableView viewForHeaderInSection:(NSInteger)section
+{
 	if (section == 0) {
 		CGFloat sectionH = [self tableView:tableView heightForHeaderInSection:section];
 		return [[MASQHeaderView alloc]
@@ -94,27 +95,8 @@
 	if (section == 0) return 120;
 	else return [super tableView:tableView heightForHeaderInSection:section];
 }
-
-// -(UIBarButtonItem *)loveButton {
-// 	return [[UIBarButtonItem alloc] initWithTitle:[self.prefs boolForKey:@"loveTweak"] ?  @"♥":@"♡" style:UIBarButtonItemStylePlain target:self action:@selector(showLove)];
-// }
-
-// -(void)showLove {
-// 	MASQSocialExtendedController * contr = [MASQSocialExtendedController composeViewControllerForServiceType:SLServiceTypeTwitter];
-//
-// 	[contr setCompletionHandler:^(SLComposeViewControllerResult result) {
-// 		if (result == SLComposeViewControllerResultDone) {
-// 				if (![self.prefs boolForKey:@"loveTweak"]) {
-// 					 self.navigationItem.rightBarButtonItem.title = @"♥";
-// 					 [self.prefs setBool:YES forKey:@"loveTweak"];
-// 				}
-// 			}
-// 		}];
-// 	[self presentViewController:contr animated:YES completion:nil];
-// 	[contr showPlatter];
-// }
-
--(UIImage *)imageFromPrefsWithName:(NSString *)n {
+-(UIImage *)imageFromPrefsWithName:(NSString *)n
+{
 	return [UIImage imageNamed:n inBundle:[self bundle]];
 }
 @end

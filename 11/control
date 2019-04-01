@@ -2,8 +2,8 @@ Package: masq.extension.sb11
 Name: Masq11
 Version: 1.0
 Architecture: iphoneos-arm
-Description: iOS 11+ SpringBoard extension for MASQKit!
+Description: iOS 11(+12?) SpringBoard extension using MasqKit!
 Maintainer: candoizo
 Author: candoizo
 Section: Tweaks (Masq Extensions)
-Depends: ca.ndoizo.masq
+Depends: ca.ndoizo.masq, firmware (>= 11.0)

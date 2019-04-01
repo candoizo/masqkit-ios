@@ -17,8 +17,25 @@
     [self updateTheme];
 
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTheme)  name:UIApplicationDidBecomeActiveNotification object:nil];
+
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(__debug_updateArtwork:)  name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
+
+    // _kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification
+    /*
+      ios 11 only? called in music.app and spotify...
+    */
   }
   return self;
+}
+
+// -[MPMediaLibrary _reloadLibraryForContentsChangeWithNotificationInfo:0x0]
+
+-(void)__debug_updateArtwork:(id)arg1 {
+  HBLogDebug(@"%@", arg1);
+  [self updateArtwork:nil];
+
+  //kMRMediaRemoteNowPlayingInfoArtworkIdentifier
+  //kMRMediaRemoteNowPLayingInfoUniqueIdentifier // could use this but it might lead to extra changes
 }
 
 -(void)dealloc {

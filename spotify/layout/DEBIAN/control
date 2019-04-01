@@ -1,9 +1,0 @@
-Package: masq.extension.spotify
-Name: MASQSpotify
-Depends: ca.ndoizo.masq
-Version: 1.0
-Architecture: iphoneos-arm
-Description: Spotify extension powered by MASQKit!
-Maintainer: candoizo
-Author: candoizo
-Section: Tweaks (MASQKit)

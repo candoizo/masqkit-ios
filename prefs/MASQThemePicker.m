@@ -124,7 +124,7 @@
 		[self.prefs setValue:self.selectedTheme forKey:[self themeKey]];
 
 		Class _cfx = NSClassFromString(@"_CFXPreferences");
-		if (_cfx)
+		if ([_cfx respondsToSelector:@selector(flushCachesForAppIdentifier:user:)])
 		{
 			_CFXPreferences *prefs = [_cfx copyDefaultPreferences];
 			[prefs flushCachesForAppIdentifier:(__bridge CFStringRef)@"ca.ndoizo.masq" user:(__bridge CFStringRef)@"/User"];

@@ -56,8 +56,8 @@
 }
 
 -(void)popMissingAlert {
-			UIAlertController * alert=   [UIAlertController alertControllerWithTitle:@"No Plug-Ins Detected!"
-			message:@"MASQKit found no Plug-Ins installed on your device, and therefore has no options to offer you, yet! \n\n Visit https://ndoizo.ca !"
+			UIAlertController * alert=   [UIAlertController alertControllerWithTitle:@"No Extensions!"
+			message:@"MASQKit found no extensions installed on your device, and therefore has no options to offer you, yet: \n\n https://ndoizo.ca ← Add the repo to find some!"
 			preferredStyle:UIAlertControllerStyleAlert];
 
 			UIAlertAction* cancel = [NSClassFromString(@"UIAlertAction") actionWithTitle:@"Dismiss" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * action){

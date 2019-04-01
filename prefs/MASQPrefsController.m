@@ -2,8 +2,13 @@
 #import "MASQLocalizer.h"
 #import "MASQIntroView.h"
 #import "MASQHeaderView.h"
-#import "MASQSocialExtendedController.h"
-#import "../src/MASQHousekeeper.h"
+// #import "MASQSocialExtendedController.h"
+#import "../src/MASQThemeManager.h"
+
+@interface UIImage (livate)
++ (UIImage *)imageNamed:(id)img inBundle:(id)bndl;
++ (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)bundleIdentifier format:(int)format scale:(int)scale;
+@end
 
 @implementation MASQPrefsController
 +(void)clearPrefs { [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:@"ca.ndoizo.masq"]; }
@@ -30,7 +35,7 @@
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	self.prefs = [NSClassFromString(@"MASQHousekeeper") sharedPrefs];
+	self.prefs = [NSClassFromString(@"MASQThemeManager") prefs];
 	// self.navigationItem.rightBarButtonItem = [self loveButton];
 }
 
@@ -46,7 +51,7 @@
 
 	[super viewWillAppear:animated];
 	[self reloadSpecifiers];
-	self.navigationController.navigationController.navigationBar.barTintColor = [NSClassFromString(@"MASQHousekeeper") masqTintWithAlpha:1];
+	self.navigationController.navigationController.navigationBar.barTintColor = [UIColor colorWithRed:0.87 green:0.25 blue:0.40 alpha:1];
 	self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
 }
 

@@ -1,0 +1,9 @@
+Package: masq.extension.
+Name: Masq_NAME_
+Version: 1.0
+Architecture: iphoneos-arm
+Description: __FUNC__ powered by MASQKit!
+Maintainer: candoizo
+Author: candoizo
+Section: Tweaks (MASQKit)
+Depends: ca.ndoizo.masq

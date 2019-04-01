@@ -1,5 +1,5 @@
 #import "MASQThemePicker.h"
-#import "../src/MASQHousekeeper.h"
+#import "../src/MASQThemeManager.h"
 
 @interface _CFXPreferences : NSObject
 + (_CFXPreferences *)copyDefaultPreferences;
@@ -9,7 +9,7 @@
 @implementation MASQThemePicker
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	self.prefs = [NSClassFromString(@"MASQHousekeeper") sharedPrefs];
+	self.prefs = [NSClassFromString(@"MASQThemeManager") prefs];
 	self.title = @"Themes";
 	self.selectedTheme = [self.prefs valueForKey:[self themeKey]];
   self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
@@ -157,7 +157,17 @@
 
 -(UIColor *)themeTint {
 	if ([self.specifier propertyForKey:@"tint"])
-	return [NSClassFromString(@"MASQHousekeeper") hexToRGB:[self.specifier propertyForKey:@"tint"]];
-	else return [NSClassFromString(@"MASQHousekeeper") masqTintWithAlpha:1];
+	return [MASQThemePicker hexToRGB:[self.specifier propertyForKey:@"tint"]];
+	else return [UIColor colorWithRed:0.87 green:0.25 blue:0.40 alpha:1];
+}
+
++(UIColor *)hexToRGB:(NSString *)hex {
+  const char *cStr = [hex cStringUsingEncoding:NSASCIIStringEncoding];
+  long x = strtol(cStr+1, NULL, 16);
+  unsigned char r, g, b;
+  b = x & 0xFF;
+  g = (x >> 8) & 0xFF;
+  r = (x >> 16) & 0xFF;
+  return [UIColor colorWithRed:(float)r/255.0f green:(float)g/255.0f blue:(float)b/255.0f alpha:1];
 }
 @end

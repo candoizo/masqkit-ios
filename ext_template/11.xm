@@ -1,4 +1,5 @@
 #import "../src/MASQArtworkView.h"
+#import "../src/MASQBlurredImageView.h"
 #import "Interfaces.h"
 
 // All extensions need this to make sure the kit is loaded first

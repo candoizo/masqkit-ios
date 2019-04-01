@@ -1,0 +1,15 @@
+title = "SpringBoard Settings";
+items = (
+  {
+     cell = PSGroupCell;
+     label = "Theme Pickers:";
+  },
+  {
+     cell = PSLinkCell;
+     cellClass = MASQThemeLinkCell;
+     label = LS_LABEL;
+     themeKey = LS;
+     tint = "#007AFF";
+     detail = MASQThemePicker;
+  }
+);

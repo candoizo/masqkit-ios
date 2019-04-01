@@ -14,11 +14,10 @@
   if (!self.masqArtwork)
   {
     SPTNowPlayingContentCell * act = [self activeContentHost];
-    self.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:@"MP" frameHost:act.placeholderImageView imageHost:act.coverArtContent];
-    // self.masqArtwork.center = act.contentUnitView.center;
-    // only use this for especially difficult views that pretend to be a 0,0
+    self.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:@"Spotify" frameHost:act.placeholderImageView imageHost:act.coverArtContent];
+
+    // only needed for especially difficult views that pretend to be at 0,0
     self.masqArtwork.centerHost = act.contentUnitView;
-    // [NSNotificationCenter.defaultCenter addObserver:self.masqArtwork selector:@selector(updateCenterForThemeChanges)  name:UIApplicationDidBecomeActiveNotification object:nil];
     [self addSubview:self.masqArtwork];
   }
 }
@@ -37,24 +36,9 @@
   if (arg1 && self.masqArtwork && arg1 == act)
   {
     [self.masqArtwork updateArtwork:act.coverArtContent.image];
-    // self.masqArtwork.center = act.contentUnitView.center;
   }
 
 }
-//
-// %new
-// -(void)updateCenterForThemeChanges {
-//   SPTNowPlayingContentCell * act = [self activeContentHost];
-//   if (act && self.masqArtwork)
-//   {
-//     self.masqArtwork.center = act.contentUnitView.center;
-//   }
-// }
-
-// -(void)viewWillAppear:(BOOL)arg1 {
-//   %orig;
-//   self.masqArtwork.center = act.contentUnitView.center;
-// }
 %new
 -(SPTNowPlayingContentCell *)activeContentHost {
   SPTNowPlayingContentCell * cell = [self cellAtRelativePage:0];

@@ -1,7 +1,5 @@
 #import "MASQArtworkView.h"
-#import "MASQHousekeeper.h"
 #import "MASQThemeManager.h"
-#import "MASQMediaStateManager.h"
 
 #define _c(c) NSClassFromString(c)
 #define arrayContainsKindOfClass(a, c) [a filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self isKindOfClass: %@", c]]
@@ -201,7 +199,7 @@
 {
   if (NSClassFromString(@"SBMediaController"))
   if ([UIApplication.sharedApplication respondsToSelector:@selector(launchApplicationWithIdentifier:suspended:)])
-  [UIApplication.sharedApplication launchApplicationWithIdentifier:MASQMediaStateManager.playerBundleID suspended:NO];
+  [UIApplication.sharedApplication launchApplicationWithIdentifier: [NSClassFromString(@"SBMediaController") sharedInstance].nowPlayingApplication.bundleIdentifier suspended:NO];
 }
 
 /// images

@@ -1,6 +1,7 @@
 #import "MASQIntroView.h"
-#import "../src/MASQHousekeeper.h"
+#import "../src/MASQThemeManager.h"
 
+#define kMasqTint(x) [UIColor colorWithRed:0.87 green:0.25 blue:0.40 alpha:x]
 static NSString * const kWelcome = @"Welcome to MASQKit";
 static NSString * const kDesc = @"An versatile runtime library for customizing media players on iOS!";
 static NSString * const kSectionOne = @"Customize your setup with creative themes from amazing designers";
@@ -86,7 +87,7 @@ static NSString * const kSectionThree = @"Extensions let you bring the experienc
 
 -(id)continueButton {
   UIButton * cont = [[UIButton alloc] initWithFrame:CGRectMake(0, self.bounds.size.height *0.85, self.bounds.size.width/1.4 , self.bounds.size.width/8)];
-	cont.backgroundColor = [NSClassFromString(@"MASQHousekeeper") masqTintWithAlpha:0.9];
+	cont.backgroundColor = kMasqTint(0.9);
 	cont.layer.masksToBounds = YES;
 	cont.layer.cornerRadius = 10;
 	cont.center = CGPointMake(self.center.x, cont.center.y);
@@ -96,7 +97,7 @@ static NSString * const kSectionThree = @"Extensions let you bring the experienc
 }
 
 -(void)dismiss {
-	[[NSClassFromString(@"MASQHousekeeper") sharedPrefs] setBool:YES forKey:@"firstTime"];
+	[[NSClassFromString(@"MASQThemeManager") prefs] setBool:YES forKey:@"firstTime"];
 	 [UIView animateWithDuration:.35 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
 				self.alpha = 0;
 			}  completion:^(BOOL finished) {

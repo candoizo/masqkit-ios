@@ -12,4 +12,5 @@
 @property (nonatomic) id delegate;
 @property (assign,nonatomic) int mediaControlsPlayerState; // only exists below 11.1.12
 @property (nonatomic) int style;
+@property (nonatomic, retain) MASQBlurredImageView * masqBackground;
 @end

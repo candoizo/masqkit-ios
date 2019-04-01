@@ -6,7 +6,8 @@
 
 @interface UIView (MASQ)
 @property (nonatomic, retain) MASQArtworkView * masqArtwork;
--(id)imageSub;
+-(UIView *)imageSub;
+-(void)addMasq;
 @end
 
 @interface ArtworkComponent : UIView
@@ -31,15 +32,51 @@
  %new
 -(id)imageSub {
   UIView * i = arrayOfClass(((UIView *)self).subviews, _c(@"Music.ArtworkComponentImageView"))[0];
-  if (i) ((UIView *)i).hidden = YES;
+  // if (i) ((UIView *)i).hidden = YES;
   return i;
+}
+
+-(id)subviews {
+  NSArray * orig = %orig;
+  for (UIView * v in orig)
+  {
+    v.hidden = ![v isKindOfClass:%c(MASQArtworkView)];
+  }
+  return orig;
+}
+
+-(CALayer *)layer {return nil;} // avoid shadow bakein
+
+-(void)setVideoView:(BOOL)arg1 {
+  UIView * se = self;
+  // might need to check if imageSub has a width
+  if (!se.masqArtwork && [se imageSub])
+  {
+    // HBLogDebug(@"%@", ((UIImageView *)[se imageSub]).image);
+    [se addMasq];
+    // if (se.subviews) for (UIView * v in se.subviews)
+    // {
+    //   v.alpha = ![v isKindOfClass:%c(MASQArtworkView)];
+    // }
+  }
+
+  // if (se.masqArtwork)
+  // {
+  //     if (se.subviews) for (UIView * v in se.subviews)
+  //     {
+  //       v.hidden = ![v isKindOfClass:%c(MASQArtworkView)];
+  //     }
+  // }
+  // if (((UIImageView *)[se imageSub]).image)
+  // HBLogDebug(@"%@", ((UIImageView *)[se imageSub]).image);
+  %orig;
 }
 %end
 
 %group grp
 %hook MPMediaLibraryArtwork
 -(void)setArtwork:(id)arg1 {
-  %log;
+  // %log;
   %orig;
 }
 %end

@@ -16,6 +16,7 @@
 @property (nonatomic, assign) NSBundle * currentTheme;
 @property (nonatomic, assign) unsigned long hashCache;
 @property (nonatomic, retain) UIView * frameHost;
+@property (nonatomic, retain) UIView * centerHost;
 @property (nonatomic, retain) UIImageView * imageHost;
 @property (nonatomic, retain) UIImageView * artworkImageView;
 @property (nonatomic, retain) UIButton * overlayView;
@@ -24,6 +25,7 @@
 -(id)initWithThemeKey:(NSString *)arg1;
 -(id)initWithThemeKey:(NSString *)arg1 frameHost:(id)arg2 imageHost:(id)arg3;
 
+-(void)updateCenter;
 -(void)updateTheme;
 -(void)updateFrame;
 -(void)updateArtwork:(UIImage *)img;

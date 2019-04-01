@@ -60,6 +60,11 @@
       [self updateArtwork:imageHost.image];
     }
   }
+
+  else if (self.centerHost && [keyPath isEqualToString:@"center"])
+  {
+    [self updateCenter];
+  }
 }
 
 -(void)themeUpdating {
@@ -91,6 +96,12 @@
   }
 }
 
+-(void)updateCenter
+{
+  if (self.centerHost.center.y)
+  self.center = self.centerHost.center;
+}
+
 -(void)updateFrame
 {
   [UIView animateWithDuration:0/*CGRectEqualToRect(self.frame, CGRectZero) ? 0 : 0.3*/ animations:^
@@ -105,6 +116,7 @@
     _artworkImageView.bounds = CGRectMake(_containerView.bounds.origin.x,_containerView.bounds.origin.y,self.bounds.size.width * ratio, self.frame.size.height * ratio);
     _artworkImageView.center = _containerView.center;
   } completion:nil];
+  if (self.centerHost) [self updateCenter];
 }
 
 -(void)updateArtwork:(UIImage *)img
@@ -133,6 +145,16 @@
     [self.frameHost addObserver:self forKeyPath:@"frame" options:NSKeyValueObservingOptionNew context:nil];
     self.center = self.frameHost.center;
     [self updateFrame];
+  }
+}
+
+-(void)setCenterHost:(id)arg1
+{
+  _centerHost = arg1;
+  if (self.centerHost)
+  {
+    [self.centerHost addObserver:self forKeyPath:@"center" options:NSKeyValueObservingOptionNew context:nil];
+    self.center = self.centerHost.center;
   }
 }
 

@@ -3,7 +3,7 @@
 #import "MASQIntroView.h"
 #import "MASQHeaderView.h"
 // #import "MASQSocialExtendedController.h"
-#import "../src/MASQThemeManager.h"
+#import "../MASQThemeManager.h"
 
 @interface UIImage (livate)
 + (UIImage *)imageNamed:(id)img inBundle:(id)bndl;

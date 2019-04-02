@@ -1,5 +1,5 @@
 #import "MASQIntroView.h"
-#import "../src/MASQThemeManager.h"
+#import "../MASQThemeManager.h"
 
 #define kMasqTint(x) [UIColor colorWithRed:0.87 green:0.25 blue:0.40 alpha:x]
 static NSString * const kWelcome = @"Welcome to MASQKit";

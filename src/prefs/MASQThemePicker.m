@@ -1,5 +1,5 @@
 #import "MASQThemePicker.h"
-#import "../src/MASQThemeManager.h"
+#import "../MASQThemeManager.h"
 
 @interface _CFXPreferences : NSObject
 + (_CFXPreferences *)copyDefaultPreferences;

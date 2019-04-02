@@ -3,7 +3,8 @@ items = (
        cell = PSLinkCell;
        cellClass = MASQSubPageLinkCell;
        iconBundle = "com.spotify.client";
-       label = "Spotify (8.4.98)";
+       label = "Spotify";
+       versionInfo = "Built for Spotify version 8.4.99.";
        detail = MASQSubPageController;
        specs = MASQSpotify.page;
     }

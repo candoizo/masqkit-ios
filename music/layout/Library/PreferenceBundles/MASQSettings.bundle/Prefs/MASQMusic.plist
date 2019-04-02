@@ -3,8 +3,9 @@ items = (
        cell = PSLinkCell;
        cellClass = MASQSubPageLinkCell;
        iconBundle = "com.apple.Music";
-       label = "Music (Swift)";
+       label = "Music";
        detail = MASQSubPageController;
+       versionInfo = "Tested on iOS 11.0.2 and 11.2.2";
        specs = MASQMusic.page;
     }
 );

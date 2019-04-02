@@ -5,7 +5,7 @@
   if (self = [super initWithFrame:arg1]) {
     [self addSubview:[self tweakTitleWithName:arg2]];
     [self addSubview:[self tweakIconWithImage:arg3]];
-    [self addSubview:[self creditViewWithText:@"a candoizo production\n\n©hirp ©hirp"]];
+    [self addSubview:[self creditViewWithText:@"Artwork themeing anywhere!"]];
 
   // Set vertical effect
   UIInterpolatingMotionEffect *verticalMotionEffect = [[UIInterpolatingMotionEffect alloc] initWithKeyPath:@"center.y" type:UIInterpolatingMotionEffectTypeTiltAlongVerticalAxis];
@@ -54,7 +54,7 @@
 }
 
 -(UILabel *)creditViewWithText:(NSString *)arg1 {
-	UILabel *copyright = [[UILabel alloc] initWithFrame:CGRectMake(0, - 40, self.bounds.size.width, 30)];
+	UILabel *copyright = [[UILabel alloc] initWithFrame:CGRectMake(0, 80, self.bounds.size.width, 30)];
 	copyright.numberOfLines = 0;
 	copyright.font = [UIFont fontWithName:@"HelveticaNeue" size:8];
 	copyright.text = arg1;

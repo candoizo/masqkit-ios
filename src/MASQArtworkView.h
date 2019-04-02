@@ -32,11 +32,15 @@
 
 @interface UIApplication (Private)
 +(id)sharedApplication;
--(id)bundleIdentifier;
 -(BOOL)launchApplicationWithIdentifier:(id)arg1 suspended:(BOOL)arg2;
+@end
+
+@interface SBApplication : UIApplication
+-(NSString *)bundleIdentifier;
 @end
 
 @interface SBMediaController : NSObject
 +(SBMediaController *)sharedInstance;
--(UIApplication *)nowPlayingApplication;
+-(SBApplication *)nowPlayingApplication;
+-(BOOL)hasTrack;
 @end

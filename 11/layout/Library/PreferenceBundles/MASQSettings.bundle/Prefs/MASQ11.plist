@@ -2,9 +2,11 @@ items = (
     {
        cell = PSLinkCell;
        cellClass = MASQSubPageLinkCell;
-       label = "SpringBoard (iOS 11+)";
+       label = "SpringBoard";
+       versionInfo = "Compatible with iOS 11, untested on iOS 12.";
        iconBundle = "com.apple.Preferences";
        detail = MASQSubPageController;
        specs = MASQ11.page;
+
     }
 );

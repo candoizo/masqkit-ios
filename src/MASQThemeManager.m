@@ -36,10 +36,13 @@
 
   if ([self backingDict][arg1])
   {
-    if (![themeId isEqualToString:[self backingDict][arg1])]
+    if (![themeId isEqualToString:[self backingDict][arg1]])
     {
       HBLogWarn(@"Hey these are different! %@ != %@", themeId, [self backingDict][arg1]);
       HBLogWarn(@"if on ios 11, then the hard dict path will be more updated");
+      if (!NSClassFromString(@"SBMediaController"))
+      // if not in springboard we accept the path is probably correct
+      themeId = [self backingDict][arg1];
     }
   }
 
@@ -47,6 +50,7 @@
   { //error probably
     themeId = @"Default.bundle/Default@100";
   }
+  HBLogWarn(@"The value of the theme was %@", themeId);
   NSURL * tPath = [[self themeDir] URLByAppendingPathComponent:themeId];
   return [NSBundle bundleWithURL:tPath];
 }

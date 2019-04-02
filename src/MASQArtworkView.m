@@ -212,6 +212,7 @@
   UIView * c = [[UIView alloc] initWithFrame:self.bounds];
   c.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight; //resize to super width
   c.center = self.center;
+  c.userInteractionEnabled = NO;
 
   UIImageView * maskView = [[UIImageView alloc] initWithFrame:c.bounds];
   maskView.contentMode = UIViewContentModeScaleAspectFit;
@@ -226,6 +227,7 @@
 -(id)underlayView {
   UIButton * u = [[UIButton alloc] initWithFrame:self.bounds];
   u.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight; //resize to super width
+  u.userInteractionEnabled = NO;
   u.center = self.center;
   return _underlayView = u;
 }

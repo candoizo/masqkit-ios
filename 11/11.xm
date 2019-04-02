@@ -1,9 +1,10 @@
 #import "../src/MASQArtworkView.h"
 #import "Interfaces.h"
 
-// All extensions need this to make sure the kit is loaded first
-%ctor {
-  if (!%c(MASQHousekeeper)) dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
+%ctor
+{ // check that the kit has been loaded into the app first
+  if (!%c(MASQThemeManager))
+  dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
 }
 
 
@@ -15,10 +16,11 @@
 
     Class cc = %c(MediaControlsEndpointsViewController);
     Class ls = %c(SBDashBoardMediaControlsViewController);
-    // assign the key based on where it's from
-    NSString * key; //here
-    if ([self.delegate isKindOfClass:cc]) key = @"CC";
-    else if ([self.delegate isKindOfClass:ls]) key = @"LS";
+
+    NSString * key;// assign the key based on where it's from
+    if ([self.delegate isKindOfClass:cc]) key = @"ControlCenter";
+    else if ([self.delegate isKindOfClass:ls]) key = @"LockScreen";
+    else return orig; //avoid mayhem from unexpected things
 
     if (key)
     { // load it in assuming we expected it
@@ -26,7 +28,6 @@
       orig.masqArtwork.userInteractionEnabled = YES;
       [orig addSubview:orig.masqArtwork];
     }
-    // else HBLogError(@"No Theme Key? key:%@", key);
   }
   return orig;
 }
@@ -45,26 +46,22 @@
 
     else if ([%c(UIDevice) currentDevice].systemVersion.doubleValue < 11.2)
     {
-      HBLogDebug(@"below v 11.2");
       self.headerView.masqArtwork.hidden = (arg1 == 0) || (arg1 == 3);
     }
     else
     {
-          if ([self.headerView.masqArtwork.identifier isEqualToString:@"CC"])
-          { // hiding of the cc modes
-            if (arg1 == 0x3 || arg1 == 0x1)
-            self.headerView.masqArtwork.hidden = YES;
-            else if (arg1 == 0x0)
-            self.headerView.masqArtwork.hidden = NO;
-          }
+      if ([self.headerView.masqArtwork.identifier isEqualToString:@"CC"])
+      { // hiding of the cc modes
+        if (arg1 == 0x3 || arg1 == 0x1)
+        self.headerView.masqArtwork.hidden = YES;
+        else if (arg1 == 0x0)
+        self.headerView.masqArtwork.hidden = NO;
+      }
     }
-
-    // self.headerView.masqArtwork.hidden = );
   }
 }
 
--(void)viewWillAppear:(BOOL)arg1
-{
+-(void)viewWillAppear:(BOOL)arg1 {
   %orig;
   if (self.headerView.masqArtwork)
   [self.headerView.masqArtwork updateTheme];

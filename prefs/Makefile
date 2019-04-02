@@ -5,15 +5,9 @@ BUNDLE_NAME = MASQSettings
 MASQSettings_FILES = $(wildcard *.m) Init.xm
 MASQSettings_INSTALL_PATH = /Library/PreferenceBundles
 MASQSettings_FRAMEWORKS = UIKit CoreGraphics #\
-#StoreKit CoreTelephony AVFoundation AudioToolbox EventKit \
-#EventKitUI SystemConfiguration AdSupport MessageUI CoreMedia \
-#CoreMotion MediaPlayer MobileCoreServices GLKit CFNetwork \
-#CoreVideo QuartzCore OpenGLES Security
 
 MASQSettings_PRIVATE_FRAMEWORKS = Preferences Social
 MASQSettings_CFLAGS = -fobjc-arc
-#MASQSettings_LDFLAGS += -F$(THEOS)/lib/
-#MASQSettings_WEAK_FRAMEWORKS = GoogleMobileAds
 
 include $(THEOS_MAKE_PATH)/bundle.mk
 

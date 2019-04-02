@@ -36,11 +36,12 @@
   SPTNowPlayingContentCell * act = [self activeContentHost];
   if (arg1 && self.masqArtwork && arg1 == act && act.coverArtContent)
   {
-    if (act.coverArtContent.image.hash != self.masqArtwork.hashCache)
-    {
+    // good intentions but too late when someone opens from the bg
+    // if (act.coverArtContent.image.hash != self.masqArtwork.hashCache)
+    // {
       [self.masqArtwork updateArtwork:act.coverArtContent.image];
-      HBLogWarn(@"Spotify has was different so updating!");
-    }
+      // HBLogWarn(@"Spotify has was different so updating!");
+    // }
   }
   // @TODO might need another updater here cus it doesnt work too well
 }

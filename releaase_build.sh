@@ -18,11 +18,13 @@ cd ..
 cd spotify
 make clean-packages
 make clean package install
+
+
 #themes
-cd ../customcoverthemepack
+cd ../_theme.customcover
 make clean-packages
 make clean package install
 
-cd ../basic
+cd ../_theme.basic
 make clean-packages
 make clean package install

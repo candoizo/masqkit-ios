@@ -1,6 +1,10 @@
 #import "MASQThemeManager.h"
 // #import "MASQHousekeeper.h"
 
+// @interface UIApplication (Private)
+// -(NSString *)bundleIdentifier;
+// @end
+
 @implementation MASQThemeManager
 +(id)prefs {
   static dispatch_once_t once;
@@ -19,7 +23,6 @@
   NSString * themeId = nil;
   if ([prefs valueForKey:arg1])
   themeId = [prefs valueForKey:arg1];
-  if (themeId) HBLogWarn(@"Prefs had a value, and it was %@", themeId);
 
   // here where the problem where i lost updates on 3rd party apps arises
   /*
@@ -31,15 +34,22 @@
   */
   // if the backingDict has a newer thing I shoul duse that
   // but probably only on iOS 11 because i wont be getting the instant updates on ios 10
-  if (!themeId && [self backingDict][arg1])
-  themeId = [self backingDict][arg1];
 
-  if ([self backingDict][arg1])
+  // so if there was no themeId we overwrite, but what if there was an old one?
+  NSString * backingTheme = [self backingDict][arg1];
+  if (!themeId && backingTheme)
+  themeId = backingTheme;
+
+  // if we're not in springboard and the old theme is different, we shoudl use it
+  // HBLogWarn(@"UIBundle %@", UIApplication.sharedApplication.bundleIdentifier);
+  // we check if we're in springboard because its the only one we can guaruntee
+  // wont need to do this, since it stays synced with NSUserDefaults
+  if (!NSClassFromString(@"SpringBoard") && backingTheme)
   {
-    if (![themeId isEqualToString:[self backingDict][arg1]])
-    {
-      HBLogWarn(@"Hey these are different! %@ != %@", themeId, [self backingDict][arg1]);
-      HBLogWarn(@"if on ios 11, then the hard dict path will be more updated");
+    HBLogWarn(@"not in springboard, backing dict %@ != %@", backingTheme, themeId);
+    if (![themeId isEqualToString:backingTheme])
+    { // this means it's an older themeid
+      HBLogWarn(@"The dict path was more updated!");
       if (!NSClassFromString(@"SBMediaController"))
       // if not in springboard we accept the path is probably correct
       themeId = [self backingDict][arg1];
@@ -47,10 +57,9 @@
   }
 
   if (!themeId)
-  { //error probably
+  { //error probably or not set.
     themeId = @"Default.bundle/Default@100";
   }
-  HBLogWarn(@"The value of the theme was %@", themeId);
   NSURL * tPath = [[self themeDir] URLByAppendingPathComponent:themeId];
   return [NSBundle bundleWithURL:tPath];
 }

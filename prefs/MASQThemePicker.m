@@ -124,7 +124,11 @@
 		[self.prefs setValue:self.selectedTheme forKey:[self themeKey]];
 
 		Class _cfx = NSClassFromString(@"_CFXPreferences");
-		if ([_cfx respondsToSelector:@selector(flushCachesForAppIdentifier:user:)])
+		// basically this if statement actually fucks us up
+		// the like one milisecond delay makes it not update intime for 3rd party apps
+		// if (/[_cfx respondsToSelector:@selector(flushCachesForAppIdentifier:user:)])
+		// but the version doesnt cause the same problem :D
+		if (UIDevice.currentDevice.systemVersion.doubleValue > 11)
 		{
 			_CFXPreferences *prefs = [_cfx copyDefaultPreferences];
 			[prefs flushCachesForAppIdentifier:(__bridge CFStringRef)@"ca.ndoizo.masq" user:(__bridge CFStringRef)@"/User"];

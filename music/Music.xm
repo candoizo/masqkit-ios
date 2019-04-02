@@ -23,7 +23,6 @@
   }
 }
 
-
  %new
 -(id)imageSub {
   UIView * i = arrayOfClass(((UIView *)self).subviews, _c(@"Music.ArtworkComponentImageView"))[0];

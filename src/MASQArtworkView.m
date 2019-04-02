@@ -66,10 +66,10 @@
     [self updateFrame];
   }
 
-  else if ([keyPath isEqualToString:@"image"] && !self.usesDirectImage)
+  else if ([keyPath isEqualToString:@"image"])
   {
     UIImageView * imageHost = self.imageHost;
-    if (imageHost respondsToSelector:@selector(image))
+    if ([imageHost respondsToSelector:@selector(image)])
     [self updateArtwork:nil];
     // if (imageHost.image.hash != self.hashCache)
     // {

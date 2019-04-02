@@ -1,17 +1,4 @@
-@interface SBMediaController : NSObject
-+(SBMediaController *)sharedInstance;
--(UIApplication *)nowPlayingApplication;
-@end
-
-@interface UIApplication (Private)
-+(id)sharedApplication;
--(id)bundleIdentifier;
-- (BOOL)launchApplicationWithIdentifier:(id)arg1 suspended:(BOOL)arg2;
-@end
-
 @interface MASQArtworkView : UIView
-@property (nonatomic, assign) BOOL usesDirectImage;
-// @property (nonatomic, assign) BOOL disabled;
 @property (nonatomic, assign) NSString * identifier; //themeKey
 @property (nonatomic, assign) NSBundle * currentTheme;
 @property (nonatomic, assign) unsigned long hashCache;
@@ -40,4 +27,16 @@
 -(id)overlayImage;
 -(id)underlayImage;
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context;
+@end
+
+
+@interface UIApplication (Private)
++(id)sharedApplication;
+-(id)bundleIdentifier;
+-(BOOL)launchApplicationWithIdentifier:(id)arg1 suspended:(BOOL)arg2;
+@end
+
+@interface SBMediaController : NSObject
++(SBMediaController *)sharedInstance;
+-(UIApplication *)nowPlayingApplication;
 @end

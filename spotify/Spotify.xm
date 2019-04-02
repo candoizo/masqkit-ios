@@ -30,16 +30,20 @@
   [self addMasq];
 }
 
-// -(void)setAppearanceForCell:(id)arg1 isVideo:(BOOL)arg2 trackBelongsToContext:(BOOL)arg3 {
-//   %orig;
-//
-//   SPTNowPlayingContentCell * act = [self activeContentHost];
-//   if (arg1 && self.masqArtwork && arg1 == act)
-//   {
-//     [self.masqArtwork updateArtwork:act.coverArtContent.image];
-//   }
-//   // @TODO might need another updater here cus it doesnt work too well
-// }
+-(void)setAppearanceForCell:(id)arg1 isVideo:(BOOL)arg2 trackBelongsToContext:(BOOL)arg3 {
+  %orig;
+
+  SPTNowPlayingContentCell * act = [self activeContentHost];
+  if (arg1 && self.masqArtwork && arg1 == act && act.coverArtContent)
+  {
+    if (act.coverArtContent.image.hash != self.masqArtwork.hashCache)
+    {
+      [self.masqArtwork updateArtwork:act.coverArtContent.image];
+      HBLogWarn(@"Spotify has was different so updating!");
+    }
+  }
+  // @TODO might need another updater here cus it doesnt work too well
+}
 
 %new
 -(SPTNowPlayingContentCell *)activeContentHost {

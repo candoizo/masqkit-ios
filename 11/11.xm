@@ -38,7 +38,10 @@
   // 0x3 paused expanded?
   if (self.headerView.masqArtwork)
   {
-    self.headerView.masqArtwork.hidden = !([%c(SBMediaController) sharedInstance].nowPlayingApplication);
+    if (![%c(SBMediaController) sharedInstance].nowPlayingApplication)
+    {
+      self.headerView.masqArtwork.hidden = YES;
+    }
 
     if ([%c(UIDevice) currentDevice].systemVersion.doubleValue < 11.2)
     {
@@ -55,6 +58,8 @@
             self.headerView.masqArtwork.hidden = NO;
           }
     }
+
+    // self.headerView.masqArtwork.hidden = );
   }
 }
 

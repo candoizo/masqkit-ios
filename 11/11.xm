@@ -26,7 +26,7 @@
       orig.masqArtwork.userInteractionEnabled = YES;
       [orig addSubview:orig.masqArtwork];
     }
-    else HBLogError(@"No Theme Key? key:%@", key);
+    // else HBLogError(@"No Theme Key? key:%@", key);
   }
   return orig;
 }

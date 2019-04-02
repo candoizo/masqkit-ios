@@ -30,16 +30,17 @@
   [self addMasq];
 }
 
--(void)setAppearanceForCell:(id)arg1 isVideo:(BOOL)arg2 trackBelongsToContext:(BOOL)arg3 {
-  %orig;
+// -(void)setAppearanceForCell:(id)arg1 isVideo:(BOOL)arg2 trackBelongsToContext:(BOOL)arg3 {
+//   %orig;
+//
+//   SPTNowPlayingContentCell * act = [self activeContentHost];
+//   if (arg1 && self.masqArtwork && arg1 == act)
+//   {
+//     [self.masqArtwork updateArtwork:act.coverArtContent.image];
+//   }
+//   // @TODO might need another updater here cus it doesnt work too well
+// }
 
-  SPTNowPlayingContentCell * act = [self activeContentHost];
-  if (arg1 && self.masqArtwork && arg1 == act)
-  {
-    [self.masqArtwork updateArtwork:act.coverArtContent.image];
-  }
-  // @TODO might need another updater here cus it doesnt work too well
-}
 %new
 -(SPTNowPlayingContentCell *)activeContentHost {
   SPTNowPlayingContentCell * cell = [self cellAtRelativePage:0];

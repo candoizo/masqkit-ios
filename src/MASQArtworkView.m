@@ -22,7 +22,7 @@
 
     // _kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification
     /*
-      ios 11 only? called in music.app and spotify...
+      ios 11 only? called in music.app and spotify... and springboard
     */
   }
   return self;
@@ -69,11 +69,13 @@
   else if ([keyPath isEqualToString:@"image"] && !self.usesDirectImage)
   {
     UIImageView * imageHost = self.imageHost;
-    if (imageHost.image.hash != self.hashCache)
-    {
-      self.hashCache = imageHost.image.hash;
-      [self updateArtwork:imageHost.image];
-    }
+    if (imageHost respondsToSelector:@selector(image))
+    [self updateArtwork:nil];
+    // if (imageHost.image.hash != self.hashCache)
+    // {
+    //   self.hashCache = imageHost.image.hash;
+    //   [self updateArtwork:imageHost.image];
+    // }
   }
 
   else if (self.centerHost && [keyPath isEqualToString:@"center"])
@@ -136,9 +138,27 @@
 
 -(void)updateArtwork:(UIImage *)img
 {
-  if ([img isKindOfClass:_c(@"UIImage")]) self.artworkImageView.image = img;
-  else if ([self.imageHost isKindOfClass:_c(@"UIImageView")])
-  self.artworkImageView.image = self.imageHost.image;
+  if ([img isKindOfClass:_c(@"UIImage")])
+  {
+    self.artworkImageView.image = img;
+    return;
+  }
+
+  UIImageView * ihost = self.imageHost;
+  if (ihost)
+  {
+    if ([ihost respondsToSelector:@selector(image)])
+    {
+      UIImage * image = [ihost image];
+      HBLogDebug(@"image  hsh %d", image.hash);
+      if (image.hash != self.hashCache)
+      {
+        HBLogWarn(@"these have a different cache, so lets update");
+        self.hashCache = image.hash;
+        self.artworkImageView.image = image;
+      }
+    }
+  }
   else HBLogError(@"imageHost is not type UIImageView, and no UIImage was offered so artwork is NOT being updated, perhaps you will need a different imageHost?");
 }
 

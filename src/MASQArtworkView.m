@@ -76,11 +76,6 @@
     UIImageView * imageHost = self.imageHost;
     if ([imageHost respondsToSelector:@selector(image)])
     [self updateArtwork:nil];
-    // if (imageHost.image.hash != self.hashCache)
-    // {
-    //   self.hashCache = imageHost.image.hash;
-    //   [self updateArtwork:imageHost.image];
-    // }
   }
 
   else if (self.centerHost && [keyPath isEqualToString:@"center"])
@@ -97,11 +92,8 @@
     ((UIImageView *)_containerView.maskView).image = [self maskImage];
     [_overlayView setBackgroundImage:[self overlayImage] forState:UIControlStateNormal];
     [_underlayView setBackgroundImage:[self underlayImage] forState:UIControlStateNormal];
-
-    // fixup the artwork scale by updating hte frame
+    
     [self updateFrame];
-    // float ratio = [self ratio];
-    // _artworkImageView.transform = CGAffineTransformMakeScale(ratio, ratio);
   }
 }
 

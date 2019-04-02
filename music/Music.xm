@@ -1,6 +1,10 @@
 #import "../src/MASQArtworkView.h"
 #import "Interfaces.h"
 
+// @TODO
+// 11.2 works very well
+// 11.1.2 is problematic :(
+
 #define _c(s) NSClassFromString(s) // %_-
 #define arrayOfClass(a, c) [a filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self isKindOfClass: %@", c]]
 
@@ -40,6 +44,7 @@
 
 -(CALayer *)layer {return nil;} // avoid shadow bakein
 
+// doesnt seem to be called below 11.2
 -(void)setVideoView:(BOOL)arg1 {
   UIView * se = self;
   // might need to check if imageSub has a width
@@ -49,6 +54,8 @@
   }
   %orig;
 }
+
+
 %end
 
 %ctor {

@@ -1,6 +1,11 @@
 #import "../src/MASQArtworkView.h"
 #import "Interfaces.h"
 
+// @TODO
+// 11.2
+// loses track of the changes when switching from custom list to radio :(
+// if you skip a lot if can lose track
+
 %ctor {
   if (!%c(MASQArtworkView)) //if not loaded we need to do so
   dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);

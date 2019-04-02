@@ -3,7 +3,7 @@ Name: MasqSpotify
 Depends: ca.ndoizo.masq
 Version: 1.0
 Architecture: iphoneos-arm
-Description: Spotify extension (dev on 8.4.98), using MasqKit!
+Description: Spotify extension (dev on 8.4.99), using MasqKit!
 Maintainer: candoizo
 Author: candoizo
 Section: Tweaks (Masq Extensions)

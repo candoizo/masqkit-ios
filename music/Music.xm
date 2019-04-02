@@ -10,10 +10,6 @@
 -(void)addMasq;
 @end
 
-@interface ArtworkComponent : UIView
-
-@end
-
 %hook Artwork
 %property (nonatomic, retain) MASQArtworkView * masqArtwork;
 %new
@@ -57,6 +53,7 @@
 %end
 
 %ctor {
-  if (!%c(MASQHousekeeper)) dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
+  if (!%c(MASQHousekeeper))
+  dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
   %init(Artwork = _c(@"Music.NowPlayingContentView"));
 }

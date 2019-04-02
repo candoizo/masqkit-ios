@@ -2,30 +2,27 @@
 #import "Interfaces.h"
 
 %ctor
-{ // check that the kit has been loaded into the app first
+{ // check that the kit has been loaded into the app we're hooking first
   if (!%c(MASQThemeManager))
   dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
 }
-
 
 %hook MediaControlsPanelViewController
 -(id)headerView {
   MediaControlsHeaderView * orig = %orig;
   if ([orig artworkView] && !orig.masqArtwork)
   {
-
     Class cc = %c(MediaControlsEndpointsViewController);
     Class ls = %c(SBDashBoardMediaControlsViewController);
-
     NSString * key;// assign the key based on where it's from
-    if ([self.delegate isKindOfClass:cc]) key = @"ControlCenter";
-    else if ([self.delegate isKindOfClass:ls]) key = @"LockScreen";
+    if ([self.delegate isKindOfClass:cc]) key = @"CC";
+    else if ([self.delegate isKindOfClass:ls]) key = @"LS";
     else return orig; //avoid mayhem from unexpected things
 
     if (key)
-    { // load it in assuming we expected it
+    { // load it in assuming we matched
       orig.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:key frameHost:orig.artworkView imageHost:orig.artworkView];
-      orig.masqArtwork.userInteractionEnabled = YES;
+      orig.masqArtwork.userInteractionEnabled = YES; //only for sb so ppl can open on tap
       [orig addSubview:orig.masqArtwork];
     }
   }
@@ -43,7 +40,6 @@
     {
       self.headerView.masqArtwork.hidden = YES;
     }
-
     else if ([%c(UIDevice) currentDevice].systemVersion.doubleValue < 11.2)
     {
       self.headerView.masqArtwork.hidden = (arg1 == 0) || (arg1 == 3);
@@ -51,10 +47,10 @@
     else
     {
       if ([self.headerView.masqArtwork.identifier isEqualToString:@"CC"])
-      { // hiding of the cc modes
-        if (arg1 == 0x3 || arg1 == 0x1)
+      { // tracking the cc module
+        if (arg1 == 3 || arg1 == 1)
         self.headerView.masqArtwork.hidden = YES;
-        else if (arg1 == 0x0)
+        else if (arg1 == 0)
         self.headerView.masqArtwork.hidden = NO;
       }
     }
@@ -65,16 +61,24 @@
   %orig;
   if (self.headerView.masqArtwork)
   [self.headerView.masqArtwork updateTheme];
+  // since its sb we call it manually when the user looks
+  // in app extensions this is automatically handled
 }
 %end
 
-// hide artwork assets
+// obscure artwork assets
 %hook MediaControlsHeaderView
 %property (nonatomic, retain) MASQArtworkView * masqArtwork;
--(id)shadow {return nil;}
+-(id)shadow {
+  return nil;
+}
 
--(id)artworkBackgroundView {return nil;}
+-(id)artworkBackgroundView {
+  return nil;
+}
 
+// we don't wan to break this one because we're hosting it
+// it alive to handle all the layout methods pointed at it
 -(id)artworkView {
   UIView * orig = %orig;
   orig.hidden = YES;

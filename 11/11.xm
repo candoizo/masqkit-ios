@@ -19,7 +19,7 @@ static NSString * const kDashBoardKey = @"LS";
 -(id)headerView {
   MediaControlsHeaderView * orig = %orig;
   if ([orig artworkView] && !orig.masqArtwork)
-  {
+  { //assign our view when the host is ready and there is none
     Class cc = %c(MediaControlsEndpointsViewController);
     Class ls = %c(SBDashBoardMediaControlsViewController);
     NSString * key;// assign the key based on where it's from
@@ -49,14 +49,20 @@ static NSString * const kDashBoardKey = @"LS";
     if ([artwork.identifier isEqualToString:kControlCenterKey])
     { // we only need to account for the different cc states on diff vers
       // artwork.hidden = [self onScreen];
-      artwork.hidden = ![%c(SBMediaController) sharedInstance].hasTrack;
-      /*else */if ([%c(UIDevice) currentDevice].systemVersion.doubleValue < 11.2)
+      BOOL appPlaying = [%c(SBMediaController) sharedInstance].hasTrack;
+      artwork.hidden = !appPlaying; //if app is playing, we are not hidden
+      /*else */if ([%c(UIDevice) currentDevice].systemVersion.doubleValue < 11.2 && appPlaying)
       { // before ios 11.2 its a bit different
         // 0 means closed
-        if (arg1 != 0)
-        artwork.hidden = YES;
+        // headerViewOnScreen is ios 1
+        // headerViewOnScreen was removed
+        // artwork.hidden = !(arg1 == 0 || self.headerView.headerViewOnScreen);
+        HBLogWarn(@"iOS 11.2 >, playing, style %d", (int)arg1);
+        artwork.hidden = arg1 == 0;
+        // if (arg1 == 0 || self.headerView.headerViewOnScreen)
+        // artwork.hidden = YES;
       }
-      else if ([%c(SBMediaController) sharedInstance].hasTrack)
+      else if (appPlaying)
       { // a higher version, and we have a track
         // 0 means open, 1 = 3 mean transition / closing
         if (arg1 == 3 || arg1 == 1)

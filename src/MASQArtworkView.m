@@ -92,7 +92,7 @@
     ((UIImageView *)_containerView.maskView).image = [self maskImage];
     [_overlayView setBackgroundImage:[self overlayImage] forState:UIControlStateNormal];
     [_underlayView setBackgroundImage:[self underlayImage] forState:UIControlStateNormal];
-    
+
     [self updateFrame];
   }
 }
@@ -103,7 +103,7 @@
   if (ident)
   {
     NSBundle * currentTheme = [MASQThemeManager themeBundleForKey:ident];
-    HBLogWarn(@"id %@, theme b %@", self.identifier, currentTheme);
+    HBLogDebug(@"id %@, theme b %@", self.identifier, currentTheme);
     if (currentTheme == self.currentTheme) return;
 
     self.currentTheme = currentTheme;
@@ -149,10 +149,10 @@
     if ([ihost respondsToSelector:@selector(image)])
     {
       UIImage * image = [ihost image];
-      HBLogDebug(@"image  hsh %d", image.hash);
+      // HBLogDebug(@"image  hsh %d", image.hash);
       if (image.hash != self.hashCache)
       {
-        HBLogWarn(@"these have a different cache, so lets update");
+        // HBLogWarn(@"these have a different cache, so lets update");
         self.hashCache = image.hash;
         self.artworkImageView.image = image;
       }

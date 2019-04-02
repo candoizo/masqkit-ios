@@ -5,7 +5,7 @@ items = (
        iconBundle = "com.apple.Music";
        label = "Music";
        detail = MASQSubPageController;
-       versionInfo = "Tested on iOS 11.0.2 and 11.2.2";
+       versionInfo = "Compatible with iOS 11, untested on iOS 12.";
        specs = MASQMusic.page;
     }
 );

@@ -2,6 +2,9 @@
 @property (nonatomic, retain) MASQArtworkView * masqArtwork;
 @property (nonatomic,retain) UIImageView * artworkView;
 @property () UIView * artworkBackgroundView;
+
+
+-(BOOL)headerViewOnScreen; // < 11.2 only
 @end
 
 @interface MediaControlsPanelViewController : UIViewController

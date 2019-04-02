@@ -19,8 +19,29 @@
   NSString * themeId = nil;
   if ([prefs valueForKey:arg1])
   themeId = [prefs valueForKey:arg1];
+  if (themeId) HBLogWarn(@"Prefs had a value, and it was %@", themeId);
+
+  // here where the problem where i lost updates on 3rd party apps arises
+  /*
+    basically first I was checking the prefs valueForKey:@"" and if I got a value from there I ignored the backingDict value, even though it could have been newer
+
+    since the NSUserDefaults wasnt updated yet but still held the old value it wasnt updating. But once i exited a second time it usually had by then, and thats why it would give me a new one!
+
+    Meanwhile it already updates intantly between prefs / sb so thats why it was updating immediately
+  */
+  // if the backingDict has a newer thing I shoul duse that
+  // but probably only on iOS 11 because i wont be getting the instant updates on ios 10
   if (!themeId && [self backingDict][arg1])
   themeId = [self backingDict][arg1];
+
+  if ([self backingDict][arg1])
+  {
+    if (![themeId isEqualToString:[self backingDict][arg1])]
+    {
+      HBLogWarn(@"Hey these are different! %@ != %@", themeId, [self backingDict][arg1]);
+      HBLogWarn(@"if on ios 11, then the hard dict path will be more updated");
+    }
+  }
 
   if (!themeId)
   { //error probably

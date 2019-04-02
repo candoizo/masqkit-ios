@@ -43,7 +43,7 @@
       self.headerView.masqArtwork.hidden = YES;
     }
 
-    if ([%c(UIDevice) currentDevice].systemVersion.doubleValue < 11.2)
+    else if ([%c(UIDevice) currentDevice].systemVersion.doubleValue < 11.2)
     {
       HBLogDebug(@"below v 11.2");
       self.headerView.masqArtwork.hidden = (arg1 == 0) || (arg1 == 3);

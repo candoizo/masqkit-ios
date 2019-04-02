@@ -16,7 +16,7 @@
     _identifier = key;
     [self updateTheme];
 
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTheme)  name:UIApplicationDidBecomeActiveNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(__debug_updateTheme:)  name:UIApplicationDidBecomeActiveNotification object:nil];
 
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(__debug_updateArtwork:)  name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
 
@@ -29,6 +29,11 @@
 }
 
 // -[MPMediaLibrary _reloadLibraryForContentsChangeWithNotificationInfo:0x0]
+
+-(void)__debug_updateTheme:(id)arg1
+{
+  [self updateTheme];
+}
 
 -(void)__debug_updateArtwork:(id)arg1 {
   HBLogDebug(@"%@", arg1);
@@ -102,15 +107,17 @@
 
 -(void)updateTheme
 {
-  if (self.identifier)
+  NSString * ident = self.identifier;
+  if (ident)
   {
-    NSBundle * currentTheme = [MASQThemeManager themeBundleForKey:self.identifier];
-    HBLogDebug(@"id %@, theme b %@", self.identifier, currentTheme);
+    NSBundle * currentTheme = [MASQThemeManager themeBundleForKey:ident];
+    HBLogWarn(@"id %@, theme b %@", self.identifier, currentTheme);
     if (currentTheme == self.currentTheme) return;
 
     self.currentTheme = currentTheme;
     [self themeUpdating];
   }
+  else HBLogError(@"There was no identifier?");
 }
 
 -(void)updateCenter

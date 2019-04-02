@@ -18,7 +18,6 @@ cd ..
 cd spotify
 make clean-packages
 make clean package install
-
 #themes
 cd ../customcoverthemepack
 make clean-packages

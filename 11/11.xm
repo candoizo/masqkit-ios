@@ -57,7 +57,15 @@ static NSString * const kDashBoardKey = @"LS";
         // headerViewOnScreen is ios 1
         // headerViewOnScreen was removed
         // artwork.hidden = !(arg1 == 0 || self.headerView.headerViewOnScreen);
+
+        // 0 means closed
+        // 2 means open
         HBLogWarn(@"iOS 11.2 >, playing, style %d", (int)arg1);
+        // if (arg1 == 2)
+        // {
+        //
+        // }
+        // else if ()
         if (arg1 == 0)
         {
           artwork.hidden = YES;
@@ -67,7 +75,7 @@ static NSString * const kDashBoardKey = @"LS";
         {
           if (appPlaying) artwork.hidden = NO;
         }
-        artwork.hidden = arg1 == 0;
+        // artwork.hidden = arg1 == 0;
         // if (arg1 == 0 || self.headerView.headerViewOnScreen)
         // artwork.hidden = YES;
       }

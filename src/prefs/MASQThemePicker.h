@@ -11,4 +11,5 @@
 -(NSString *)themeKey; // MP, CC, SP, LS, SC,
 -(UIColor *)themeTint;
 -(NSString *)themePath;
++(UIColor *)hexToRGB:(NSString *)arg1;
 @end

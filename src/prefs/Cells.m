@@ -2,6 +2,7 @@
 #import <Preferences/PSSwitchTableCell.h>
 // #import <Preferences/PSSegmentTableCell.h>
 #import "../MASQThemeManager.h"
+#import "MASQThemePicker.h"
 
 #define kMasqTint(x) [UIColor colorWithRed:0.87 green:0.25 blue:0.40 alpha:x]
 
@@ -19,7 +20,7 @@
 	if (self) {
 
 		NSString * tintHex = [arg3 propertyForKey:@"tint"];
-		if (tintHex) [((UISwitch *)[self control]) setOnTintColor:[NSClassFromString(@"MASQThemeManager") hexToRGB:tintHex]];
+		if (tintHex) [((UISwitch *)[self control]) setOnTintColor:[NSClassFromString(@"MASQThemePicker") hexToRGB:tintHex]];
 		else [((UISwitch *)[self control]) setOnTintColor:kMasqTint(0.8)]; //?TODO
 
 		if ([arg3 propertyForKey:@"hint"])	{
@@ -27,7 +28,7 @@
 			self.detailTextLabel.textAlignment = 4;
 			self.detailTextLabel.font = [self.detailTextLabel.font fontWithSize:12];
 			if (tintHex) {
-				self.detailTextLabel.textColor = [[NSClassFromString(@"MASQThemeManager") hexToRGB:tintHex] colorWithAlphaComponent:0.7];
+				self.detailTextLabel.textColor = [[NSClassFromString(@"MASQThemePicker") hexToRGB:tintHex] colorWithAlphaComponent:0.7];
 			}
 			else self.detailTextLabel.textColor = kMasqTint(0.7);
 		}
@@ -54,7 +55,7 @@
 
 	self.detailTextLabel.font = [self.detailTextLabel.font fontWithSize:12];
 	NSString * tintHex = [arg1 propertyForKey:@"tint"];
-	if (tintHex) self.detailTextLabel.textColor = [[NSClassFromString(@"MASQThemeManager") hexToRGB:tintHex] colorWithAlphaComponent:0.7];
+	if (tintHex) self.detailTextLabel.textColor = [[NSClassFromString(@"MASQThemePicker") hexToRGB:tintHex] colorWithAlphaComponent:0.7];
 	else self.detailTextLabel.textColor = kMasqTint(0.7);
 }
 
@@ -83,7 +84,7 @@
 	if (self) {
 
 		NSString * tintHex = [arg3 propertyForKey:@"tint"];
-		if (tintHex) self.tintColor = [NSClassFromString(@"MASQThemeManager") hexToRGB:tintHex];
+		if (tintHex) self.tintColor = [NSClassFromString(@"MASQThemePicker") hexToRGB:tintHex];
 		else self.tintColor = kMasqTint(0.8);
 	}
 	return self;

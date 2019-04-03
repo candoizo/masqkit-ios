@@ -30,7 +30,7 @@ static NSString * const kDashBoardKey = @"LS";
     if (key)
     { // load it in assuming we matched
       orig.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:key frameHost:orig.artworkView imageHost:orig.artworkView];
-      orig.masqArtwork.userInteractionEnabled = YES; //only for sb so ppl can open app on tap
+      orig.masqArtwork.userInteractionEnabled = !orig.masqArtwork.hidden; //only for sb so ppl can open app on tap
       [orig addSubview:orig.masqArtwork];
     }
   }
@@ -58,6 +58,15 @@ static NSString * const kDashBoardKey = @"LS";
         // headerViewOnScreen was removed
         // artwork.hidden = !(arg1 == 0 || self.headerView.headerViewOnScreen);
         HBLogWarn(@"iOS 11.2 >, playing, style %d", (int)arg1);
+        if (arg1 == 0)
+        {
+          artwork.hidden = YES;
+          if (appPlaying && arg1 != 0) artwork.hidden = NO;
+        }
+        else
+        {
+          if (appPlaying) artwork.hidden = NO;
+        }
         artwork.hidden = arg1 == 0;
         // if (arg1 == 0 || self.headerView.headerViewOnScreen)
         // artwork.hidden = YES;

@@ -6,4 +6,4 @@ Description: iOS 11(+12?) SpringBoard extension using MasqKit!
 Maintainer: candoizo
 Author: candoizo
 Section: Tweaks (Masq Extensions)
-Depends: ca.ndoizo.masq, firmware (>= 11.0)
+Depends: ca.ndoizo.masqkit, firmware (>= 11.0)

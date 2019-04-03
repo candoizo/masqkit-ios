@@ -6,4 +6,4 @@ Description: Some basic examples of Masq themes.
 Maintainer: candoizo
 Author: candoizo
 Section: Tweaks (Masq Themes)
-Depends: ca.ndoizo.masq
+Depends: ca.ndoizo.masqkit

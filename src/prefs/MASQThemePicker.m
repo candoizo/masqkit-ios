@@ -128,11 +128,14 @@
 		// the like one milisecond delay makes it not update intime for 3rd party apps
 		// if (/[_cfx respondsToSelector:@selector(flushCachesForAppIdentifier:user:)])
 		// but the version doesnt cause the same problem :D
-		if (UIDevice.currentDevice.systemVersion.doubleValue > 11)
+		// if (UIDevice.currentDevice.systemVersion.doubleValue > 11)
+		// { //basically this check was making it not update fast enough on ios 11.0.2 :o
+		if (_cfx)
 		{
 			_CFXPreferences *prefs = [_cfx copyDefaultPreferences];
 			[prefs flushCachesForAppIdentifier:(__bridge CFStringRef)@"ca.ndoizo.masq" user:(__bridge CFStringRef)@"/User"];
 		}
+		// }
 	}
 }
 

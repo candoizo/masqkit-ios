@@ -1,6 +1,6 @@
-Package: masq.extension.music.swifty
+Package: masq.extension.music
 Name: MasqMusic
-Depends: ca.ndoizo.masq, firmware (>= 11.0)
+Depends: ca.ndoizo.masqkit, firmware (>= 11.0)
 Version: 1.0
 Architecture: iphoneos-arm
 Description: Music.app (iOS 11+) extension using MasqKit!

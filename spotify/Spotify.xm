@@ -48,7 +48,7 @@
       // HBLogWarn(@"Spotify has was different so updating!");
     // }
   }
-  // @TODO might need another updater here cus it doesnt work too well
+  // @TODO might need another updater here cus it doesnt work right?
 }
 
 %new
@@ -74,6 +74,14 @@
 }
 %end
 
+// something about this is causing problems, worse its called test so its gunna change one day D=
+// -[SPTRadioTestManagerImplementation isRadioURITransitionEnabled] // temptation
+// -[SPTRadioPlaybackService startDecoratedRadioStation: player: startedFromElement: atIndex:0xffffffffffffffff completion:0x1d6e72b80] new radio station view made
+%hook SPTRadioPlaybackService
+-(void)startDecoratedRadioStation:(id)arg1 player:(id)arg2 startedFromElement:(id)arg3 atIndex:(id)arg4 completion:(id)arg5
+%end
+
+
 // ios 10? old devices? dunno
 @interface SPTNowPlayingViewController : UIViewController
 @property (nonatomic, retain) MASQArtworkView * masqArtwork;
@@ -87,7 +95,6 @@
   if (!self.masqArtwork)
   {
     self.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:@"Spotify" frameHost:[self spt_nowPlayingCoverArtView] imageHost:[self activeContentHost].coverArtContent];
-
     // only needed for especially difficult views that pretend to be at 0,0
     self.masqArtwork.centerHost = [self activeContentHost].contentUnitView;
     [self.view addSubview:self.masqArtwork];

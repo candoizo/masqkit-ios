@@ -2,7 +2,7 @@ Package: masq.theme.customcover
 Name: CustomCover Masqpack
 Version: 1.0b
 Architecture: iphoneos-arm
-Description: Some CustomCover themes by Charlie Hewitt, converted for Masq!
+Description: Iconic CustomCover themes by Charlie Hewitt, converted for Masq!
 Maintainer: candoizo
 Author: candoizo
 Section: Tweaks (Masq Themes)

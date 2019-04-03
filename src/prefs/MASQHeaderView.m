@@ -56,7 +56,7 @@
 -(UILabel *)creditViewWithText:(NSString *)arg1 {
 	UILabel *copyright = [[UILabel alloc] initWithFrame:CGRectMake(0, 80, self.bounds.size.width, 30)];
 	copyright.numberOfLines = 0;
-	copyright.font = [UIFont fontWithName:@"HelveticaNeue" size:8];
+	copyright.font = [UIFont fontWithName:@"HelveticaNeue" size:10];
 	copyright.text = arg1;
 	copyright.textColor = [UIColor.blackColor colorWithAlphaComponent:0.5];
 	copyright.textAlignment = 1;

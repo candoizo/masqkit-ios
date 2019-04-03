@@ -2,9 +2,7 @@
 #import "Interfaces.h"
 
 // @TODO
-// 11.2
-// loses track of the changes when switching from custom list to radio :(
-// if you skip a lot if can lose track
+// hard to test but potentially skipping when lagging can make it lose track once?
 
 %ctor {
   if (!%c(MASQArtworkView)) //if not loaded we need to do so
@@ -41,20 +39,13 @@
   SPTNowPlayingContentCell * act = [self activeContentHost];
   if (arg1 && self.masqArtwork && arg1 == act && act.coverArtContent)
   {
-    // good intentions but too late when someone opens from the bg
-    // if (act.coverArtContent.image.hash != self.masqArtwork.hashCache)
-    // {
     if (act.coverArtContent != self.masqArtwork.imageHost)
     {
-      // fixes the playlist losing track when it switches to the radio controller
       self.masqArtwork.imageHost = act.coverArtContent;
     }
 
     [self.masqArtwork updateArtwork:act.coverArtContent.image];
-      // HBLogWarn(@"Spotify has was different so updating!");
-    // }
   }
-  // @TODO might need another updater here cus it doesnt work right?
 }
 
 %new
@@ -86,30 +77,30 @@
 // %hook SPTRadioPlaybackService
 // -(void)startDecoratedRadioStation:(id)arg1 player:(id)arg2 startedFromElement:(id)arg3 atIndex:(id)arg4 completion:(id)arg5
 // %end
-
-
-// ios 10? old devices? dunno
-@interface SPTNowPlayingViewController : UIViewController
-@property (nonatomic, retain) MASQArtworkView * masqArtwork;
--(SPTNowPlayingContentView *)spt_nowPlayingCoverArtView;
--(SPTNowPlayingContentCell *)activeContentHost;
-@end
-%hook SPTNowPlayingViewController
-%property (nonatomic, retain) MASQArtworkView * masqArtwork;
-%new
--(void)addMasq {
-  if (!self.masqArtwork)
-  {
-    self.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:@"Spotify" frameHost:[self spt_nowPlayingCoverArtView] imageHost:[self activeContentHost].coverArtContent];
-    // only needed for especially difficult views that pretend to be at 0,0
-    self.masqArtwork.centerHost = [self activeContentHost].contentUnitView;
-    [self.view addSubview:self.masqArtwork];
-  }
-}
-
-%new
--(SPTNowPlayingContentCell *)activeContentHost {
-  SPTNowPlayingContentView * cell = [self spt_nowPlayingCoverArtView];
-  return [cell cellAtRelativePage:0];
-}
-%end
+//
+//
+// // ios 10? old devices? dunno
+// @interface SPTNowPlayingViewController : UIViewController
+// @property (nonatomic, retain) MASQArtworkView * masqArtwork;
+// -(SPTNowPlayingContentView *)spt_nowPlayingCoverArtView;
+// -(SPTNowPlayingContentCell *)activeContentHost;
+// @end
+// %hook SPTNowPlayingViewController
+// %property (nonatomic, retain) MASQArtworkView * masqArtwork;
+// %new
+// -(void)addMasq {
+//   if (!self.masqArtwork)
+//   {
+//     self.masqArtwork = [[%c(MASQArtworkView) alloc] initWithThemeKey:@"Spotify" frameHost:[self spt_nowPlayingCoverArtView] imageHost:[self activeContentHost].coverArtContent];
+//     // only needed for especially difficult views that pretend to be at 0,0
+//     self.masqArtwork.centerHost = [self activeContentHost].contentUnitView;
+//     [self.view addSubview:self.masqArtwork];
+//   }
+// }
+//
+// %new
+// -(SPTNowPlayingContentCell *)activeContentHost {
+//   SPTNowPlayingContentView * cell = [self spt_nowPlayingCoverArtView];
+//   return [cell cellAtRelativePage:0];
+// }
+// %end

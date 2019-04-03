@@ -44,7 +44,13 @@
     // good intentions but too late when someone opens from the bg
     // if (act.coverArtContent.image.hash != self.masqArtwork.hashCache)
     // {
-      [self.masqArtwork updateArtwork:act.coverArtContent.image];
+    if (act.coverArtContent != self.masqArtwork.imageHost)
+    {
+      // fixes the playlist losing track when it switches to the radio controller
+      self.masqArtwork.imageHost = act.coverArtContent;
+    }
+
+    [self.masqArtwork updateArtwork:act.coverArtContent.image];
       // HBLogWarn(@"Spotify has was different so updating!");
     // }
   }
@@ -77,9 +83,9 @@
 // something about this is causing problems, worse its called test so its gunna change one day D=
 // -[SPTRadioTestManagerImplementation isRadioURITransitionEnabled] // temptation
 // -[SPTRadioPlaybackService startDecoratedRadioStation: player: startedFromElement: atIndex:0xffffffffffffffff completion:0x1d6e72b80] new radio station view made
-%hook SPTRadioPlaybackService
--(void)startDecoratedRadioStation:(id)arg1 player:(id)arg2 startedFromElement:(id)arg3 atIndex:(id)arg4 completion:(id)arg5
-%end
+// %hook SPTRadioPlaybackService
+// -(void)startDecoratedRadioStation:(id)arg1 player:(id)arg2 startedFromElement:(id)arg3 atIndex:(id)arg4 completion:(id)arg5
+// %end
 
 
 // ios 10? old devices? dunno

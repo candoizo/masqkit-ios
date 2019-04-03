@@ -11,7 +11,7 @@
 @end
 
 @implementation MASQPrefsController
-+(void)clearPrefs { [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:@"ca.ndoizo.masq"]; }
++(void)clearPrefs { [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:@"ca.ndoizo.masqkit"]; }
 
 - (NSArray *)specifiers {
 	if (!_specifiers)	{

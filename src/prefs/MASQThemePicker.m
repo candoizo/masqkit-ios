@@ -29,34 +29,37 @@
 	// for all the installed bundles in /Application Support/MASQ/Themes/x.bundle
 	for (NSString * bundles in [NSFileManager.defaultManager contentsOfDirectoryAtPath:themePath error:nil])
 	{
-		// Path to theme bundle
-		NSString * tbPath = [NSString stringWithFormat:@"%@/%@", themePath, bundles];
-		HBLogDebug(@"tbPath: %@", tbPath);
-		// for all themes or theme installed in the bundle
-		for (NSString * themeid in [NSFileManager.defaultManager contentsOfDirectoryAtPath:tbPath error:nil])
+		if ([bundles hasSuffix:@".bundle"])
 		{
-			// if (![themes containsObject:@"@"]) //coult implement plist dict
-
-			//old simple way by path
-			NSArray * theme = [themeid componentsSeparatedByString:@"@"];
-			NSString * bthemeId = [NSString stringWithFormat:@"%@/%@", bundles, themeid];
-			NSString * name = theme.firstObject;
-			NSString * scale = theme.lastObject;
-
-			NSString * credPath = [NSString stringWithFormat:@"%@/%@/Credit.txt",
-			tbPath, themeid];
-			if ([NSFileManager.defaultManager fileExistsAtPath:credPath])
+		// Path to theme bundle
+			NSString * tbPath = [NSString stringWithFormat:@"%@/%@", themePath, bundles];
+			HBLogDebug(@"tbPath: %@", tbPath);
+			// for all themes or theme installed in the bundle
+			for (NSString * themeid in [NSFileManager.defaultManager contentsOfDirectoryAtPath:tbPath error:nil])
 			{
-				NSString * credit = [NSString stringWithContentsOfFile:credPath encoding:NSUTF8StringEncoding error:nil];
-				[themes addObject:@{ @"bundle":bthemeId, @"name":name, @"scale":scale, @"author":credit ?: @""}];
-			}
-			else {
-				// no credit exists
-				if ([bthemeId isEqualToString:@"Default.bundle/Default@100"])
-				[themes insertObject:@{ @"bundle":bthemeId, @"name":name, @"scale":scale, @"author":@""} atIndex:0];
+				// if (![themes containsObject:@"@"]) //coult implement plist dict
 
-				else //if not the default add normally
-				[themes addObject:@{ @"bundle":bthemeId, @"name":name, @"scale":scale, @"author":@""}];
+				//old simple way by path
+				NSArray * theme = [themeid componentsSeparatedByString:@"@"];
+				NSString * bthemeId = [NSString stringWithFormat:@"%@/%@", bundles, themeid];
+				NSString * name = theme.firstObject;
+				NSString * scale = theme.lastObject;
+
+				NSString * credPath = [NSString stringWithFormat:@"%@/%@/Credit.txt",
+				tbPath, themeid];
+				if ([NSFileManager.defaultManager fileExistsAtPath:credPath])
+				{
+					NSString * credit = [NSString stringWithContentsOfFile:credPath encoding:NSUTF8StringEncoding error:nil];
+					[themes addObject:@{ @"bundle":bthemeId, @"name":name, @"scale":scale, @"author":credit ?: @""}];
+				}
+				else {
+					// no credit exists
+					if ([bthemeId isEqualToString:@"Default.bundle/Default@100"])
+					[themes insertObject:@{ @"bundle":bthemeId, @"name":name, @"scale":scale, @"author":@""} atIndex:0];
+
+					else //if not the default add normally
+					[themes addObject:@{ @"bundle":bthemeId, @"name":name, @"scale":scale, @"author":@""}];
+				}
 			}
 		}
 	}
@@ -133,7 +136,7 @@
 		if (_cfx)
 		{
 			_CFXPreferences *prefs = [_cfx copyDefaultPreferences];
-			[prefs flushCachesForAppIdentifier:(__bridge CFStringRef)@"ca.ndoizo.masq" user:(__bridge CFStringRef)@"/User"];
+			[prefs flushCachesForAppIdentifier:(__bridge CFStringRef)@"ca.ndoizo.masqkit" user:(__bridge CFStringRef)@"/User"];
 		}
 		// }
 	}

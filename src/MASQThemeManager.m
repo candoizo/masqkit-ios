@@ -11,7 +11,7 @@
   static id sprefs;
   dispatch_once(&once, ^
   {
-    sprefs = [[NSUserDefaults alloc] initWithSuiteName:@"ca.ndoizo.masq"];
+    sprefs = [[NSUserDefaults alloc] initWithSuiteName:@"ca.ndoizo.masqkit"];
   });
   return sprefs;
 }
@@ -69,7 +69,7 @@
 }
 
 +(NSDictionary *)backingDict {
-  return [NSDictionary dictionaryWithContentsOfFile:[[NSBundle bundleWithPath:@"/private/var/mobile/Library/Preferences/"] pathForResource:@"ca.ndoizo.masq" ofType:@"plist"]];
+  return [NSDictionary dictionaryWithContentsOfFile:[[NSBundle bundleWithPath:@"/private/var/mobile/Library/Preferences/"] pathForResource:@"ca.ndoizo.masqkit" ofType:@"plist"]];
 }
 
 // +(UIColor *)hexToRGB:(NSString *)hex {

@@ -51,8 +51,14 @@ static NSString * const kDashBoardKey = @"LS";
       // artwork.hidden = [self onScreen];
       BOOL appPlaying = [%c(SBMediaController) sharedInstance].hasTrack;
       artwork.hidden = !appPlaying; //if app is playing, we are not hidden
-      /*else */if ([%c(UIDevice) currentDevice].systemVersion.doubleValue < 11.2 && appPlaying)
-      { // before ios 11.2 its a bit different
+      /*else */if ([%c(UIDevice) currentDevice].systemVersion.doubleValue < 11.2)
+      {
+        if (arg1 == 2 && appPlaying)
+        artwork.hidden = NO;
+
+        else if (arg1 == 0)
+        artwork.hidden = YES;
+        // before ios 11.2 its a bit different
         // 0 means closed
         // headerViewOnScreen is ios 1
         // headerViewOnScreen was removed
@@ -66,16 +72,18 @@ static NSString * const kDashBoardKey = @"LS";
         //
         // }
         // else if ()
-        if (arg1 == 0)
-        {
-          artwork.hidden = YES;
-          if (appPlaying && arg1 != 0) artwork.hidden = NO;
-        }
-        else
-        {
-          if (appPlaying) artwork.hidden = NO;
-        }
-        // artwork.hidden = arg1 == 0;
+        // if (arg1 == 0)
+        // {
+        //   HBLogWarn(@"was zero");
+        //   artwork.hidden = YES;
+        //   if (appPlaying && arg1 != 0) artwork.hidden = NO;
+        // }
+        // else
+        // {
+        //   HBLogWarn(@"was something else");
+        //   if (appPlaying) artwork.hidden = NO;
+        // }
+        // // artwork.hidden = arg1 == 0;
         // if (arg1 == 0 || self.headerView.headerViewOnScreen)
         // artwork.hidden = YES;
       }

@@ -1,11 +1,11 @@
 {
-	CFBundleDevelopmentRegion = English;
-	CFBundleExecutable = MASQPrefs;
-	CFBundleIdentifier = ca.ndoizo.masq;
+	CFBundleDevelopmentRegion = "English";
+	CFBundleExecutable = "MASQPrefs";
+	CFBundleIdentifier = "ca.ndoizo.masq";
 	CFBundleInfoDictionaryVersion = 6.0;
-	CFBundlePackageType = BNDL;
+	CFBundlePackageType = "BNDL";
 	CFBundleShortVersionString = 1.0.0;
-	CFBundleSignature = ????;
+	CFBundleSignature = "????";
 	CFBundleVersion = 1.0;
 	MinimumOSVers1ion = 3.0;
 	NSPrincipalClass = MASQPrefsController;

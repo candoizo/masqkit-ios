@@ -43,11 +43,11 @@
 	// if ([self.prefs boolForKey:@"firstTime"]) [self.prefs setBool:NO forKey:@"firstTime"]; 	//obv fix before release
 	// else [self.view addSubview:[[MASQIntroView alloc] init]];
 
-	//if they havent seen this their first time opening
-	if (![self.prefs boolForKey:@"firstTime"])
-	{
-		[self.view addSubview:[[MASQIntroView alloc] init]];
-	}
+	// //if they havent seen this their first time opening
+	// if (![self.prefs boolForKey:@"firstTime"])
+	// {
+	// 	[self.view addSubview:[[MASQIntroView alloc] init]];
+	// }
 
 	[super viewWillAppear:animated];
 	[self reloadSpecifiers];
@@ -86,7 +86,7 @@
 		return [[MASQHeaderView alloc]
 		initWithFrame:CGRectMake(0,0,self.view.bounds.size.width, sectionH)
 		tweakTitle:@"MASQ"
-		iconImage:[self imageFromPrefsWithName:@"Assets/Icon"]];
+		iconImage:[self imageFromPrefsWithName:@"Icon/Icon"]];
 	}
 	else return [super tableView:tableView viewForHeaderInSection:section];
 }

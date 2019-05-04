@@ -1,0 +1,10 @@
+Package: masq.extension.sylph
+Name: MASQSylph
+Depends: ca.ndoizo.masqkit, ch.mdaus.sylph, firmware (>= 11.0)
+Version: 1.0b
+Architecture: iphoneos-arm
+Description: Slyph themeing extension using MasqKit!
+Maintainer: candoizo
+Author: Max Dausch ft. candoizo
+Section: Tweaks (Masq Extensions)
+Replaces: masq.extension.slyph

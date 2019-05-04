@@ -1,0 +1,12 @@
+items = (
+    {
+       cell = PSLinkCell;
+       cellClass = MASQSubPageLinkCell;
+       label = "Sylph";
+       detail = MASQSubPageController;
+       versionInfo = "Build for Sylph v0.0.1.4";
+       specs = MASQSylph.page;
+       iconBundle = "com.apple.Preferences";
+       // feel free to change this instead to a direct path to your tweak icon
+    }
+);

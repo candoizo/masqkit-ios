@@ -1,0 +1,11 @@
+Package: ca.ndoizo.masqkit
+Name: MASQKit
+Depends: preferenceloader
+Version: 1.0.1
+Architecture: iphoneos-arm
+Description: Core functionality & theme pickers for Masq extensions!
+Maintainer: candoizo
+Author: candoizo
+Section: Tweaks
+Icon: /Library/PreferenceBundles/MASQSettings.bundle/Icon/Icon.png
+Depiction: https://ndoizo.ca/ca.ndoizo.masqkit

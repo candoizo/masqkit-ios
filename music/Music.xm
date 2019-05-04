@@ -1,9 +1,6 @@
 #import "../src/MASQArtworkView.h"
 #import "Interfaces.h"
 
-// @TODO
-// 11.1.2 is problematic :(
-
 #define _c(s) NSClassFromString(s) // %_-
 #define arrayOfClass(a, c) [a filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self isKindOfClass: %@", c]]
 
@@ -51,7 +48,7 @@
 // or maybe i have to wait for the width idk
 -(void)setVideoView:(BOOL)arg1 {
   Artwork * _self = self;
-  
+
   if (!_self.masqArtwork && [_self imageSub])
   [_self addMasq];
 

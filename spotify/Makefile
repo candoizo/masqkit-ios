@@ -1,3 +1,4 @@
+ARCHS = arm64 #arm64
 TWEAK_NAME = MASQSpotify
 $(TWEAK_NAME)_FILES = Spotify.xm
 $(TWEAK_NAME)_FRAMEWORKS = UIKit CoreGraphics

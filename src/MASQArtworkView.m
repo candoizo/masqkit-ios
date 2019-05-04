@@ -1,7 +1,6 @@
 #import "MASQArtworkView.h"
 #import "MASQThemeManager.h"
 
-#define _c(c) NSClassFromString(c)
 #define arrayContainsKindOfClass(a, c) [a filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self isKindOfClass: %@", c]]
 
 @implementation MASQArtworkView
@@ -16,37 +15,29 @@
     _identifier = key;
     [self updateTheme];
 
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(__debug_updateTheme:)  name:UIApplicationDidBecomeActiveNotification object:nil];
+    // lol omg this had to be changed
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTheme)  name:UIApplicationDidBecomeActiveNotification object:nil];
 
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(__debug_updateArtwork:)  name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
-
-    // _kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateArtwork:)  name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
     /*
       ios 11 only? called in music.app and spotify... and springboard
+
+
+      // _kMRPlayerPlaybackQueueContentItemArtworkChangedNotification
+      // kMRPlaybackQueueContentItemArtworkChangedNotification
+      // _kMRPlaybackQueueContentItemArtworkChangedNotification
+
     */
   }
   return self;
 }
 
-// -[MPMediaLibrary _reloadLibraryForContentsChangeWithNotificationInfo:0x0]
-
--(void)__debug_updateTheme:(id)arg1
-{
-  [self updateTheme];
-}
-
--(void)__debug_updateArtwork:(id)arg1 {
-  HBLogDebug(@"%@", arg1);
-  [self updateArtwork:nil];
-
-  //kMRMediaRemoteNowPlayingInfoArtworkIdentifier
-  //kMRMediaRemoteNowPLayingInfoUniqueIdentifier // could use this but it might lead to extra changes
-}
-
 -(void)dealloc {
-  [[NSNotificationCenter defaultCenter] removeObserver:self
+  [NSNotificationCenter.defaultCenter removeObserver:self
     name:UIApplicationDidBecomeActiveNotification object:nil];
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
+  [NSNotificationCenter.defaultCenter removeObserver:self
+    name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
+  // [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 -(id)initWithThemeKey:(NSString *)arg1 frameHost:(id)arg2 imageHost:(id)arg3
@@ -103,7 +94,7 @@
   if (ident)
   {
     NSBundle * currentTheme = [MASQThemeManager themeBundleForKey:ident];
-    HBLogDebug(@"id %@, theme b %@", self.identifier, currentTheme);
+    // HBLogDebug(@"id %@, theme b %@", self.identifier, currentTheme);
     if (currentTheme == self.currentTheme) return;
 
     self.currentTheme = currentTheme;
@@ -137,7 +128,7 @@
 
 -(void)updateArtwork:(UIImage *)img
 {
-  if ([img isKindOfClass:_c(@"UIImage")])
+  if ([img isKindOfClass:NSClassFromString(@"UIImage")])
   {
     self.artworkImageView.image = img;
     return;

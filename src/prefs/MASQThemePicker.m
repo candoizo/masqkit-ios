@@ -25,7 +25,7 @@
 	// NSMutableArray *themes = [@[@{@"bundle":@"Disabled@100", @"name":@"Disabled", @"scale":@"100"}] mutableCopy];
 	NSMutableArray * themes = [NSMutableArray new];
 	NSString * themePath = [self themePath];
-	HBLogDebug(@"Theme path: %@", [self themePath]);
+	// HBLogDebug(@"Theme path: %@", [self themePath]);
 	// for all the installed bundles in /Application Support/MASQ/Themes/x.bundle
 	for (NSString * bundles in [NSFileManager.defaultManager contentsOfDirectoryAtPath:themePath error:nil])
 	{
@@ -33,7 +33,7 @@
 		{
 		// Path to theme bundle
 			NSString * tbPath = [NSString stringWithFormat:@"%@/%@", themePath, bundles];
-			HBLogDebug(@"tbPath: %@", tbPath);
+			// HBLogDebug(@"tbPath: %@", tbPath);
 			// for all themes or theme installed in the bundle
 			for (NSString * themeid in [NSFileManager.defaultManager contentsOfDirectoryAtPath:tbPath error:nil])
 			{
@@ -123,7 +123,7 @@
 		// save selection to prefs
 		self.selectedTheme = self.themes[indexPath.row][@"bundle"];
 
-		HBLogDebug(@"self.selectedTheme %@", self.selectedTheme);
+		// HBLogDebug(@"self.selectedTheme %@", self.selectedTheme);
 		[self.prefs setValue:self.selectedTheme forKey:[self themeKey]];
 
 		Class _cfx = NSClassFromString(@"_CFXPreferences");

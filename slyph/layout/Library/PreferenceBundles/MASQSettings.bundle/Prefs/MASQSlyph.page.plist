@@ -1,0 +1,11 @@
+title = "Sylph Settings";
+items = (
+    {
+       cell = PSLinkCell;
+       cellClass = MASQThemeLinkCell;
+       label = "Theme Picker";
+       themeKey = LS;
+       tint = "#007AFF";
+       detail = MASQThemePicker;
+    }
+);

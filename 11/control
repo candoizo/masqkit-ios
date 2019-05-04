@@ -1,9 +1,10 @@
-Package: masq.extension.sb11
-Name: Masq11
-Version: 1.0
+Package: masq.extension.springboard
+Name: MASQSpringBoard
+Version: 1.0.1
 Architecture: iphoneos-arm
-Description: SpringBoard extension developed for iOS 11 using MasqKit!
+Description: Artworking themeing in SpringBoard using MasqKit!
 Maintainer: candoizo
 Author: candoizo
 Section: Tweaks (Masq Extensions)
 Depends: ca.ndoizo.masqkit, firmware (>= 11.0)
+Depiction: https://ndoizo.ca/masq.extension.springboard

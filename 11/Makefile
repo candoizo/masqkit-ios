@@ -1,4 +1,4 @@
-ARCHS = arm64
+ARCHS = arm64 #arm64e needed for xs but no linux tc yet?
 
 include $(THEOS)/makefiles/common.mk
 

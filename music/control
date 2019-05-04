@@ -1,9 +1,10 @@
 Package: masq.extension.music
-Name: MasqMusic
+Name: MASQMusic
 Depends: ca.ndoizo.masqkit, firmware (>= 11.0)
-Version: 1.0
+Version: 1.0.1
 Architecture: iphoneos-arm
-Description: Music.app (iOS 11+) extension using MasqKit!
+Description: Artwork themeing in the Music.app using MasqKit!
 Maintainer: candoizo
 Author: candoizo
 Section: Tweaks (Masq Extensions)
+Depiction: https://ndoizo.ca/masq.extension.music

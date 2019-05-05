@@ -46,10 +46,10 @@
   // wont need to do this, since it stays synced with NSUserDefaults
   if (!NSClassFromString(@"SpringBoard") && backingTheme)
   {
-    HBLogWarn(@"not in springboard, backing dict %@ != %@", backingTheme, themeId);
+    // HBLogWarn(@"not in springboard, backing dict %@ != %@", backingTheme, themeId);
     if (![themeId isEqualToString:backingTheme])
     { // this means it's an older themeid
-      HBLogWarn(@"The dict path was more updated!");
+      // HBLogWarn(@"The dict path was more updated!");
       if (!NSClassFromString(@"SBMediaController"))
       // if not in springboard we accept the path is probably correct
       themeId = [self backingDict][arg1];

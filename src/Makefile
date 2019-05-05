@@ -1,3 +1,5 @@
+#export ARHCS = arm64 arm64e
+
 TWEAK_NAME = MASQKit
 
 $(TWEAK_NAME)_FILES = $(wildcard *.m)

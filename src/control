@@ -1,6 +1,6 @@
 Package: ca.ndoizo.masqkit
 Name: MASQKit
-Depends: preferenceloader
+Depends: mobilesubstrate, firmware (>= 10.0), preferenceloader
 Version: 1.0.1
 Architecture: iphoneos-arm
 Description: Core functionality & theme pickers for Masq extensions!

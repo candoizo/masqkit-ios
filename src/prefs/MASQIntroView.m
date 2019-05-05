@@ -75,7 +75,7 @@ static NSString * const kSectionThree = @"Extensions let you bring the experienc
 -(id)descriptionLabel {
   UILabel * desc = [[UILabel alloc] initWithFrame:CGRectMake(0, self.bounds.size.height/5, self.bounds.size.width/1.5, 50)];
   desc.adjustsFontSizeToFitWidth = YES;
-  desc.minimumFontSize = 10.0;
+  //desc.minimumFontSize = 10.0;
   desc.numberOfLines = 0;
   desc.font = [UIFont fontWithName:@".SFUIText" size:14];
   desc.center = CGPointMake(self.center.x, desc.center.y);

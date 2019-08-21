@@ -78,6 +78,11 @@
 @interface MASQSegmentCell : PSSegmentTableCell //PSSegmentCell
 @end
 
+@interface _CFXPreferences : NSObject
++ (_CFXPreferences *)copyDefaultPreferences;
+- (void)flushCachesForAppIdentifier:(CFStringRef)arg1 user:(CFStringRef)arg2;
+@end
+
 @implementation MASQSegmentCell
 - (id)initWithStyle:(int)arg1 reuseIdentifier:(id)arg2 specifier:(PSSpecifier *)arg3 {
 	self = [super initWithStyle:arg1 reuseIdentifier:arg2 specifier:arg3];
@@ -89,6 +94,26 @@
 	}
 	return self;
 }
+// -(void)controlChanged:(id)arg1 {
+// 	// [super controlChanged:arg1];
+// 	Class _cfx = NSClassFromString(@"_CFXPreferences");
+// 		// basically this if statement actually fucks us up
+// 		// the like one milisecond delay makes it not update intime for 3rd party apps
+// 		// if (/[_cfx respondsToSelector:@selector(flushCachesForAppIdentifier:user:)])
+// 		// but the version doesnt cause the same problem :D
+// 		// if (UIDevice.currentDevice.systemVersion.doubleValue > 11)
+// 		// { //basically this check was making it not update fast enough on ios 11.0.2 :o
+// 		if (_cfx)
+// 		{
+// 			_CFXPreferences *prefs = [_cfx copyDefaultPreferences];
+// 			[prefs flushCachesForAppIdentifier:(__bridge CFStringRef)@"ca.ndoizo.masqkit" user:(__bridge CFStringRef)@"/User"];
+// 		}
+// }
+// // - (void)setProperty:(id)property forKey:(NSString *)key
+// // 	[super setProperty:property forKey:key];
+// //
+// //
+// // }
 @end
 
 @interface MASQSubPageLinkCell : PSTableCell

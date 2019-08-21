@@ -7,5 +7,16 @@ items = (
        themeKey = Spotify;
        tint = "#1db954";
        detail = MASQThemePicker;
-    }
+    } ,
+    // {
+    //     	cell = PSSliderCell;
+    //     	cellClass = CANSliderCell;
+    //     	defaults = ca.ndoizo.masqkit;
+    //     	key = Spotify.scale;
+    //       min = 0.4;
+    //       max = 1.4;
+    //       showValue = 1;
+    //       label = "Adjust Scale";
+    //       hint = "Adjust the original size of the artwork beyond safe limits.";
+    // },
 );

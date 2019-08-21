@@ -2,10 +2,14 @@
 #import "Interfaces.h"
 
 // @TODO
-// hard to test but potentially skipping when lagging can make it lose track once?
+/*
+  - swiping sometimes causes a flash
+  - make a toggle to hide artwork on videos like how it prolly should be xD
+
+*/
 
 %ctor {
-  if (!%c(MASQArtworkView)) //if not loaded we need to do so
+  if (!%c(MASQArtworkView))
   dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
 }
 

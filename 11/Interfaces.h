@@ -1,3 +1,4 @@
+#import "../src/MASQThemeManager.h"
 #import "../src/MASQArtworkView.h"
 #import "../src/MASQArtworkBlurView.h"
 
@@ -26,15 +27,22 @@
 // @interface MASQArtworkBlurView : UIImageView
 // @end
 
+// ios 12.4 (maybe 12.2)+
 @interface MRPlatterViewController : UIViewController
-@property (nonatomic) float trueWidth;
 @property (nonatomic) UIView * topDividerView;
 @property (nonatomic) UIView * backgroundView;
 @property (nonatomic) MediaControlsHeaderView * nowPlayingHeaderView;
-@property (nonatomic) id delegate;
 @property (assign,nonatomic) int mediaControlsPlayerState; // only exists below 11.1.12
+@property (nonatomic) id delegate;
+@property (nonatomic) float trueWidth;
 @property (nonatomic) int style;
--(BOOL)onScreen;
+// -(BOOL)onScreen;
 
 @property (nonatomic, retain) MASQArtworkBlurView * masqBackground;
+@property (nonatomic, assign) CGFloat _continuousCornerRadius;
+@end
+
+
+@interface CALayer (Newish)
+-(int)maskedCorners;
 @end

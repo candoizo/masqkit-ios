@@ -20,54 +20,50 @@ items = (
      tint = "#7f6bda";
      detail = MASQThemePicker;
   }
-  // ,
-  // {
-  //    cell = PSGroupCell;
-  //    label = "Lockscreen Background Style:";
-  // }
-  // ,
-  // {
-  //    cell = PSSegmentCell;
-  //    cellClass = MASQSegmentCell;
-  //    tint = "#007AFF";
-  //    default = 3;
-  //    defaults = ca.ndoizo.masq;
-  //    key = LSStyle;
-  //    validValues = (
-  //                   0,
-  //                   1,
-  //                   2,
-  //                   3
-  //                   );
-  //    validTitles = (
-  //                   "Disable",
-  //                   "Light",
-  //                   "Vibrant",
-  //                   "Dark"
-  //                   );
-  // },
-  // {
-  //    cell = PSGroupCell;
-  //    label = "Control Center Background Style:";
-  // },
-  // {
-  //    cell = PSSegmentCell;
-  //    cellClass = MASQSegmentCell;
-  //    tint = "#7f6bda";
-  //    default = 3;
-  //    defaults = ca.ndoizo.masq;
-  //    key = CCStyle;
-  //    validValues = (
-  //                   0,
-  //                   1,
-  //                   2,
-  //                   3
-  //                   );
-  //    validTitles = (
-  //                   "Disable",
-  //                   "Light",
-  //                   "Vibrant",
-  //                   "Dark"
-  //                   );
-  // }
+  ,
+  {
+     cell = PSGroupCell;
+     label = "Lock Screen Artwork Background:";
+  }
+  ,
+  {
+     cell = PSSegmentCell;
+     cellClass = MASQSegmentCell;
+     tint = "#007AFF";
+     default = 3;
+     defaults = ca.ndoizo.masqkit;
+     key = LS.style;
+     validValues = (
+                    0,
+                    2,
+                    3
+                    );
+     validTitles = (
+                    "Disable",
+                    "Light",
+                    "Dark"
+                    );
+  },
+  {
+     cell = PSGroupCell;
+     label = "Control Center Artwork Background:";
+  },
+  {
+     cell = PSSegmentCell;
+     cellClass = MASQSegmentCell;
+     tint = "#7f6bda";
+     default = 3;
+     defaults = ca.ndoizo.masqkit;
+     key = CC.style;
+     validValues = (
+                    0,
+                    2,
+                    3
+                    );
+     validTitles = (
+                    "Disable",
+                    "Light",
+                    "Dark"
+                    );
+  }
 );

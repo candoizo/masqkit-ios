@@ -7,6 +7,5 @@ items = (
        iconBundle = "com.apple.Preferences";
        detail = MASQSubPageController;
        specs = MASQ11.page;
-
     }
 );

@@ -61,7 +61,7 @@
   %orig;
   if ([self.backgroundView valueForKey:@"_backdropView"])
   {
-    [self.masqBackground _setContinuousCornerRadius:(self.view.layer.maskedCorners/2)];
+    [self.masqBackground _setContinuousCornerRadius:(self.view.layer.maskedCorners*0.85)];
   }
 //   if (self.masqBackground) {
 //     self.masqBackground.hidden = arg1 == 0; //if not playing
@@ -127,7 +127,7 @@
     self.masqBackground.frame = propose; //jumpy without this if
 
 
-    [self.masqBackground _setContinuousCornerRadius:self.view.layer.maskedCorners];
+    [self.masqBackground _setContinuousCornerRadius:self.view.layer.maskedCorners * .85];
 
 
       // if (self.masqBackground.identifier)
@@ -202,7 +202,7 @@
   %orig;
 }
 
--(void)viewDidLayoutSubviews { // lockscreen 11 - 12.4 super awareness for peeks
+-(void)viewDidLayoutSubviews { // lockscreen 11 - 12.4 super awareness for pee
   %orig;
   if (!self.backgroundView && self.masqBackground)
   {

@@ -3,6 +3,11 @@
 
 #define arrayContainsKindOfClass(a, c) [a filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self isKindOfClass: %@", c]]
 
+
+@interface SBMainDisplaySceneLayoutViewController : UIViewController
++(id)_applicationSceneLayoutElementControllerForLayoutRole:(int)arg1;
+@end
+
 @implementation MASQArtworkView
 -(id)initWithThemeKey:(NSString *)key
 {
@@ -21,8 +26,6 @@
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateArtwork:)  name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
     /*
       ios 11 only? called in music.app and spotify... and springboard
-
-
       // _kMRPlayerPlaybackQueueContentItemArtworkChangedNotification
       // kMRPlaybackQueueContentItemArtworkChangedNotification
       // _kMRPlaybackQueueContentItemArtworkChangedNotification
@@ -113,6 +116,21 @@
 {
   [UIView animateWithDuration:0/*CGRectEqualToRect(self.frame, CGRectZero) ? 0 : 0.3*/ animations:^
   {
+
+    // NSString * key = [NSString stringWithFormat:@"%@.scale", self.identifier];
+    // if ([MASQThemeManager.prefs valueForKey:key])
+    // {
+    //   double os = [MASQThemeManager.prefs doubleForKey:key];
+    //   CGRect overscale = CGRectMake(0,0,self.frameHost.bounds.size.width * os, self.frameHost.bounds.size.height * os);
+    //
+    //   self.bounds = overscale;
+    //   self.center = self.frameHost.center;
+    // }
+    // else {
+      // self.bounds = self.frameHost.bounds;
+      // self.center = self.frameHost.center;
+    // }
+    // above would implement scaling
     self.bounds = self.frameHost.bounds;
     self.center = self.frameHost.center;
     _containerView.maskView.frame = _containerView.frame;

@@ -75,7 +75,7 @@
 @end
 
 
-@interface MASQSegmentCell : PSSegmentTableCell//PSSegmentCell
+@interface MASQSegmentCell : PSSegmentTableCell //PSSegmentCell
 @end
 
 @implementation MASQSegmentCell

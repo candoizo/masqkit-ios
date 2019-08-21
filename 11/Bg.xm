@@ -143,48 +143,42 @@
 }
 %end
 
+
 // ios 12.2 + ?
 %hook MRPlatterViewController
 %property (nonatomic, assign) float trueWidth;
 %property (nonatomic, retain) MASQArtworkBlurView * masqBackground;
 
--(void)setBackgroundView:(UIView *)arg1 {
+-(void)setBackgroundView:(UIView *)arg1 { // add the cc background 11 - 12.4
   %orig;
 
-  if (!self.masqBackground) { // CC 11 - 12.4
+  if (!self.masqBackground) {
     [arg1 addSubview:self.masqBackground = [[%c(MASQArtworkBlurView) alloc] initWithFrame:arg1.bounds]];
-    self.masqBackground.hidden = YES;
     self.masqBackground.identifier = @"CC";
   }
 }
 
 //need to investigate why it doesnt update based on my notification :/
--(void)_updateHeaderUI { // 12.2 +
+-(void)_updateHeaderUI { // 12.2 + update cc
   %orig;
 
   if (self._continuousCornerRadius && self.style == 1)
-  [self.masqBackground _setContinuousCornerRadius:self._continuousCornerRadius/2];
+  [self.masqBackground _setContinuousCornerRadius:self._continuousCornerRadius*0.85];
 
   NSString * key = [NSString stringWithFormat:@"%@.style", self.masqBackground.identifier];
   int style = [[%c(MASQThemeManager) prefs] integerForKey:key];
   self.masqBackground.alpha = !(style == 0) || [%c(SBMediaController) sharedInstance].hasTrack;
   self.masqBackground.hidden = style == 0 || ![%c(SBMediaController) sharedInstance].hasTrack;
 
+  // dispatch_async
   [self.masqBackground updateArtwork];
 }
 
 -(void)viewWillAppear:(BOOL)arg1 { //cc present
 
-  if (self.masqBackground) {
+  if (self.masqBackground) { // update cc on changes / ls on change
     if ([self.masqBackground.identifier hasPrefix:@"CC"])
     {
-      // probably dont need this in this part since its targeting 12.2 +
-      // // ios 11-11.1.12
-      // if ([self respondsToSelector:@selector(mediaControlsPlayerState)])
-      // self.masqBackground.hidden = (self.mediaControlsPlayerState == 0);
-      // // higher ios doesnt have this anymore
-      // else self.masqBackground.hidden = NO;
-
       // trying to hide cc when disabled
       NSString * key = [NSString stringWithFormat:@"%@.style", self.masqBackground.identifier];
       int style = [[%c(MASQThemeManager) prefs] integerForKey:key];
@@ -197,30 +191,27 @@
 
   if (!self.masqBackground && !self.backgroundView)
   { //lockscreen does not set it for some reason, so here we stick it in
+
     CGRect r = CGRectMake(self.view.bounds.origin.x, self.view.bounds.origin.y, self.trueWidth, self.view.bounds.size.height);
 
     [self.view.superview insertSubview:self.masqBackground = [[%c(MASQArtworkBlurView) alloc] initWithFrame:r] atIndex:0];
-    self.masqBackground.hidden = YES;
-    [self.masqBackground _setContinuousCornerRadius:self._continuousCornerRadius];
     self.masqBackground.identifier = @"LS";
-
-    // self.trueWidth = self.view.bounds.size.width;
-    // self.masqBackground.clipsToBounds = YES;
-    [self.masqBackground updateEffectWithKey];
-    [self.masqBackground updateArtwork];
+    // self.masqBackground.hidden = YES;
+    // [self.masqBackground _setContinuousCornerRadius:self._continuousCornerRadius];
   }
   %orig;
 }
 
--(void)viewDidLayoutSubviews {
+-(void)viewDidLayoutSubviews { // lockscreen 11 - 12.4 super awareness for peeks
   %orig;
   if (!self.backgroundView && self.masqBackground)
   {
+    // update frame to the true size
     CGRect propose = CGRectMake(0, 0, self.view.superview.superview.bounds.size.width, self.view.bounds.size.height);
     if (!CGRectEqualToRect(self.masqBackground.bounds, propose))
     self.masqBackground.frame = propose; //jumpy without this if, expand on it for that bug above
 
-    // lockscreen exclusive 12.2 +
+    // lockscreen alernative12.2 + since its self._continuousCornerRadius = nil
     [self.masqBackground _setContinuousCornerRadius:self.view.layer.maskedCorners*0.85];
   }
 }

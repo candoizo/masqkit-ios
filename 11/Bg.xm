@@ -163,7 +163,7 @@
   %orig;
 
   if (self._continuousCornerRadius && self.style == 1)
-  [self.masqBackground _setContinuousCornerRadius:self._continuousCornerRadius*0.85];
+  [self.masqBackground _setContinuousCornerRadius:self._continuousCornerRadius*0.5];
 
   NSString * key = [NSString stringWithFormat:@"%@.style", self.masqBackground.identifier];
   int style = [[%c(MASQThemeManager) prefs] integerForKey:key];

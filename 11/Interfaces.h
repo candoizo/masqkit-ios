@@ -36,7 +36,7 @@
 @property (nonatomic) id delegate;
 @property (nonatomic) float trueWidth;
 @property (nonatomic) int style;
-// -(BOOL)onScreen;
+-(BOOL)onScreen;
 
 @property (nonatomic, retain) MASQArtworkBlurView * masqBackground;
 @property (nonatomic, assign) CGFloat _continuousCornerRadius;

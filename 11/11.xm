@@ -7,7 +7,6 @@ static NSString * const kDashBoardKey = @"LS";
 { // check that the kit has been loaded into the hooked process
   if (!%c(MASQThemeManager))
   dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
-
 }
 
 %hook MediaControlsPanelViewController

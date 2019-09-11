@@ -2,7 +2,7 @@ TWEAK_NAME = MASQKit
 SUBPROJECTS += prefs
 
 $(TWEAK_NAME)_FILES = $(wildcard *.m)
-$(TWEAK_NAME)_FRAMEWORKS = UIKit CoreGraphics CoreImage
+$(TWEAK_NAME)_FRAMEWORKS = UIKit CoreGraphics
 $(TWEAK_NAME)_PRIVATE_FRAMEWORKS = MediaRemote
 $(TWEAK_NAME)_CFLAGS = -fobjc-arc
 

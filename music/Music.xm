@@ -75,7 +75,7 @@
 
 -(NSArray *)mutableChildViewControllers;
 
--(
+// -(
 @end
 
 %hook MNPCH
@@ -131,33 +131,33 @@
 //   return self;
 // }
 
--(id)_collectionView {
-  UIView * orig = %orig;
-  orig.backgroundColor = [%c(UIColor) blackColor];
-  return orig;
-
-}
-
--(void)viewDidLayoutSubviews {
-  %orig;
-
-
-  [self _collectionView];
-}
+// -(id)_collectionView {
+//   UIView * orig = %orig;
+//   orig.backgroundColor = [%c(UIColor) blackColor];
+//   return orig;
+//
+// }
+//
+// -(void)viewDidLayoutSubviews {
+//   %orig;
+//
+//
+//   [self _collectionView];
+// }
 
 %end
 
 %hook MTBC
--(void)_setSelectedViewControler:(UIViewController *)arg1
-{
-  %orig;
-  if (arg1.view)
-  {
-    arg1.view.backgroundColor = [%c(UIColor) blackColor];
-
-  }
-
-}
+// -(void)_setSelectedViewControler:(UIViewController *)arg1
+// {
+//   %orig;
+//   if (arg1.view)
+//   {
+//     arg1.view.backgroundColor = [%c(UIColor) blackColor];
+//
+//   }
+//
+// }
 %end
 
 %ctor {

@@ -1,8 +1,4 @@
-packages
-obj
-.theos
-src/obj
-publicextensions
 __handlers__/
-haystack
-public/
+.theos/
+packages/
+obj/

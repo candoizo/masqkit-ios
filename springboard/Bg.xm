@@ -23,22 +23,22 @@
 
 -(void)viewWillAppear:(BOOL)arg1 { //cc is invoked
 
-  if (self.masqBackground)
-  { // update cc & ls on pref / audio source changes
-
-    // if ([self.masqBackground.identifier hasPrefix:kControlCenterKey])
-    // { // there is a special case to avoid a visual glitch when closing other cc modusles
-    //    if (self.headerView.style == 0)
-    //    [self.masqBackground updateEffect];
-    //    else
-    //    [self.masqBackground updateEffect];
-    // }
-    // else // lockscreen can update it with no worries
-    // [self.masqBackground updateEffect];
-
-    // for both
-    [self.masqBackground updateVisibility];
-    }
+  // if (self.masqBackground)
+  // { // update cc & ls on pref / audio source changes
+  //
+  //   // if ([self.masqBackground.identifier hasPrefix:kControlCenterKey])
+  //   // { // there is a special case to avoid a visual glitch when closing other cc modusles
+  //   //    if (self.headerView.style == 0)
+  //   //    [self.masqBackground updateEffect];
+  //   //    else
+  //   //    [self.masqBackground updateEffect];
+  //   // }
+  //   // else // lockscreen can update it with no worries
+  //   // [self.masqBackground updateEffect];
+  //
+  //   // for both
+  //   [self.masqBackground updateVisibility];
+  //   }
 
   if (!self.masqBackground && !self.backgroundView)
   { // adding the lockscreen view by catching that it doesn't set a backgroundView

@@ -17,6 +17,7 @@
 -(void)updateArtwork:(id)arg1;
 -(void)updateVisibility;
 -(void)updateRadius;
+-(void)updateAppearance;
 
 -(void)setFrameHost:(UIView *)arg1;
 // -(void)setImageDelegate:(id)arg1;

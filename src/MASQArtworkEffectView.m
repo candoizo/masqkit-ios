@@ -18,8 +18,19 @@
 
 @implementation MASQArtworkEffectView
 -(void)dealloc {
-  [NSNotificationCenter.defaultCenter removeObserver:self
+  NSNotificationCenter * def = NSNotificationCenter.defaultCenter;
+  [def removeObserver:self
     name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
+    
+    
+  if ([self.identifier rangeOfString:@"CC"].location != NSNotFound)
+  [def removeObserver:self name:@"SBControlCenterControllerWillPresentNotification" object:nil];
+
+  else if ([self.identifier rangeOfString:@"LS"].location != NSNotFound)
+  [def removeObserver:self name:@"SBCoverSheetWillPresentNotification" object:nil];
+
+  else
+  [def removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
 -(id)init
@@ -97,9 +108,35 @@
 
   if (arg1)
   {
+    
     [self updateEffect];
     [self updateArtwork:nil];
+    
+    NSNotificationCenter * def = NSNotificationCenter.defaultCenter;
+    NSString * key = arg1;
+    if (NSClassFromString(@"SBMediaController"))
+    { // this artwork is in springboard
+
+      // control center
+      if ([key rangeOfString:@"CC"].location != NSNotFound)
+      [def addObserver:self selector:@selector(updateAppearance)  name:@"SBControlCenterControllerWillPresentNotification" object:nil];
+
+      // lock screen
+      else if ([key rangeOfString:@"LS"].location != NSNotFound)
+      [def addObserver:self selector:@selector(updateAppearance)  name:@"SBCoverSheetWillPresentNotification" object:nil];
+
+      else // fallback incase of weird views
+      [def addObserver:self selector:@selector(updateAppearance)  name:UIApplicationDidBecomeActiveNotification object:nil];
+
+    }
+    else [def addObserver:self selector:@selector(updateAppearance)  name:UIApplicationDidBecomeActiveNotification object:nil];
+    
   }
+}
+
+-(void)updateAppearance {
+  [self updateEffect];
+  [self updateVisibility];
 }
 
 -(void)setFrameHost:(id)arg1 {
@@ -123,7 +160,6 @@
 
 -(void)setRadiusHost:(id)arg1 {
   _radiusHost = arg1;
-
 
   [self updateRadius];
 }

@@ -8,9 +8,10 @@
 }
 
 %hook MediaControlsPanelViewController
-// hooking the init and adding an observer to a new method would probably be a good idea
+
 -(id)headerView {
   MediaControlsHeaderView * orig = %orig;
+
   if ([orig artworkView] && !orig.masqArtwork)
   { //assign our view when the host is ready and there is none
     Class cc = %c(MediaControlsEndpointsViewController);
@@ -40,12 +41,12 @@
     if ([artwork.identifier isEqualToString:kControlCenterKey])
     { // we only need to account for the different cc states on diff vers
       // special ios 12 shit
-      BOOL appPlaying = ((SBMediaController *)[%c(SBMediaController) sharedInstance]).hasTrack;
+      BOOL appPlaying = [[%c(SBMediaController) sharedInstance] hasTrack];
       BOOL stateWantsHidden = nil; // detecting cc states
       if ([%c(UIDevice) currentDevice].systemVersion.doubleValue < 11.2)
       { // on iOS 11 + the cc is a module
-        // users can open or close it, and the style represents a state
-        // we know when its closed we don't want it visible
+        // users can open or close it, and the style represents a transition state
+        // when closed we don't want it visible
         //
         // in the end it had to be hidden during state 2 and 0
         // or ofcourse when no track is playing we want to be hidden
@@ -62,19 +63,14 @@
   }
 }
 
-// // since they can view these without having springboard as the foreground app
-// -(void)viewWillAppear:(BOOL)arg1 {
-//   %orig;
-//
-//   if (self.headerView.masqArtwork)
-//   [self.headerView.masqArtwork updateTheme];
-// }
 %end
 
 // ios 12.2-4? .4 fosho
 %hook MRPlatterViewController
+
 -(id)nowPlayingHeaderView {
   MediaControlsHeaderView * orig = %orig;
+
   if ([orig artworkView] && !orig.masqArtwork)
   { //assign our view when the host is ready and there is none
     Class cc = %c(MediaControlsEndpointsViewController);
@@ -94,51 +90,28 @@
     }
   }
   return orig;
+
 }
 
 -(void)_updateOnScreenForStyle:(long long)arg1 {
   %orig;
-  if (self.nowPlayingHeaderView.masqArtwork)
+
+  MediaControlsHeaderView * header = self.nowPlayingHeaderView;
+  if (header.masqArtwork)
   {
-    MASQArtworkView * artwork = self.nowPlayingHeaderView.masqArtwork;
+    MASQArtworkView * artwork = header.masqArtwork;
     if ([artwork.identifier isEqualToString:kControlCenterKey])
-    { // we only need to account for the different cc states on diff vers
-      // special ios 12 shit
+    { // ios 12.2 cc transition state checks
       BOOL appPlaying = [[%c(SBMediaController) sharedInstance] hasTrack];
-      artwork.hidden = !(self.nowPlayingHeaderView.style == 0 && appPlaying);
-
-
-
-      //SBControlCenterControllerWillPresentNotification
-      // nice so with frida-trace I was able to find this notification which looks perfect
-
-
-
-
-      // artwork.hidden = !appPlaying; //if app is playing, we are not hidden
-      // if ([%c(UIDevice) currentDevice].systemVersion.doubleValue >= 12.2)
-      // {
-      //   // style = 0 when open, 1 in small mode
-      //   if (self.nowPlayingHeaderView.style == 0 && appPlaying)
-      //   artwork.hidden = NO;
-      //   else artwork.hidden = YES;
-      // }
+      artwork.hidden = !(header.style == 0 && appPlaying);
     }
   }
+
 }
 
-// since they can view these without having springboard as the foreground app
-// -(void)viewWillAppear:(BOOL)arg1 {
-//   %orig;
-//
-//   if (self.nowPlayingHeaderView.masqArtwork)
-//   [self.nowPlayingHeaderView.masqArtwork updateTheme];
-// }
 %end
 
-
-// applicable to ios 11 - 12
-// hide other artwork stuff
+// ios 11 - 12, hide extra stuff
 %hook MediaControlsHeaderView
 %property (nonatomic, retain) MASQArtworkView * masqArtwork;
 
@@ -162,4 +135,5 @@
 - (id)artworkBackground {
     return nil;
 }
+
 %end

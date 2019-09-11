@@ -23,22 +23,22 @@
 
 -(void)viewWillAppear:(BOOL)arg1 { //cc is invoked
 
-  if (self.masqBackground)
-  { // update cc & ls on pref / audio source changes
-
-    if ([self.masqBackground.identifier hasPrefix:kControlCenterKey])
-    { // there is a special case to avoid a visual glitch when closing other cc modusles
-       if (self.headerView.style == 0)
-       [self.masqBackground updateEffect];
-       else
-       [self.masqBackground updateEffect];
-    }
-    else // lockscreen can update it with no worries
-    [self.masqBackground updateEffect];
-
-    // for both
-    [self.masqBackground updateVisibility];
-    }
+  // if (self.masqBackground)
+  // { // update cc & ls on pref / audio source changes
+  //
+  //   // if ([self.masqBackground.identifier hasPrefix:kControlCenterKey])
+  //   // { // there is a special case to avoid a visual glitch when closing other cc modusles
+  //   //    if (self.headerView.style == 0)
+  //   //    [self.masqBackground updateEffect];
+  //   //    else
+  //   //    [self.masqBackground updateEffect];
+  //   // }
+  //   // else // lockscreen can update it with no worries
+  //   // [self.masqBackground updateEffect];
+  //
+  //   // for both
+  //   [self.masqBackground updateVisibility];
+  //   }
 
   if (!self.masqBackground && !self.backgroundView)
   { // adding the lockscreen view by catching that it doesn't set a backgroundView
@@ -76,32 +76,11 @@
 
 
 // ios 12.2 + ? , main difference is nowPlayingHeaderView instead of headerView + corner rad
-/*
-  @TODO:
-
-  - see if I can go back to the old way of super update ls so it like fades in perfectly rather than a short delay
-  - avoid views turning longer than they should be
-
-*/
 %hook MRPlatterViewController
 %property (nonatomic, retain) MASQArtworkEffectView * masqBackground;
 
 -(void)viewWillAppear:(BOOL)arg1
 { //cc/ls present
-  if (self.masqBackground)
-  { // update cc & ls on pref / audio source changes
-    if ([self.masqBackground.identifier hasPrefix:kControlCenterKey])
-    { // there is a special case to avoid a visual glitch when closing other cc modules
-       if (self.nowPlayingHeaderView.style == 0 || arg1)
-
-       [self.masqBackground updateEffect];
-    }
-    else // lockscreen can update it with no worries
-    [self.masqBackground updateEffect];
-
-    // check both
-    [self.masqBackground updateVisibility];
-  }
 
   if (!self.masqBackground && !self.backgroundView)
   { //add lockscreen controller, it does not set a bg view so here we catch it
@@ -113,7 +92,6 @@
     // set the identifier, this is used to monitor preference key changes.
     self.masqBackground = [[%c(MASQArtworkEffectView) alloc] initWithFrameHost:self.view.superview radiusHost:self.view imageHost:self.nowPlayingHeaderView.artworkView];
     self.masqBackground.identifier = kDashBoardKey;
-    // [self.masqBackground updateArtwork:nil];
     [self.view.superview insertSubview:self.masqBackground atIndex:0];
   }
 

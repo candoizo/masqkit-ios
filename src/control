@@ -1,9 +1,9 @@
 Package: ca.ndoizo.masqkit
 Name: MASQKit
 Depends: mobilesubstrate, firmware (>= 10.0), preferenceloader
-Version: 1.0.2-1
+Version: 1.0.3
 Architecture: iphoneos-arm
-Description: Settings & core functionality for Masq extensions!
+Description: Settings & core library functions for Masq extensions!
 Maintainer: candoizo
 Author: candoizo
 Section: Tweaks

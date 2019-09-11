@@ -1,64 +1,56 @@
 #import "MASQArtworkView.h"
 #import "MASQThemeManager.h"
 
-#define arrayContainsKindOfClass(a, c) [a filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self isKindOfClass: %@", c]]
-
 @implementation MASQArtworkView
 -(id)initWithThemeKey:(NSString *)key
 {
   if (self = [super init])
   {
+    _identifier = key;
     self.userInteractionEnabled = NO;
     [self addSubview:[self underlayView]];
     [self addSubview:[self containerView]];
     [self addSubview:[self overlayView]];
-    _identifier = key;
     [self updateTheme];
 
-    // lol omg this had to be changed
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTheme)  name:UIApplicationDidBecomeActiveNotification object:nil];
+    // [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTheme)  name:UIApplicationDidBecomeActiveNotification object:nil];
 
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateArtwork:)  name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
+    NSNotificationCenter * def = NSNotificationCenter.defaultCenter;
+    [def addObserver:self selector:@selector(updateArtwork:)  name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
 
     if (NSClassFromString(@"SBMediaController"))
     { // this artwork is in springboard
 
       // control center
       if ([key rangeOfString:@"CC"].location != NSNotFound)
-      [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTheme)  name:@"SBControlCenterControllerWillPresentNotification" object:nil];
+      [def addObserver:self selector:@selector(updateTheme)  name:@"SBControlCenterControllerWillPresentNotification" object:nil];
 
       // lock screen
-      if ([key rangeOfString:@"LS"].location != NSNotFound)
-      [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTheme)  name:@"SBCoverSheetWillPresentNotification" object:nil];
+      else if ([key rangeOfString:@"LS"].location != NSNotFound)
+      [def addObserver:self selector:@selector(updateTheme)  name:@"SBCoverSheetWillPresentNotification" object:nil];
+
+      else // fallback incase of weird views
+      [def addObserver:self selector:@selector(updateTheme)  name:UIApplicationDidBecomeActiveNotification object:nil];
 
     }
-
-    /*
-      ios 11 only? called in music.app and spotify... and springboard
-      // _kMRPlayerPlaybackQueueContentItemArtworkChangedNotification
-      // kMRPlaybackQueueContentItemArtworkChangedNotification
-      // _kMRPlaybackQueueContentItemArtworkChangedNotification
-
-    */
+    else [def addObserver:self selector:@selector(updateTheme)  name:UIApplicationDidBecomeActiveNotification object:nil];
   }
   return self;
 }
 
 -(void)dealloc {
-  [NSNotificationCenter.defaultCenter removeObserver:self
-    name:UIApplicationDidBecomeActiveNotification object:nil];
-  [NSNotificationCenter.defaultCenter removeObserver:self
-    name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
+
+  NSNotificationCenter * def = NSNotificationCenter.defaultCenter;
+  [def removeObserver:self name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
 
   if ([self.identifier rangeOfString:@"CC"].location != NSNotFound)
-  [NSNotificationCenter.defaultCenter removeObserver:self
-    name:@"SBControlCenterControllerWillPresentNotification" object:nil];
-  // [[NSNotificationCenter defaultCenter] removeObserver:self];
+  [def removeObserver:self name:@"SBControlCenterControllerWillPresentNotification" object:nil];
 
-  if ([self.identifier rangeOfString:@"LS"].location != NSNotFound)
-  [NSNotificationCenter.defaultCenter removeObserver:self
-    name:@"SBCoverSheetWillPresentNotification" object:nil];
-  // [[NSNotificationCenter defaultCenter] removeObserver:self];
+  else if ([self.identifier rangeOfString:@"LS"].location != NSNotFound)
+  [def removeObserver:self name:@"SBCoverSheetWillPresentNotification" object:nil];
+
+  else
+  [def removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
 
 }
 
@@ -73,9 +65,6 @@
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-
-  // if ([MASQThemeManager themeBundleForKey:self.identifier] != self.currentTheme)
-  // [self updateTheme];
 
   if ([keyPath isEqualToString:@"frame"])
   {
@@ -100,8 +89,6 @@
 -(void)themeUpdating {
   if (self.currentTheme)
   {
-    // unset the scale so when we change it isnt messed
-    // _artworkImageView.transform = CGAffineTransformMakeScale(1, 1);
     ((UIImageView *)_containerView.maskView).image = [self maskImage];
     [_overlayView setBackgroundImage:[self overlayImage] forState:UIControlStateNormal];
     [_underlayView setBackgroundImage:[self underlayImage] forState:UIControlStateNormal];
@@ -271,8 +258,13 @@
       if (NSClassFromString(@"SBCoverSheetPresentationManager"))
       { // dismiss notification center ios 11.x - 12.x
         SBCoverSheetPresentationManager * nc = [NSClassFromString(@"SBCoverSheetPresentationManager") sharedInstance];
-        BOOL deviceUnlocked = ((SBLockStateAggregator *)[NSClassFromString(@"SBLockStateAggregator") sharedInstance]).lockState == 2;
+        // BOOL deviceUnlocked = ((SBLockStateAggregator *)[NSClassFromString(@"SBLockStateAggregator") sharedInstance]).lockState == 2;
+        // @TODO uhh wtf is this now = 1
+        // literally it makes no sense how that could be possible it was legit working with ==2 for so long but idfk
+
+        BOOL deviceUnlocked = ((SBLockStateAggregator *)[NSClassFromString(@"SBLockStateAggregator") sharedInstance]).lockState == 1;
         if (nc.isVisible && deviceUnlocked)
+        // if (nc.isVisible)
         [nc setCoverSheetPresented:NO animated:YES withCompletion:nil];
       }
 

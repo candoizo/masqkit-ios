@@ -146,6 +146,9 @@
 	 [super viewWillAppear:animated];
 	 self.navigationController.navigationController.navigationBar.tintColor = [self themeTint];
 	 [self updateThemeList];
+
+	 if (self.themes.count <= 1)
+	 [self popMissingAlert];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -183,5 +186,23 @@
   g = (x >> 8) & 0xFF;
   r = (x >> 16) & 0xFF;
   return [UIColor colorWithRed:(float)r/255.0f green:(float)g/255.0f blue:(float)b/255.0f alpha:1];
+}
+
+-(void)popMissingAlert {
+			UIAlertController * alert=   [UIAlertController alertControllerWithTitle:@"No Themes!"
+			message:@"MASQKit found no themes installed on your device, and therefore has no choices to offer you, yet: \n\n https://ndoizo.ca ← Visit the repo to find some!"
+			preferredStyle:UIAlertControllerStyleAlert];
+
+			UIAlertAction* cancel = [NSClassFromString(@"UIAlertAction") actionWithTitle:@"Dismiss" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * action){
+																[alert dismissViewControllerAnimated:YES completion:nil];
+															}];
+
+			UIAlertAction* repo = [NSClassFromString(@"UIAlertAction") actionWithTitle:@"Open in Cydia" style:UIAlertActionStyleCancel handler:^(UIAlertAction * action){
+															[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"cydia://url/https://cydia.saurik.com/api/share#?source=https://ndoizo.ca"]];
+															}];
+
+			[alert addAction:repo];
+			[alert addAction:cancel];
+			[self presentViewController:alert animated:YES completion:nil];
 }
 @end

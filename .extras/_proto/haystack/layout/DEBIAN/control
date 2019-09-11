@@ -1,0 +1,9 @@
+Package: masq.extension.haystack
+Name: MASQHaystack
+Depends: ca.ndoizo.masq
+Version: 1.0
+Architecture: iphoneos-arm
+Description: iOS 11 Haystack (tweak) extension for MASQKit!
+Maintainer: candoizo & laughingquoll
+Author: candoizo & laughingquoll
+Section: Extensions

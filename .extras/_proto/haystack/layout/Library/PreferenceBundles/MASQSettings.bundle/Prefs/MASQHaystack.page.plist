@@ -1,0 +1,11 @@
+title = "Haystack Settings";
+items = (
+  {
+     cell = PSLinkCell;
+     cellClass = MASQThemeLinkCell;
+     label = CC_LABEL;
+     themeKey = CC;
+     tint = "#7f6bda";
+     detail = MASQThemePicker;
+  }
+);

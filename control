@@ -1,9 +1,0 @@
-Package: ca.ndoizo.masq
-Name: MASQKit
-Depends:
-Version: 1.0.1b
-Architecture: iphoneos-arm
-Description: DEVELOPER BUNDLE, SHOULD BUILD FOR PUBLIC FROM src!
-Maintainer: candoizo
-Author: candoizo
-Section: Tweaks

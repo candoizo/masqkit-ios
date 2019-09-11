@@ -1,0 +1,10 @@
+items = (
+    {
+       cell = PSLinkCell;
+       cellClass = MASQSubPageLinkCell;
+       iconPath = "/Library/PreferenceBundles/MaizeSettings.bundle/SettingsIcon"; //path to your preferences icon, drop anything after @2/3x 
+       label = "Haystack";
+       detail = MASQSubPageController;
+       specs = MASQHaystack.page;
+    }
+);

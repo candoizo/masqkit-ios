@@ -124,7 +124,6 @@
 -(void)setRadiusHost:(id)arg1 {
   _radiusHost = arg1;
 
-
   [self updateRadius];
 }
 

@@ -13,41 +13,44 @@
     [self addSubview:[self overlayView]];
     [self updateTheme];
 
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTheme)  name:UIApplicationDidBecomeActiveNotification object:nil];
+    // [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTheme)  name:UIApplicationDidBecomeActiveNotification object:nil];
 
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateArtwork:)  name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
+    NSNotificationCenter * def = NSNotificationCenter.defaultCenter;
+    [def addObserver:self selector:@selector(updateArtwork:)  name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
 
     if (NSClassFromString(@"SBMediaController"))
     { // this artwork is in springboard
 
       // control center
       if ([key rangeOfString:@"CC"].location != NSNotFound)
-      [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTheme)  name:@"SBControlCenterControllerWillPresentNotification" object:nil];
+      [def addObserver:self selector:@selector(updateTheme)  name:@"SBControlCenterControllerWillPresentNotification" object:nil];
 
       // lock screen
-      if ([key rangeOfString:@"LS"].location != NSNotFound)
-      [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTheme)  name:@"SBCoverSheetWillPresentNotification" object:nil];
+      else if ([key rangeOfString:@"LS"].location != NSNotFound)
+      [def addObserver:self selector:@selector(updateTheme)  name:@"SBCoverSheetWillPresentNotification" object:nil];
+
+      else // fallback incase of weird views
+      [def addObserver:self selector:@selector(updateTheme)  name:UIApplicationDidBecomeActiveNotification object:nil];
 
     }
+    else [def addObserver:self selector:@selector(updateTheme)  name:UIApplicationDidBecomeActiveNotification object:nil];
   }
   return self;
 }
 
 -(void)dealloc {
-  [NSNotificationCenter.defaultCenter removeObserver:self
-    name:UIApplicationDidBecomeActiveNotification object:nil];
-  [NSNotificationCenter.defaultCenter removeObserver:self
-    name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
+
+  NSNotificationCenter * def = NSNotificationCenter.defaultCenter;
+  [def removeObserver:self name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
 
   if ([self.identifier rangeOfString:@"CC"].location != NSNotFound)
-  [NSNotificationCenter.defaultCenter removeObserver:self
-    name:@"SBControlCenterControllerWillPresentNotification" object:nil];
-  // [[NSNotificationCenter defaultCenter] removeObserver:self];
+  [def removeObserver:self name:@"SBControlCenterControllerWillPresentNotification" object:nil];
 
-  if ([self.identifier rangeOfString:@"LS"].location != NSNotFound)
-  [NSNotificationCenter.defaultCenter removeObserver:self
-    name:@"SBCoverSheetWillPresentNotification" object:nil];
-  // [[NSNotificationCenter defaultCenter] removeObserver:self];
+  else if ([self.identifier rangeOfString:@"LS"].location != NSNotFound)
+  [def removeObserver:self name:@"SBCoverSheetWillPresentNotification" object:nil];
+
+  else
+  [def removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
 
 }
 
@@ -255,8 +258,13 @@
       if (NSClassFromString(@"SBCoverSheetPresentationManager"))
       { // dismiss notification center ios 11.x - 12.x
         SBCoverSheetPresentationManager * nc = [NSClassFromString(@"SBCoverSheetPresentationManager") sharedInstance];
-        BOOL deviceUnlocked = ((SBLockStateAggregator *)[NSClassFromString(@"SBLockStateAggregator") sharedInstance]).lockState == 2;
+        // BOOL deviceUnlocked = ((SBLockStateAggregator *)[NSClassFromString(@"SBLockStateAggregator") sharedInstance]).lockState == 2;
+        // @TODO uhh wtf is this now = 1
+        // literally it makes no sense how that could be possible it was legit working with ==2 for so long but idfk
+
+        BOOL deviceUnlocked = ((SBLockStateAggregator *)[NSClassFromString(@"SBLockStateAggregator") sharedInstance]).lockState == 1;
         if (nc.isVisible && deviceUnlocked)
+        // if (nc.isVisible)
         [nc setCoverSheetPresented:NO animated:YES withCompletion:nil];
       }
 

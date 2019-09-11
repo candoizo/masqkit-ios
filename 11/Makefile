@@ -1,4 +1,4 @@
-TARGET = iphone:clang:11
+# for osx compile -TARGET = iphone:clang:11
 ARCHS = arm64 #arm64e needed for xs but no linux tc yet?
 
 include $(THEOS)/makefiles/common.mk

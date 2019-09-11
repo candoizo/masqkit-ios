@@ -1,8 +1,8 @@
 Package: masq.extension.springboard
 Name: MASQSpringBoard
-Version: 1.0.2
+Version: 1.0.3
 Architecture: iphoneos-arm
-Description: Artworking themeing in SpringBoard using MasqKit!
+Description: Artwork themeing for the modern SpringBoard!
 Maintainer: candoizo
 Author: candoizo
 Section: Tweaks (Masq Extensions)

@@ -46,3 +46,9 @@
 @property (nonatomic) MASQArtworkView * masqArtwork;
 -(BOOL)isShowingOverlayForCurrentPage;
 @end
+
+
+@interface SPTNowPlayingCoverArtCell : UIView
+-(UIImageView *)imageView;
+-(UIView *)windowedContentView;
+@end

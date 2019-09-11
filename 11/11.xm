@@ -1,7 +1,5 @@
 #import "Interfaces.h"
 
-static NSString * const kControlCenterKey = @"CC";
-static NSString * const kDashBoardKey = @"LS";
 
 %ctor
 { // check that the kit has been loaded into the hooked process
@@ -42,37 +40,35 @@ static NSString * const kDashBoardKey = @"LS";
     if ([artwork.identifier isEqualToString:kControlCenterKey])
     { // we only need to account for the different cc states on diff vers
       // special ios 12 shit
-
-      // artwork.hidden = [self onScreen];
-      BOOL appPlaying = [%c(SBMediaController) sharedInstance].hasTrack;
-      artwork.hidden = !appPlaying; //if app is playing, we are not hidden
-      /*else */if ([%c(UIDevice) currentDevice].systemVersion.doubleValue < 11.2)
-      {
-        if (arg1 == 2 && appPlaying)
-        artwork.hidden = NO;
-
-        else if (arg1 == 0)
-        artwork.hidden = YES;
+      BOOL appPlaying = ((SBMediaController *)[%c(SBMediaController) sharedInstance]).hasTrack;
+      BOOL stateWantsHidden = nil; // detecting cc states
+      if ([%c(UIDevice) currentDevice].systemVersion.doubleValue < 11.2)
+      { // on iOS 11 + the cc is a module
+        // users can open or close it, and the style represents a state
+        // we know when its closed we don't want it visible
+        //
+        // in the end it had to be hidden during state 2 and 0
+        // or ofcourse when no track is playing we want to be hidden
+        stateWantsHidden = (arg1 != 2 && appPlaying) || arg1 == 0;
       }
       else if (appPlaying)
-      { // a higher version, and we have a track
-        // 0 means open, 1 = 3 mean transition / closing
-        if (arg1 == 3 || arg1 == 1)
-        artwork.hidden = YES;
-        else if (arg1 == 0)
-        artwork.hidden = NO;
+      { // on lower than 11.2 its sort the same module
+        // but there styles and stuff is all changed
+        // for some reason it was better to set this when the app was playing
+        stateWantsHidden = arg1 == 3 || arg1 == 1 || arg1 != 0;
       }
+      artwork.hidden = !appPlaying || stateWantsHidden;
     }
   }
 }
 
 // // since they can view these without having springboard as the foreground app
--(void)viewWillAppear:(BOOL)arg1 {
-  %orig;
-  if (self.headerView.masqArtwork)
-  [self.headerView.masqArtwork updateTheme];
-  // appstore extensions would not need to call this
-}
+// -(void)viewWillAppear:(BOOL)arg1 {
+//   %orig;
+//
+//   if (self.headerView.masqArtwork)
+//   [self.headerView.masqArtwork updateTheme];
+// }
 %end
 
 // ios 12.2-4? .4 fosho
@@ -108,31 +104,40 @@ static NSString * const kDashBoardKey = @"LS";
     if ([artwork.identifier isEqualToString:kControlCenterKey])
     { // we only need to account for the different cc states on diff vers
       // special ios 12 shit
+      BOOL appPlaying = [[%c(SBMediaController) sharedInstance] hasTrack];
+      artwork.hidden = !(self.nowPlayingHeaderView.style == 0 && appPlaying);
 
-      // artwork.hidden = [self onScreen];
-      BOOL appPlaying = [%c(SBMediaController) sharedInstance].hasTrack;
-      artwork.hidden = !appPlaying; //if app is playing, we are not hidden
-      /*else */if ([%c(UIDevice) currentDevice].systemVersion.doubleValue >= 12.2)
-      {
-        // style = 0 when open, 1 in small mode
-        if (self.nowPlayingHeaderView.style == 0 && appPlaying)
-        artwork.hidden = NO;
-        else artwork.hidden = YES;
-      }
+
+
+      //SBControlCenterControllerWillPresentNotification
+      // nice so with frida-trace I was able to find this notification which looks perfect
+
+
+
+
+      // artwork.hidden = !appPlaying; //if app is playing, we are not hidden
+      // if ([%c(UIDevice) currentDevice].systemVersion.doubleValue >= 12.2)
+      // {
+      //   // style = 0 when open, 1 in small mode
+      //   if (self.nowPlayingHeaderView.style == 0 && appPlaying)
+      //   artwork.hidden = NO;
+      //   else artwork.hidden = YES;
+      // }
     }
   }
 }
 
-// // since they can view these without having springboard as the foreground app
--(void)viewWillAppear:(BOOL)arg1 {
-  %orig;
-
-  if (self.nowPlayingHeaderView.masqArtwork)
-  [self.nowPlayingHeaderView.masqArtwork updateTheme];
-  // appstore extensions would not need to call this
-}
+// since they can view these without having springboard as the foreground app
+// -(void)viewWillAppear:(BOOL)arg1 {
+//   %orig;
+//
+//   if (self.nowPlayingHeaderView.masqArtwork)
+//   [self.nowPlayingHeaderView.masqArtwork updateTheme];
+// }
 %end
 
+
+// applicable to ios 11 - 12
 // hide other artwork stuff
 %hook MediaControlsHeaderView
 %property (nonatomic, retain) MASQArtworkView * masqArtwork;

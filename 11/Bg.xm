@@ -1,243 +1,158 @@
 #import "Interfaces.h"
 
-
-// ios 11-12.1.2
 %hook MediaControlsPanelViewController
-%property (nonatomic, assign) float trueWidth;
-%property (nonatomic, retain) MASQArtworkBlurView * masqBackground;
+%property (nonatomic, retain) MASQArtworkEffectView * masqBackground;
 
 -(void)setBackgroundView:(UIView *)arg1
 {
   %orig;
 
   if (!self.masqBackground)
-  { // ios 11 - 12.4 control center
-    [arg1 addSubview:self.masqBackground = [[%c(MASQArtworkBlurView) alloc] initWithFrame:arg1.bounds]];
-    self.masqBackground.imageHost = self.headerView.artworkView;
-    self.masqBackground.identifier = @"CC";
+  { // ios 11 - 12.4 Control Center platter add method (this viewcontroller is only 11-12.1.2)
 
-    // self.masqBackground.hidden = YES;
+    // Initialize and assign property with:
+    // - arg1:view it's being added to
+    // - arg2:object that has _continuousCornerRadius set, or a .layer with rounded corners
+    // - arg3:an imageview to replicate
+    // set the identifier, this is used to monitor preference key changes.
+    self.masqBackground = [[%c(MASQArtworkEffectView) alloc] initWithFrameHost:arg1 radiusHost:self.view imageHost:self.headerView.artworkView];
+    self.masqBackground.identifier = kControlCenterKey;
+    [arg1 addSubview:self.masqBackground];
+  }
+}
 
+-(void)viewWillAppear:(BOOL)arg1 { //cc is invoked
 
-    // [self.masqBackground updateEffectWithKey];
+  if (self.masqBackground)
+  { // update cc & ls on pref / audio source changes
+
+    if ([self.masqBackground.identifier hasPrefix:kControlCenterKey])
+    { // there is a special case to avoid a visual glitch when closing other cc modusles
+       if (self.headerView.style == 0)
+       [self.masqBackground updateEffect];
+       else
+       [self.masqBackground updateEffect];
+    }
+    else // lockscreen can update it with no worries
+    [self.masqBackground updateEffect];
+
+    // for both
+    [self.masqBackground updateVisibility];
+    }
+
+  if (!self.masqBackground && !self.backgroundView)
+  { // adding the lockscreen view by catching that it doesn't set a backgroundView
+
+    self.masqBackground = [[%c(MASQArtworkEffectView) alloc] initWithFrameHost:self.view.superview radiusHost:self.view imageHost:self.headerView.artworkView];
+    self.masqBackground.identifier = kDashBoardKey;
     // [self.masqBackground updateArtwork:nil];
+
+    [self.view.superview insertSubview:self.masqBackground atIndex:0];
   }
-}
 
-//need to investigate why it doesnt update based on my notification :/
-// -(void)_updateHeaderUI { // ios 12.2
-//   %orig;
-//   // if (self._continuousCornerRadius && self.style == 1)
-//   // [self.masqBackground _setContinuousCornerRadius:self._continuousCornerRadius/2];
-//   [self.masqBackground updateArtwork:nil];
-//
-//   NSString * key = [NSString stringWithFormat:@"%@.style", self.masqBackground.identifier];
-//   int style = [[%c(MASQThemeManager) prefs] integerForKey:key];
-//   self.masqBackground.alpha = !(style == 0) || [%c(SBMediaController) sharedInstance].hasTrack;
-//   self.masqBackground.hidden = style == 0 || ![%c(SBMediaController) sharedInstance].hasTrack;
-//
-//   // self.masqBackground.alpha = [%c(SBMediaController) sharedInstance].hasTrack;
-//   // self.masqBackground.hidden = ![%c(SBMediaController) sharedInstance].hasTrack;
-//
-//   // if (self.masqBackground)
-//   // [self.masqBackground updateArtwork];
-//   //
-//   //   [self.masqBackground updateEffectWithKey];
-// }
-
-
-// -(void)setMediaControlsPlayerState:(long long)arg1 {
-//   %orig;
-//   if (self.view)
-//   {
-//     HBLogDebug(@"Hidden: %d | Alpha: %d", self.masqBackground.hidden, self.masqBackground.alpha);
-//     [self.masqBackground _setContinuousCornerRadius:self.view.layer.maskedCorners*0.99];
-//   }
-//   // if (self.masqBackground) { // needed for 11 - 12.1.2
-//     // self.masqBackground.hidden = arg1 == 0; //if not playing
-//     // if (!self.masqBackground.image) [self.masqBackground updateArtwork:nil];
-//   }
-// }
-
--(void)_updateOnScreenForStyle:(long long)arg1 {
+  if(!self.masqBackground && [self.delegate isKindOfClass:%c(MediaControlsEndpointsViewController)])
+  {
+        self.masqBackground = [[%c(MASQArtworkEffectView) alloc] initWithFrameHost:self.view radiusHost:self.view imageHost:self.headerView.artworkView];
+        self.masqBackground.identifier = kControlCenterKey;
+        [self.view addSubview:self.masqBackground];
+  }
   %orig;
-
-
-  // NSString * key = [NSString stringWithFormat:@"%@.style", self.masqBackground.identifier];
-  // int style = [[%c(MASQThemeManager) prefs] integerForKey:key];
-  // self.masqBackground.alpha = !(style == 0) || [%c(SBMediaController) sharedInstance].hasTrack;
-  // self.masqBackground.hidden = style == 0 || ![%c(SBMediaController) sharedInstance].hasTrack;
-
 }
-//
-//
 
--(void)viewWillAppear:(BOOL)arg1 { //cc present
-  if (self.masqBackground) {
-    if (self.view)
-    { // cc rounded corner
-      [self.masqBackground _setContinuousCornerRadius:self.view.layer.maskedCorners*0.99];
-    }
-
-    if ([self.masqBackground.identifier hasPrefix:@"CC"])
+-(void)viewDidLayoutSubviews { // super lockscreen updates
+  if (!self.backgroundView && self.masqBackground)
+  { // update frame when it comes in
+    if (self.view.superview.superview)
     {
-      // ios 11-11.1.12
-      if ([self respondsToSelector:@selector(mediaControlsPlayerState)])
-      self.masqBackground.hidden = (self.mediaControlsPlayerState == 0);
-      // higher ios doesnt have this anymore
-      else self.masqBackground.hidden = NO;
-
-      //(self.style == 0); //@TODO FIX THIS JEEZ well no backgrounds work in general atm rip
-
-
-      // // trying to hide cc when disabled
-      // NSString * key = [NSString stringWithFormat:@"%@.style", self.masqBackground.identifier];
-      // int style = [[%c(MASQThemeManager) prefs] integerForKey:key];
-      // self.masqBackground.alpha = !(style == 0);
-      // self.masqBackground.hidden = style == 0;
-
+      CGRect propose = CGRectMake(0, 0, self.view.superview.superview.bounds.size.width, self.view.bounds.size.height);
+      if (!CGRectEqualToRect(self.masqBackground.bounds, propose))
+      self.masqBackground.frame = propose; //jumpy without this if
     }
-
-    [self.masqBackground updateEffectWithKey];
-
-    NSString * key = [NSString stringWithFormat:@"%@.style", self.masqBackground.identifier];
-    int style = [[%c(MASQThemeManager) prefs] integerForKey:key];
-    self.masqBackground.alpha = !(style == 0);
-    self.masqBackground.hidden = style == 0;
-  }
-
-  if (!self.masqBackground && !self.backgroundView) { //lockscreen does not set it for some reason
-    CGRect r = CGRectMake(self.view.bounds.origin.x, self.view.bounds.origin.y, self.trueWidth, self.view.bounds.size.height);
-    [self.view.superview insertSubview:self.masqBackground = [[%c(MASQArtworkBlurView) alloc] initWithFrame:r] atIndex:0];
-    self.masqBackground.imageHost = self.headerView.artworkView;
-    self.masqBackground.identifier = @"LS";
-    // self.masqBackground.hidden = YES;
-    // self.masqBackground.clipsToBounds = YES;
-    [self.masqBackground updateEffectWithKey];
-    [self.masqBackground updateArtwork:nil];
   }
 
   %orig;
-}
-
--(void)viewDidLayoutSubviews {
-  %orig;
-  if (!self.backgroundView && self.masqBackground) {
-
-    // ideal refsize for lockscreen
-    CGRect propose = CGRectMake(0, 0, self.view.superview.superview.bounds.size.width, self.view.bounds.size.height);
-    if (!CGRectEqualToRect(self.masqBackground.bounds, propose))
-    self.masqBackground.frame = propose; //jumpy without this if
-
-    // needed for ls rounded corners
-    [self.masqBackground _setContinuousCornerRadius:self.view.layer.maskedCorners * .85];
-  }
 }
 %end
 
 
+// ios 12.2 + ? , main difference is nowPlayingHeaderView instead of headerView + corner rad
+/*
+  @TODO:
 
+  - see if I can go back to the old way of super update ls so it like fades in perfectly rather than a short delay
+  - avoid views turning longer than they should be
 
-// ios 12.2 + ?
+*/
 %hook MRPlatterViewController
-// %property (nonatomic, assign) float trueWidth;
-%property (nonatomic, retain) MASQArtworkBlurView * masqBackground;
+%property (nonatomic, retain) MASQArtworkEffectView * masqBackground;
 
--(void)setBackgroundView:(UIView *)arg1 { // add the cc background 11 - 12.4
-  %orig;
+-(void)viewWillAppear:(BOOL)arg1
+{ //cc/ls present
+  if (self.masqBackground)
+  { // update cc & ls on pref / audio source changes
+    if ([self.masqBackground.identifier hasPrefix:kControlCenterKey])
+    { // there is a special case to avoid a visual glitch when closing other cc modules
+       if (self.nowPlayingHeaderView.style == 0 || arg1)
 
-  if (!self.masqBackground) {
-    [arg1 addSubview:self.masqBackground = [[%c(MASQArtworkBlurView) alloc] initWithFrame:arg1.bounds]];
-    self.masqBackground.identifier = @"CC";
-    self.masqBackground.imageHost = self.nowPlayingHeaderView.artworkView;
-  }
-}
-
-//need to investigate why it doesnt update based on my notification :/
--(void)_updateHeaderUI { // 12.2 + update cc
-  %orig;
-
-  if (self._continuousCornerRadius && self.style == 1)
-  [self.masqBackground _setContinuousCornerRadius:self._continuousCornerRadius*0.5];
-
-  // NSString * key = [NSString stringWithFormat:@"%@.style", self.masqBackground.identifier];
-  // int style = [[%c(MASQThemeManager) prefs] integerForKey:key];
-  // self.masqBackground.alpha = !(style == 0) || [%c(SBMediaController) sharedInstance].hasTrack;
-  // self.masqBackground.hidden = style == 0 || ![%c(SBMediaController) sharedInstance].hasTrack;
-
-  // dispatch_async
-  [self.masqBackground updateArtwork:nil];
-}
-
--(void)viewWillAppear:(BOOL)arg1 { //cc/ls present
-
-  if (self.masqBackground) { // update cc on changes / ls on change
-    if ([self.masqBackground.identifier hasPrefix:@"CC"])
-    {
-      // trying to hide cc when disabled
-      NSString * key = [NSString stringWithFormat:@"%@.style", self.masqBackground.identifier];
-      int style = [[%c(MASQThemeManager) prefs] integerForKey:key];
-      self.masqBackground.alpha = !(style == 0);
-      self.masqBackground.hidden = style == 0;
-
-      // woot it worked!
-      // if will appear and closed form
-      if (arg1 && self.nowPlayingHeaderView.style == 1)
-      [self.masqBackground updateEffectWithKey];
-
-      // if (self.masqBackground.effectView.effect._style != style)
-      if (self.nowPlayingHeaderView.style == 0) // this means its opened and I shouldnt resize unless
-      // that being said I do need to update the style on changes so this work work exactly either
-      if (style != 0 && self.style == 0)
-      [self.masqBackground updateEffectWithKey];
+       [self.masqBackground updateEffect];
     }
+    else // lockscreen can update it with no worries
+    [self.masqBackground updateEffect];
 
-    // only do this when control center is invoked to avoid force touch resize monster
-    // needed to update on pref changes for ls & cc
-    if ([self.masqBackground.identifier hasPrefix:@"LS"])
-    [self.masqBackground updateEffectWithKey];
+    // check both
+    [self.masqBackground updateVisibility];
   }
 
   if (!self.masqBackground && !self.backgroundView)
-  { //lockscreen does not set it for some reason, so here we stick it in
+  { //add lockscreen controller, it does not set a bg view so here we catch it
 
-    CGRect r = CGRectMake(self.view.bounds.origin.x, self.view.bounds.origin.y, self.view.bounds.size.width, self.view.bounds.size.height);
-    [self.view.superview insertSubview:self.masqBackground = [[%c(MASQArtworkBlurView) alloc] initWithFrame:r] atIndex:0];
-    self.masqBackground.identifier = @"LS";
-    // self.masqBackground.hidden = YES;
-    // [self.masqBackground _setContinuousCornerRadius:self._continuousCornerRadius];
+    // Initialize and assign property with:
+    // - arg1:view it's being added to
+    // - arg2:object that has _continuousCornerRadius set, or a .layer with rounded corners
+    // - arg3:an imageview to replicate
+    // set the identifier, this is used to monitor preference key changes.
+    self.masqBackground = [[%c(MASQArtworkEffectView) alloc] initWithFrameHost:self.view.superview radiusHost:self.view imageHost:self.nowPlayingHeaderView.artworkView];
+    self.masqBackground.identifier = kDashBoardKey;
+    // [self.masqBackground updateArtwork:nil];
+    [self.view.superview insertSubview:self.masqBackground atIndex:0];
   }
+
   %orig;
 }
 
--(void)viewDidLayoutSubviews { // lockscreen 11 - 12.4 super awareness for pee
+-(void)setBackgroundView:(UIView *)arg1
+{ // add the cc background 11 - 12.4 (VC is only 12.2 +)
   %orig;
+
+  if (!self.masqBackground)
+  { // control center is the only view controller calling this method
+
+    // Initialize and assign property with:
+    // - arg1:view it's being added to
+    // - arg2:object that has _continuousCornerRadius set, or a .layer with rounded corners
+    // - arg3:an imageview to replicate
+    // set the identifier, this is used to monitor preference key changes.
+    self.masqBackground = [[%c(MASQArtworkEffectView) alloc] initWithFrameHost:arg1 radiusHost:self imageHost:self.nowPlayingHeaderView.artworkView];
+    self.masqBackground.identifier = kControlCenterKey;
+    [arg1 addSubview:self.masqBackground];
+  }
+}
+
+-(void)viewDidLayoutSubviews
+{ // super lockscreen updates for the drop in
+  // this if staement is extremely important to avoi cc monsters
   if (!self.backgroundView && self.masqBackground)
-  {
-    // update frame to the true size
-    // bail incase we arent ready (does nothing noticable tho)
-    if (self.view.superview.superview.bounds.size.width == 0) return;
-    if (self.view.bounds.size.height == 0) return;
+  { // update frame when it comes in
+    if (self.view.superview)
+    {
 
-
-    CGRect propose = CGRectMake(0, 0, self.view.superview.superview.bounds.size.width, self.view.bounds.size.height);
-    if (!CGRectEqualToRect(self.masqBackground.bounds, propose))
-    self.masqBackground.frame = propose; //jumpy without this if, expand on it for that bug above
-
-    // lockscreen alernative12.2 + since its self._continuousCornerRadius = nil
-    [self.masqBackground _setContinuousCornerRadius:self.view.layer.maskedCorners*0.85];
+      CGRect propose = CGRectMake(0, 0, self.view.superview.superview.bounds.size.width, self.view.bounds.size.height);
+      if (!CGRectEqualToRect(self.masqBackground.bounds, propose))
+      self.masqBackground.frame = propose; //jumpy without this if
+    }
   }
 
-  // does nothing
-  // // the cc
-  // if (self.backgroundView && self.masqBackground)
-  // {
-  //   if (self.view.superview.superview.bounds.size.width == 0) return;
-  //   if (self.view.bounds.size.height == 0) return;
-  //
-  //   CGRect propose = CGRectMake(0, 0, self.view.superview.superview.bounds.size.width, self.view.bounds.size.height);
-  //   if (!CGRectEqualToRect(self.masqBackground.bounds, propose))
-  //   self.masqBackground.frame = propose; //jumpy without this if, expand on it for that bug above
-  // }
+  %orig;
 }
+
 %end

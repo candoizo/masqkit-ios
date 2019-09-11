@@ -12,4 +12,6 @@
 -(UIColor *)themeTint;
 -(NSString *)themePath;
 +(UIColor *)hexToRGB:(NSString *)arg1;
+
+-(void)popMissingAlert;
 @end

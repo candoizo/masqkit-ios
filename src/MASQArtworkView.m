@@ -3,11 +3,6 @@
 
 #define arrayContainsKindOfClass(a, c) [a filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self isKindOfClass: %@", c]]
 
-
-@interface SBMainDisplaySceneLayoutViewController : UIViewController
-+(id)_applicationSceneLayoutElementControllerForLayoutRole:(int)arg1;
-@end
-
 @implementation MASQArtworkView
 -(id)initWithThemeKey:(NSString *)key
 {
@@ -24,6 +19,20 @@
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTheme)  name:UIApplicationDidBecomeActiveNotification object:nil];
 
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateArtwork:)  name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
+
+    if (NSClassFromString(@"SBMediaController"))
+    { // this artwork is in springboard
+
+      // control center
+      if ([key rangeOfString:@"CC"].location != NSNotFound)
+      [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTheme)  name:@"SBControlCenterControllerWillPresentNotification" object:nil];
+
+      // lock screen
+      if ([key rangeOfString:@"LS"].location != NSNotFound)
+      [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTheme)  name:@"SBCoverSheetWillPresentNotification" object:nil];
+
+    }
+
     /*
       ios 11 only? called in music.app and spotify... and springboard
       // _kMRPlayerPlaybackQueueContentItemArtworkChangedNotification
@@ -40,7 +49,17 @@
     name:UIApplicationDidBecomeActiveNotification object:nil];
   [NSNotificationCenter.defaultCenter removeObserver:self
     name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
+
+  if ([self.identifierf rangeOfString:@"CC"].location != NSNotFound)
+  [NSNotificationCenter.defaultCenter removeObserver:self
+    name:@"SBControlCenterControllerWillPresentNotification" object:nil];
   // [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+  if ([self.identifierf rangeOfString:@"LS"].location != NSNotFound)
+  [NSNotificationCenter.defaultCenter removeObserver:self
+    name:@"SBCoverSheetWillPresentNotification" object:nil];
+  // [[NSNotificationCenter defaultCenter] removeObserver:self];
+
 }
 
 -(id)initWithThemeKey:(NSString *)arg1 frameHost:(id)arg2 imageHost:(id)arg3
@@ -245,8 +264,22 @@
 -(void)tapArtwork:(id)sender
 {
   if (NSClassFromString(@"SBMediaController"))
-  if ([UIApplication.sharedApplication respondsToSelector:@selector(launchApplicationWithIdentifier:suspended:)])
-  [UIApplication.sharedApplication launchApplicationWithIdentifier: [NSClassFromString(@"SBMediaController") sharedInstance].nowPlayingApplication.bundleIdentifier suspended:NO];
+  { // We are in SpringBoard
+    SBApplication * app = [[NSClassFromString(@"SBMediaController") sharedInstance] nowPlayingApplication];
+    if (app)
+    {
+      if (NSClassFromString(@"SBCoverSheetPresentationManager"))
+      { // dismiss notification center ios 11.x - 12.x
+        SBCoverSheetPresentationManager * nc = [NSClassFromString(@"SBCoverSheetPresentationManager") sharedInstance];
+        BOOL deviceUnlocked = ((SBLockStateAggregator *)[NSClassFromString(@"SBLockStateAggregator") sharedInstance]).lockState == 2;
+        if (nc.isVisible && deviceUnlocked)
+        [nc setCoverSheetPresented:NO animated:YES withCompletion:nil];
+      }
+
+      if (app && [UIApplication.sharedApplication respondsToSelector:@selector(launchApplicationWithIdentifier:suspended:)])
+      [UIApplication.sharedApplication launchApplicationWithIdentifier:app.bundleIdentifier suspended:NO];
+    }
+  }
 }
 
 /// images

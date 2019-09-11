@@ -1,6 +1,13 @@
-#import "../src/MASQThemeManager.h"
 #import "../src/MASQArtworkView.h"
-#import "../src/MASQArtworkBlurView.h"
+#import "../src/MASQArtworkEffectView.h"
+
+static NSString * const kControlCenterKey = @"CC";
+static NSString * const kDashBoardKey = @"LS";
+
+@interface SBMediaController (Private)
+-(instancetype)sharedInstance;
+-(BOOL)hasTrack;
+@end
 
 @interface MediaControlsHeaderView : UIView
 @property (nonatomic, retain) MASQArtworkView * masqArtwork;
@@ -21,13 +28,10 @@
 @property (nonatomic) int style;
 -(BOOL)onScreen;
 
-@property (nonatomic, retain) MASQArtworkBlurView * masqBackground;
+@property (nonatomic, retain) MASQArtworkEffectView * masqBackground;
 @end
 
-// @interface MASQArtworkBlurView : UIImageView
-// @end
 
-// ios 12.4 (maybe 12.2)+
 @interface MRPlatterViewController : UIViewController
 @property (nonatomic) UIView * topDividerView;
 @property (nonatomic) UIView * backgroundView;
@@ -38,11 +42,11 @@
 @property (nonatomic) int style;
 -(BOOL)onScreen;
 
-@property (nonatomic, retain) MASQArtworkBlurView * masqBackground;
+@property (nonatomic, retain) MASQArtworkEffectView * masqBackground;
 @property (nonatomic, assign) CGFloat _continuousCornerRadius;
 @end
 
 
-@interface CALayer (Newish)
+@interface CALayer (ElevenPlus)
 -(int)maskedCorners;
 @end

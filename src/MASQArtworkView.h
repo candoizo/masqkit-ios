@@ -1,3 +1,5 @@
+#import "Interfaces.h"
+
 @interface MASQArtworkView : UIView
 @property (nonatomic, assign) NSString * identifier; //themeKey
 @property (nonatomic, assign) NSBundle * currentTheme;
@@ -27,20 +29,4 @@
 -(id)overlayImage;
 -(id)underlayImage;
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context;
-@end
-
-
-@interface UIApplication (Private)
-+(id)sharedApplication;
--(BOOL)launchApplicationWithIdentifier:(id)arg1 suspended:(BOOL)arg2;
-@end
-
-@interface SBApplication : UIApplication
--(NSString *)bundleIdentifier;
-@end
-
-@interface SBMediaController : NSObject
-+(SBMediaController *)sharedInstance;
--(SBApplication *)nowPlayingApplication;
--(BOOL)hasTrack;
 @end

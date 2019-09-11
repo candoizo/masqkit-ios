@@ -1,6 +1,8 @@
 @interface MusicNowPlayingControlsViewController : UIViewController
 @property (nonatomic, retain) MASQArtworkView* masqArtwork;
 -(id)artworkView;
+@property (nonatomic, retain) MASQArtworkEffectView * masqBackground;
++(instancetype)sharedInstance;
 @end
 
 @interface Artwork : UIView

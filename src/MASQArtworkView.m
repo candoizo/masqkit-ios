@@ -1,21 +1,18 @@
 #import "MASQArtworkView.h"
 #import "MASQThemeManager.h"
 
-#define arrayContainsKindOfClass(a, c) [a filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self isKindOfClass: %@", c]]
-
 @implementation MASQArtworkView
 -(id)initWithThemeKey:(NSString *)key
 {
   if (self = [super init])
   {
+    _identifier = key;
     self.userInteractionEnabled = NO;
     [self addSubview:[self underlayView]];
     [self addSubview:[self containerView]];
     [self addSubview:[self overlayView]];
-    _identifier = key;
     [self updateTheme];
 
-    // lol omg this had to be changed
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTheme)  name:UIApplicationDidBecomeActiveNotification object:nil];
 
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateArtwork:)  name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
@@ -32,14 +29,6 @@
       [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateTheme)  name:@"SBCoverSheetWillPresentNotification" object:nil];
 
     }
-
-    /*
-      ios 11 only? called in music.app and spotify... and springboard
-      // _kMRPlayerPlaybackQueueContentItemArtworkChangedNotification
-      // kMRPlaybackQueueContentItemArtworkChangedNotification
-      // _kMRPlaybackQueueContentItemArtworkChangedNotification
-
-    */
   }
   return self;
 }
@@ -74,9 +63,6 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 
-  // if ([MASQThemeManager themeBundleForKey:self.identifier] != self.currentTheme)
-  // [self updateTheme];
-
   if ([keyPath isEqualToString:@"frame"])
   {
     // if ours isnt already matching the frame host, update it!
@@ -100,8 +86,6 @@
 -(void)themeUpdating {
   if (self.currentTheme)
   {
-    // unset the scale so when we change it isnt messed
-    // _artworkImageView.transform = CGAffineTransformMakeScale(1, 1);
     ((UIImageView *)_containerView.maskView).image = [self maskImage];
     [_overlayView setBackgroundImage:[self overlayImage] forState:UIControlStateNormal];
     [_underlayView setBackgroundImage:[self underlayImage] forState:UIControlStateNormal];

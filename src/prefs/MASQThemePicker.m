@@ -147,7 +147,7 @@
 	 self.navigationController.navigationController.navigationBar.tintColor = [self themeTint];
 	 [self updateThemeList];
 
-	 if (self.themes.count =< 1)
+	 if (self.themes.count <= 1)
 	 [self popMissingAlert];
 }
 

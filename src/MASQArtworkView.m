@@ -50,12 +50,12 @@
   [NSNotificationCenter.defaultCenter removeObserver:self
     name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
 
-  if ([self.identifierf rangeOfString:@"CC"].location != NSNotFound)
+  if ([self.identifier rangeOfString:@"CC"].location != NSNotFound)
   [NSNotificationCenter.defaultCenter removeObserver:self
     name:@"SBControlCenterControllerWillPresentNotification" object:nil];
   // [[NSNotificationCenter defaultCenter] removeObserver:self];
 
-  if ([self.identifierf rangeOfString:@"LS"].location != NSNotFound)
+  if ([self.identifier rangeOfString:@"LS"].location != NSNotFound)
   [NSNotificationCenter.defaultCenter removeObserver:self
     name:@"SBCoverSheetWillPresentNotification" object:nil];
   // [[NSNotificationCenter defaultCenter] removeObserver:self];

@@ -236,7 +236,10 @@
 
 - (void)viewWillAppear:(BOOL)animated {
 	 [super viewWillAppear:animated];
-	 self.navigationController.navigationController.navigationBar.tintColor = [self themeTint];
+
+	self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
+	// self.navigationController.navigationController.navigationBar.tintColor = [self themeTint];
+
 	 [self updateThemeList];
 
 	 if (self.themes.count <= 1)

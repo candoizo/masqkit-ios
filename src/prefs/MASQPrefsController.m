@@ -47,22 +47,10 @@
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	self.prefs = [NSClassFromString(@"MASQThemeManager") prefs];
-}
 
-- (void)viewWillAppear:(BOOL)animated {
-	// if ([self.prefs boolForKey:@"firstTime"]) [self.prefs setBool:NO forKey:@"firstTime"]; 	//obv fix before release
-	// else [self.view addSubview:[[MASQIntroView alloc] init]];
-
-	// //if they havent seen this their first time opening
-	// if (![self.prefs boolForKey:@"firstTime"])
-	// {
-	// 	[self.view addSubview:[[MASQIntroView alloc] init]];
-	// }
-
-	[super viewWillAppear:animated];
-	[self reloadSpecifiers];
 	[self prepareBar];
 }
+
 
 -(void)popMissingAlert {
 			UIAlertController * alert=   [UIAlertController alertControllerWithTitle:@"No Extensions!"
@@ -82,6 +70,64 @@
 			[self presentViewController:alert animated:YES completion:nil];
 }
 
+
+- (void)viewWillAppear:(BOOL)animated {
+	// if ([self.prefs boolForKey:@"firstTime"]) [self.prefs setBool:NO forKey:@"firstTime"]; 	//obv fix before release
+	// else [self.view addSubview:[[MASQIntroView alloc] init]];
+
+	// //if they havent seen this their first time opening
+	// if (![self.prefs boolForKey:@"firstTime"])
+	// {
+	// 	[self.view addSubview:[[MASQIntroView alloc] init]];
+	// }
+
+	[super viewWillAppear:animated];
+
+
+
+	if (!self.origStyle)
+	{
+		self.origStyle = UIApplication.sharedApplication.statusBarStyle;
+		[UIApplication.sharedApplication setStatusBarStyle:UIStatusBarStyleLightContent];
+	}
+	self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
+
+	UIView * con = nil;
+	for (UIView * sv in self.navigationController.navigationController.navigationBar.subviews)
+	{
+		if ([sv isKindOfClass:NSClassFromString(@"_UINavigationBarContentView")])
+		con = sv;
+	}
+	//
+	if (con)
+	{
+			UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
+
+			UIView * myv = [[UIView alloc] initWithFrame:bg.bounds];
+			myv.tag = 6969;
+			myv.userInteractionEnabled = NO;
+			// [con insertSubview:myv atIndex:0];
+
+				CAGradientLayer *gradient = [NSClassFromString(@"CAGradientLayer") layer];
+				gradient.frame = bg.bounds;
+				gradient.colors = @[(id)[UIColor colorWithRed:0.29 green:0.64 blue:1.00 alpha:1.0].CGColor, (id)[UIColor colorWithRed:1.00 green:0.29 blue:0.52 alpha:1.0].CGColor];
+				gradient.startPoint = CGPointMake(0.0,0.5);
+			  gradient.endPoint = CGPointMake(1.0,1.0);
+				// [titleLabel addSublayer:gradient];
+				[bg addSubview:myv];
+				[myv.layer insertSublayer:gradient atIndex:0];
+				// [self.view addSubview:con];
+	}
+
+	UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
+	UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
+	bgEff.alpha = 0;
+
+
+	[self reloadSpecifiers];
+	// [self prepareBar];
+}
+
 - (void)viewWillDisappear:(BOOL)animated {
 	[super viewWillDisappear:animated];
 	self.navigationController.navigationController.navigationBar.tintColor = nil;
@@ -90,13 +136,42 @@
 	if (self.origStyle > -1)
 	{ // reverting back to original
 		UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
+
+		if ([bg viewWithTag:6969])
+		{
+			[[bg viewWithTag:6969] removeFromSuperview];
+		}
+
+  [self.navigationController.navigationController.navigationBar _updateNavigationBarItemsForStyle:0];
+	self.navigationController.navigationController.navigationBar.barStyle = 0; // woot need this :D
 		UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
-		bgEff.hidden = NO;
+		// if (bgEff.layer.sublayers)
+		// if (self.origBar)
+		// for (UIView * sub in bgEff.subviews)
+		// {
+		// 	// need to hide most except this one because it fucks up when its hidden
+		// 	if ([sub isMemberOfClass:NSClassFromString(@"_UIVisualEffectSubview")])
+		// 	{
+		// 		// sub.backgroundColor = self.origBar;
+		// 		break;
+		// 	}
+		// }
+		// bgEff.alpha = 1;
 
-		if (bg.layer.sublayers[0])
-		if ([bg.layer.sublayers[0] isKindOfClass:NSClassFromString(@"CAGradientLayer")])
-		[bg.layer.sublayers[0] removeFromSuperlayer];
+		// for (UIView * sub in bgEff.subviews)
+		// {
+		// 	sub.hidden = NO;
+		// }
+		// UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
+		bgEff.alpha = 1;
 
+
+
+
+		// if (bg.layer.sublayers[0])
+		// if ([bg.layer.sublayers[0] isKindOfClass:NSClassFromString(@"CAGradientLayer")])
+		// [bg.layer.sublayers[0] removeFromSuperlayer];
+		//
 		[UIApplication.sharedApplication setStatusBarStyle:self.origStyle];
 	}
 }
@@ -133,22 +208,68 @@
 	if (!self.origStyle)
 	{
 		self.origStyle = UIApplication.sharedApplication.statusBarStyle;
+		[UIApplication.sharedApplication setStatusBarStyle:UIStatusBarStyleLightContent];
 	}
-	[UIApplication.sharedApplication setStatusBarStyle:UIStatusBarStyleLightContent];
-
 	self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
 
-	UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
-	UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
-	bgEff.hidden = YES;
-
-	CAGradientLayer *gradient = [NSClassFromString(@"CAGradientLayer") layer];
-	gradient.frame = bg.bounds;
-	gradient.colors = @[(id)[UIColor colorWithRed:0.29 green:0.64 blue:1.00 alpha:1.0].CGColor, (id)[UIColor colorWithRed:1.00 green:0.29 blue:0.52 alpha:1.0].CGColor];
-	gradient.startPoint = CGPointMake(0.0,0.5);
-  gradient.endPoint = CGPointMake(1.0,1.0);
-	// [titleLabel addSublayer:gradient];
-	[bg.layer insertSublayer:gradient atIndex:0];
+	// UIView * con = nil;
+	// for (UIView * sv in self.navigationController.navigationController.navigationBar.subviews)
+	// {
+	// 	if ([sv isKindOfClass:NSClassFromString(@"_UINavigationBarContentView")])
+	// 	con = sv;
+	// }
+	// //
+	// if (con)
+	// {
+	// 		UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
+	//
+	// 		UIView * myv = [[UIView alloc] initWithFrame:bg.bounds];
+	// 		myv.tag = 6969;
+	// 		myv.userInteractionEnabled = NO;
+	// 		// [con insertSubview:myv atIndex:0];
+	//
+	// 			CAGradientLayer *gradient = [NSClassFromString(@"CAGradientLayer") layer];
+	// 			gradient.frame = bg.bounds;
+	// 			gradient.colors = @[(id)[UIColor colorWithRed:0.29 green:0.64 blue:1.00 alpha:1.0].CGColor, (id)[UIColor colorWithRed:1.00 green:0.29 blue:0.52 alpha:1.0].CGColor];
+	// 			gradient.startPoint = CGPointMake(0.0,0.5);
+	// 		  gradient.endPoint = CGPointMake(1.0,1.0);
+	// 			// [titleLabel addSublayer:gradient];
+	// 			[bg addSubview:myv];
+	// 			[myv.layer insertSublayer:gradient atIndex:0];
+	// 			// [self.view addSubview:con];
+	// }
+	//
+	// UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
+	// // UIView * sta = [self.navigationController.navigationController.navigationBar valueForKey:@"_stack"];
+	// // //
+	// //
+	// // //
+	// // UIView * content = nil;
+	// UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
+	// // for (UIView * sub in bgEff.subviews)
+	// // {
+	// // // 	// need to hide most except this one because it fucks up when its hidden
+	// // 	if ([sub isMemberOfClass:NSClassFromString(@"_UIVisualEffectSubview")])
+	// // 	{
+	// // 		content = sub;
+	// // 		break;
+	// // 	}
+	// // }
+	// // if (content) {
+	// bgEff.alpha = 0;
+	// UIView * myv = [[UIView alloc] initWithFrame:bg.bounds];
+	// myv.tag = 6969;
+	// [content addSubview:myv];
+	// CAGradientLayer *gradient = [NSClassFromString(@"CAGradientLayer") layer];
+	// gradient.frame = bg.bounds;
+	// gradient.colors = @[(id)[UIColor colorWithRed:0.29 green:0.64 blue:1.00 alpha:1.0].CGColor, (id)[UIColor colorWithRed:1.00 green:0.29 blue:0.52 alpha:1.0].CGColor];
+	// gradient.startPoint = CGPointMake(0.0,0.5);
+  // gradient.endPoint = CGPointMake(1.0,1.0);
+	// self.origBar = gradient;
+	// // [titleLabel addSublayer:gradient];
+	// [myv.layer insertSublayer:gradient atIndex:0];
+	//
+	// }
 
 	// rightmost label
 	UILabel *titleLabel = [[UILabel alloc] init];

@@ -5,8 +5,14 @@
 -(BOOL)hasBackgroundEffect;
 @end
 
+@interface _UIVisualEffectViewBackgropCaptureGroup : NSObject
+-(void)setDisableInPlaceFiltering:(BOOL)arg1;
+@end
+
 @interface UINavigationBar (Private)
 // -(UIView *)backgroundView;
+-(UIView *)currentBackButton;
+-(void)_updateNavigationBarItemsForStyle:(int)arg1;
 @end
 
 @interface UIBarButtonItem (Private)
@@ -19,6 +25,7 @@
 
 @interface MASQPrefsController : PSListController
 @property (nonatomic, assign) int origStyle;
+@property (nonatomic, assign) CAGradientLayer * origBar;
 @property (nonatomic) NSUserDefaults * prefs;
 +(void)clearPrefs;
 

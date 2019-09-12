@@ -2,6 +2,14 @@
 	if (!%c(MASQHousekeeper)) dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
 }
 
+// %hook PSRootController
+// -(id)navigationController:(id)arg1 willShowViewController:(id)arg2 animated:(BOOL)arg3
+// {
+// 	return %orig;
+// }
+// %end
+
+
 // #import "MASQSubPageController.h"
 // #import "dlfcn.h"
 // id const kGADAdSizeSmartBannerPortrait = nil;

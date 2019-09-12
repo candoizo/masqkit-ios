@@ -29,7 +29,7 @@
 
 -(UILabel *)tweakTitleWithName:(NSString *)arg1 {
   UILabel *tweakTitle = [[UILabel alloc] initWithFrame:CGRectZero];
-  tweakTitle.font = [UIFont fontWithName:@"HelveticaNeue-Medium" size:40];
+  tweakTitle.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:40];
   tweakTitle.text = arg1;
   tweakTitle.textAlignment = 1;
   tweakTitle.textColor = [UIColor.blackColor colorWithAlphaComponent:0.7];

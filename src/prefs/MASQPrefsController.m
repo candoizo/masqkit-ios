@@ -36,7 +36,6 @@
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	self.prefs = [NSClassFromString(@"MASQThemeManager") prefs];
-	// self.navigationItem.rightBarButtonItem = [self loveButton];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -51,8 +50,7 @@
 
 	[super viewWillAppear:animated];
 	[self reloadSpecifiers];
-	self.navigationController.navigationController.navigationBar.barTintColor = [UIColor colorWithRed:0.87 green:0.25 blue:0.40 alpha:1];
-	self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
+	[self prepareBar];
 }
 
 -(void)popMissingAlert {
@@ -98,5 +96,44 @@
 -(UIImage *)imageFromPrefsWithName:(NSString *)n
 {
 	return [UIImage imageNamed:n inBundle:[self bundle]];
+}
+
+-(void)prepareBar {
+
+	// set colors
+	// self.navigationController.navigationController.navigationBar.barTintColor = [UIColor colorWithRed:0.87 green:0.25 blue:0.40 alpha:1];
+	self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
+
+	// header gradient background
+	// UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 50)];
+	UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
+
+	UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
+	bgEff.hidden = YES;
+
+	CAGradientLayer *gradient = [NSClassFromString(@"CAGradientLayer") layer];
+	gradient.frame = bg.bounds;
+	gradient.colors = @[(id)[UIColor colorWithRed:0.29 green:0.64 blue:1.00 alpha:1.0].CGColor, (id)[UIColor colorWithRed:1.00 green:0.29 blue:0.52 alpha:1.0].CGColor];
+	gradient.startPoint = CGPointMake(0.0,0.5);
+  gradient.endPoint = CGPointMake(1.0,1.0);
+	// [titleLabel addSublayer:gradient];
+	[bg.layer insertSublayer:gradient atIndex:0];
+
+
+
+	// rightmost label
+	UILabel *titleLabel = [[UILabel alloc] init];
+	titleLabel.text = @"MASQ";
+	titleLabel.textColor = UIColor.whiteColor;
+	[titleLabel sizeToFit];
+	UIBarButtonItem *right = [[UIBarButtonItem alloc] initWithCustomView:titleLabel];
+	self.navigationItem.rightBarButtonItem = right;
+
+
+	//center icon title
+	UIImageView * icon = [[UIImageView alloc] initWithFrame:CGRectMake(0,0, 32,32)];
+	icon.image = [self imageFromPrefsWithName:@"Icon/Masq"];
+	self.navigationItem.titleView = icon;
+
 }
 @end

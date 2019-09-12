@@ -1,8 +1,11 @@
+#import "../MASQArtworkView.h"
+
 #import <Preferences/PSListController.h>
 #import <Preferences/PSSpecifier.h>
 
 @interface MASQThemePicker : PSViewController <UITableViewDataSource, UITableViewDelegate>
 @property () NSUserDefaults * prefs;
+@property (nonatomic, retain) MASQArtworkView * artwork;
 @property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, retain) NSArray *themes;
 @property (nonatomic, retain) NSString *selectedTheme;

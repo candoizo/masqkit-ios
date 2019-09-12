@@ -15,7 +15,7 @@
   self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
   self.tableView.delegate = self;
   self.tableView.dataSource = self;
-  self.tableView.rowHeight = 65.0f;
+  // self.tableView.rowHeight = 65.0f;
 	self.tableView.tintColor = [self themeTint];
 	[self.view addSubview:self.tableView];
 }
@@ -75,7 +75,51 @@
 	self.themes = themes;
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+
+    NSString *sectionName;
+    switch (section) {
+        case 0:
+				sectionName = @"Preview";
+            // sectionName = NSLocalizedString(@"mySectionName", @"mySectionName");
+            break;
+        case 1:
+            // sectionName = NSLocalizedString(@"myOtherSectionName", @"myOtherSectionName");
+            break;
+        // ...
+        default:
+            sectionName = @"";
+            break;
+    }
+    return sectionName;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+	if (indexPath.section == 0)
+	return 130;
+	else
+	return 65.0f;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+
+	if (indexPath.section == 0)
+	{ // theme previewer
+	  UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"ThemeCell"];
+		cell.userInteractionEnabled = NO;
+		// cell.rowHeight = 120;
+	  cell.selectionStyle = UITableViewCellSelectionStyleNone;
+
+		MASQArtworkView * view = [[NSClassFromString(@"MASQArtworkView") alloc] initWithThemeKey:[self themeKey] frameHost:nil imageHost:nil];
+		view.frame = CGRectMake(0,0,120,120);
+		view.center = CGPointMake(tableView.center.x, view.center.y);
+		self.artwork = view;
+		[view updateArtwork:nil];
+		[cell addSubview:view];
+
+		return cell;
+	}
+
   UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"ThemeCell"];
   cell.selectionStyle = UITableViewCellSelectionStyleNone;
 
@@ -139,6 +183,9 @@
 			[prefs flushCachesForAppIdentifier:(__bridge CFStringRef)@"ca.ndoizo.masqkit" user:(__bridge CFStringRef)@"/User"];
 		}
 		// }
+
+		// if (self.artwork)
+		// [self.artwork updateTheme];
 	}
 }
 
@@ -157,11 +204,18 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-	return 1;
+	// one for the preview, one for the theme rows
+	return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+
+	if (section == 0)
+	return 1;
+	else if (section == 1)
 	return self.themes.count;
+	else
+	return 0;
 }
 
 -(NSString *)themeKey {

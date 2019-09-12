@@ -10,4 +10,16 @@
 	}
 	return _specifiers;
 }
+
+-(void)viewWillAppear:(BOOL)arg1 {
+	[super viewWillAppear:arg1];
+
+	self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
+	self.navigationController.navigationController.navigationBar.barStyle = 1;
+}
+
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+    return UIStatusBarStyleLightContent;
+}
 @end

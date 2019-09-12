@@ -18,6 +18,7 @@
 @end
 
 @interface MASQPrefsController : PSListController
+@property (nonatomic, assign) int origStyle;
 @property (nonatomic) NSUserDefaults * prefs;
 +(void)clearPrefs;
 

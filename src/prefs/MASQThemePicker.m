@@ -1,5 +1,6 @@
 #import "MASQThemePicker.h"
 #import "../MASQThemeManager.h"
+#import "MediaRemote/MediaRemote.h"
 
 @interface _CFXPreferences : NSObject
 + (_CFXPreferences *)copyDefaultPreferences;
@@ -25,6 +26,7 @@
 	// NSMutableArray *themes = [@[@{@"bundle":@"Disabled@100", @"name":@"Disabled", @"scale":@"100"}] mutableCopy];
 	NSMutableArray * themes = [NSMutableArray new];
 	NSString * themePath = [self themePath];
+	NSDictionary * defaultTheme = nil;
 	// HBLogDebug(@"Theme path: %@", [self themePath]);
 	// for all the installed bundles in /Application Support/MASQ/Themes/x.bundle
 	for (NSString * bundles in [NSFileManager.defaultManager contentsOfDirectoryAtPath:themePath error:nil])
@@ -55,7 +57,7 @@
 				else {
 					// no credit exists
 					if ([bthemeId isEqualToString:@"Default.bundle/Default@100"])
-					[themes insertObject:@{ @"bundle":bthemeId, @"name":name, @"scale":scale, @"author":@""} atIndex:0];
+					defaultTheme = @{ @"bundle":bthemeId, @"name":name, @"scale":scale, @"author":@""};
 
 					else //if not the default add normally
 					[themes addObject:@{ @"bundle":bthemeId, @"name":name, @"scale":scale, @"author":@""}];
@@ -72,6 +74,15 @@
 	// 		NSString *credit = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Credit.txt", [self themePath], themeid] encoding:NSUTF8StringEncoding error:nil];
 	// 		[themes addObject:@{ @"bundle":themeid, @"name":named, @"scale":scaling, @"author":credit ?: @""}];
   // }
+
+	if (themes.count > 0)
+	{
+		NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES];
+		[themes sortUsingDescriptors:[NSArray arrayWithObject:sort]];
+		if (defaultTheme)
+		[themes insertObject:defaultTheme atIndex:0];
+		// [root addObjectsFromArray:subprefs];
+	}
 	self.themes = themes;
 }
 
@@ -80,25 +91,34 @@
     NSString *sectionName;
     switch (section) {
         case 0:
-				sectionName = @"Preview";
-            // sectionName = NSLocalizedString(@"mySectionName", @"mySectionName");
-            break;
+					sectionName = @"Preview";
+          // sectionName = NSLocalizedString(@"mySectionName", @"mySectionName");
+        break;
         case 1:
-            // sectionName = NSLocalizedString(@"myOtherSectionName", @"myOtherSectionName");
-            break;
+          // sectionName = NSLocalizedString(@"myOtherSectionName", @"myOtherSectionName");
+        break;
         // ...
         default:
-            sectionName = @"";
-            break;
+          sectionName = @"";
+        break;
     }
     return sectionName;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
 	if (indexPath.section == 0)
-	return 130;
+	return 135;
 	else
-	return 65.0f;
+	return 62.5f;
+}
+
+-(id)fetchArtwork {
+	// need to investigate how to support spotify artwork
+	// cont = [NSClassFromString(@"MPMusicPlayerController") applicationMusicPlayer] ?: [NSClassFromString(@"MPMusicPlayerController") systemMusicPlayer];
+	MPMusicPlayerController * cont = [NSClassFromString(@"MPMusicPlayerController") systemMusicPlayer];
+	UIImage * art = [cont.nowPlayingItem.artwork imageWithSize:CGSizeMake(120,120)];
+
+	return art;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -109,12 +129,37 @@
 		cell.userInteractionEnabled = NO;
 		// cell.rowHeight = 120;
 	  cell.selectionStyle = UITableViewCellSelectionStyleNone;
+		cell.backgroundColor = nil;
 
-		MASQArtworkView * view = [[NSClassFromString(@"MASQArtworkView") alloc] initWithThemeKey:[self themeKey] frameHost:nil imageHost:nil];
-		view.frame = CGRectMake(0,0,120,120);
-		view.center = CGPointMake(tableView.center.x, view.center.y);
+		// hide separator hack
+		// cell.separatorInset = UIEdgeInsetsMake(0, 10000, 0, 0);
+		// tableView.separatorColor = [UIColor clearColor];
+		// tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+		// int style = 2;
+  	// UIBlurEffect * eff; switch (style) {
+    // 	case 1: eff = [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight]; break;
+    // 	case 2: eff = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight]; break;
+    // 	case 3: eff = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark]; break;
+  	// }
+		//
+		// // blur to aid contrast
+		// UIVisualEffectView * v = [[UIVisualEffectView alloc] initWithEffect:eff];
+		// v.frame = CGRectMake(0,0,cell.bounds.size.width, cell.bounds.size.height);
+		// v.contentMode = UIViewContentModeScaleAspectFill;
+		// v.backgroundColor = UIColor.lightGrayColor;
+		// v.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+		// [cell addSubview:v];
+
+		// a fake artwork view for positioning
+		UIImageView * contain = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,120,120)];
+		float rowHeight = [self tableView:tableView heightForRowAtIndexPath:indexPath];
+		contain.center = CGPointMake(tableView.center.x, rowHeight*0.5);
+		contain.image = [self fetchArtwork];
+		contain.hidden = YES;
+		[cell addSubview:contain];
+
+		MASQArtworkView * view = [[NSClassFromString(@"MASQArtworkView") alloc] initWithThemeKey:[self themeKey] frameHost:contain imageHost:contain];
 		self.artwork = view;
-		[view updateArtwork:nil];
 		[cell addSubview:view];
 
 		return cell;
@@ -184,8 +229,8 @@
 		}
 		// }
 
-		// if (self.artwork)
-		// [self.artwork updateTheme];
+		if (self.artwork)
+		[self.artwork updateTheme];
 	}
 }
 
@@ -258,5 +303,10 @@
 			[alert addAction:repo];
 			[alert addAction:cancel];
 			[self presentViewController:alert animated:YES completion:nil];
+}
+
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+    return UIStatusBarStyleLightContent;
 }
 @end

@@ -154,6 +154,7 @@
 {
   if ([img isKindOfClass:NSClassFromString(@"UIImage")])
   {
+    self.hashCache = img.hash;
     self.artworkImageView.image = img;
     return;
   }

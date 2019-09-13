@@ -1,5 +1,9 @@
 #import <Preferences/PSListController.h>
 
+@interface UIImage (Private)
++ (UIImage *)imageNamed:(id)img inBundle:(id)bndl;
++ (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)bundleIdentifier format:(int)format scale:(int)scale;
+@end
 
 @interface UIView (Private)
 -(BOOL)hasBackgroundEffect;
@@ -13,6 +17,7 @@
 // -(UIView *)backgroundView;
 -(UIView *)currentBackButton;
 -(void)_updateNavigationBarItemsForStyle:(int)arg1;
+// @property (nonatomic) BOOL prefersLargeTitles;
 @end
 
 @interface UIBarButtonItem (Private)

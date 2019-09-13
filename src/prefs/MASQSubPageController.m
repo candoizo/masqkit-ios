@@ -11,6 +11,22 @@
 	return _specifiers;
 }
 
+-(void)viewDidLoad {
+	[super viewDidLoad];
+
+		if (self.title)
+		{
+			UILabel *titleLabel = [[UILabel alloc] init];
+			titleLabel.text = self.title;
+			titleLabel.textColor = UIColor.whiteColor;
+			[titleLabel sizeToFit];
+			UIBarButtonItem *right = [[UIBarButtonItem alloc] initWithCustomView:titleLabel];
+			self.navigationItem.rightBarButtonItem = right;
+
+			self.title = @"";
+		}
+}
+
 -(void)viewWillAppear:(BOOL)arg1 {
 	[super viewWillAppear:arg1];
 
@@ -32,12 +48,24 @@
 	[myv.layer insertSublayer:gradient atIndex:0];
 	UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
 	bgEff.alpha = 0;
+
+	// NSDictionary *settings = @{
+  //   // UITextAttributeFont                 :  [UIFont fontWithName:@"YOURFONTNAME" size:20.0],
+  //   UITextAttributeTextColor            :  [UIColor whiteColor],
+  //   UITextAttributeTextShadowColor      :  [UIColor clearColor],
+  //   UITextAttributeTextShadowOffset     :  [NSValue valueWithUIOffset:UIOffsetZero]
+	// };
+	//
+	// self.navigationController.navigationController.navigationBar.titleTextAttributes = settings;
+
+
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
 	[super viewWillDisappear:animated];
 	self.navigationController.navigationController.navigationBar.tintColor = nil;
 	self.navigationController.navigationController.navigationBar.barTintColor = nil;
+	// self.navigationController.navigationController.navigationBar.titleTextAttributes = nil;
 
 	UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
 

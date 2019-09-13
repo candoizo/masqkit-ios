@@ -6,18 +6,25 @@
 
 
 @implementation MASQPrefsController
-+(void)clearPrefs { [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:@"ca.ndoizo.masqkit"]; }
++(void)clearPrefs {
+	[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:@"ca.ndoizo.masqkit"];
+}
+
+-(NSArray *)sortRules {
+	return @[[NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES]];
+}
 
 - (NSArray *)specifiers {
-	if (!_specifiers)	{
+
+	if (!_specifiers)
+	{
+
 		NSMutableArray * root = [[self loadSpecifiersFromPlistName:@"Root" target:self] mutableCopy];
-
 		NSMutableArray * subprefs = [self buildForeignPrefs];
-		if (subprefs.count > 0)
-		{
-			NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES];
-			[subprefs sortUsingDescriptors:[NSArray arrayWithObject:sort]];
 
+		if (subprefs.count > 0)
+		{ // sort and add installed prefs
+			[subprefs sortUsingDescriptors:[self sortRules]];
 			[root addObjectsFromArray:subprefs];
 		}
 		else
@@ -32,18 +39,14 @@
 -(NSMutableArray *)buildForeignPrefs {
 	NSString * subpath = [NSString stringWithFormat:@"%@/Prefs/", [self bundle].bundlePath];
 	NSMutableArray * plugins = [NSMutableArray new];
-	for (NSString * list in [NSFileManager.defaultManager contentsOfDirectoryAtPath:subpath error:nil]) {
-		if (![list hasSuffix:@"page.plist"]) [plugins addObjectsFromArray:[self loadSpecifiersFromPlistName:[NSString stringWithFormat:@"Prefs/%@", [list stringByDeletingPathExtension]] target:self]];
+	for (NSString * list in [NSFileManager.defaultManager contentsOfDirectoryAtPath:subpath error:nil])
+	{
+		if (![list hasSuffix:@"page.plist"])
+		[plugins addObjectsFromArray:[self loadSpecifiersFromPlistName:[NSString stringWithFormat:@"Prefs/%@", [list stringByDeletingPathExtension]] target:self]];
 	}
 	return plugins;
 }
 
-- (void)viewDidLoad {
-	[super viewDidLoad];
-	self.prefs = [NSClassFromString(@"MASQThemeManager") prefs];
-
-	[self prepareBar];
-}
 
 -(void)popMissingAlert {
 	UIAlertController * alert=   [UIAlertController alertControllerWithTitle:@"No Extensions!"
@@ -67,63 +70,95 @@
 	[self presentViewController:alert animated:YES completion:nil];
 }
 
+- (void)viewDidLoad {
+	[super viewDidLoad];
+
+	self.prefs = [NSClassFromString(@"MASQThemeManager") prefs];
+	[self prepareBar];
+}
 
 - (void)viewWillAppear:(BOOL)animated {
-	// if ([self.prefs boolForKey:@"firstTime"]) [self.prefs setBool:NO forKey:@"firstTime"]; 	//obv fix before release
-	// else [self.view addSubview:[[MASQIntroView alloc] init]];
-
-	// //if they havent seen this their first time opening
-	// if (![self.prefs boolForKey:@"firstTime"])
-	// {
-	// 	[self.view addSubview:[[MASQIntroView alloc] init]];
-	// }
-
 	[super viewWillAppear:animated];
 
-
-
-	if (!self.origStyle)
-	{
-		self.origStyle = UIApplication.sharedApplication.statusBarStyle;
-		[UIApplication.sharedApplication setStatusBarStyle:UIStatusBarStyleLightContent];
-	}
-	self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
-
-
-	// UIView * con = nil;
-	// for (UIView * sv in self.navigationController.navigationController.navigationBar.subviews)
+	[self wantsStyle:YES];
+	// if (!self.origStyle)
 	// {
-	// 	if ([sv isKindOfClass:NSClassFromString(@"_UINavigationBarContentView")])
-	// 	con = sv;
+	// 	self.origStyle = UIApplication.sharedApplication.statusBarStyle;
+	// 	[UIApplication.sharedApplication setStatusBarStyle:UIStatusBarStyleLightContent];
 	// }
+	// self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
 	//
-	// if (con)
-	// {
-			UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
-
-			UIView * myv = [[UIView alloc] initWithFrame:bg.bounds];
-			myv.tag = 6969;
-			myv.userInteractionEnabled = NO;
-			// [con insertSubview:myv atIndex:0];
-
-				CAGradientLayer *gradient = [NSClassFromString(@"CAGradientLayer") layer];
-				gradient.frame = bg.bounds;
-				gradient.colors = @[(id)[UIColor colorWithRed:0.29 green:0.64 blue:1.00 alpha:1.0].CGColor, (id)[UIColor colorWithRed:1.00 green:0.29 blue:0.52 alpha:1.0].CGColor];
-				gradient.startPoint = CGPointMake(0.0,0.5);
-			  gradient.endPoint = CGPointMake(1.0,1.0);
-				// [titleLabel addSublayer:gradient];
-				[bg addSubview:myv];
-				[myv.layer insertSublayer:gradient atIndex:0];
-				// [self.view addSubview:con];
-	// }
-
+	//
 	// UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
-	UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
-	bgEff.alpha = 0;
+	//
+	// UIView * myv = [[UIView alloc] initWithFrame:bg.bounds];
+	// myv.tag = 6969;
+	// myv.userInteractionEnabled = NO;
+	//
+	// CAGradientLayer *gradient = [NSClassFromString(@"CAGradientLayer") layer];
+	// gradient.frame = bg.bounds;
+	// gradient.colors = @[(id)[UIColor colorWithRed:0.29 green:0.64 blue:1.00 alpha:1.0].CGColor, (id)[UIColor colorWithRed:1.00 green:0.29 blue:0.52 alpha:1.0].CGColor];
+	// gradient.startPoint = CGPointMake(0.0,0.5);
+	// gradient.endPoint = CGPointMake(1.0,1.0);
+	//
+	// [bg addSubview:myv];
+	// [myv.layer insertSublayer:gradient atIndex:0];
+	//
+	// UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
+	// bgEff.alpha = 0;
 
 
 	[self reloadSpecifiers];
-	// [self prepareBar];
+}
+
+-(void)wantsStyle:(BOOL)arg1
+{
+	if (arg1)
+	{ // adding it to the header
+		if (!self.origStyle)
+		{
+			self.origStyle = UIApplication.sharedApplication.statusBarStyle;
+			[UIApplication.sharedApplication setStatusBarStyle:UIStatusBarStyleLightContent];
+		}
+		self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
+
+
+		UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
+
+		UIView * myv = [[UIView alloc] initWithFrame:bg.bounds];
+		myv.tag = 6969;
+		myv.userInteractionEnabled = NO;
+
+		CAGradientLayer *gradient = [NSClassFromString(@"CAGradientLayer") layer];
+		gradient.frame = bg.bounds;
+		gradient.colors = @[(id)[UIColor colorWithRed:0.29 green:0.64 blue:1.00 alpha:1.0].CGColor, (id)[UIColor colorWithRed:1.00 green:0.29 blue:0.52 alpha:1.0].CGColor];
+		gradient.startPoint = CGPointMake(0.0,0.5);
+		gradient.endPoint = CGPointMake(1.0,1.0);
+
+		[bg addSubview:myv];
+		[myv.layer insertSublayer:gradient atIndex:0];
+
+		UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
+		bgEff.alpha = 0;
+	}
+	else
+	{ // removing it from the header
+			if (self.origStyle > -1)
+			{ // reverting back to original
+				UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
+
+				if ([bg viewWithTag:6969])
+				[[bg viewWithTag:6969] removeFromSuperview];
+
+			  // [self.navigationController.navigationController.navigationBar _updateNavigationBarItemsForStyle:0];
+				self.navigationController.navigationController.navigationBar.barStyle = 0; // woot need this :D
+
+				UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
+				bgEff.alpha = 1;
+
+				[UIApplication.sharedApplication setStatusBarStyle:self.origStyle];
+			}
+	}
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -132,21 +167,22 @@
 	self.navigationController.navigationController.navigationBar.tintColor = nil;
 	self.navigationController.navigationController.navigationBar.barTintColor = nil;
 
-	if (self.origStyle > -1)
-	{ // reverting back to original
-		UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
-
-		if ([bg viewWithTag:6969])
-		[[bg viewWithTag:6969] removeFromSuperview];
-
-	  [self.navigationController.navigationController.navigationBar _updateNavigationBarItemsForStyle:0];
-		self.navigationController.navigationController.navigationBar.barStyle = 0; // woot need this :D
-
-		UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
-		bgEff.alpha = 1;
-
-		[UIApplication.sharedApplication setStatusBarStyle:self.origStyle];
-	}
+	[self wantsStyle:NO];
+	// if (self.origStyle > -1)
+	// { // reverting back to original
+	// 	UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
+	//
+	// 	if ([bg viewWithTag:6969])
+	// 	[[bg viewWithTag:6969] removeFromSuperview];
+	//
+	//   [self.navigationController.navigationController.navigationBar _updateNavigationBarItemsForStyle:0];
+	// 	self.navigationController.navigationController.navigationBar.barStyle = 0; // woot need this :D
+	//
+	// 	UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
+	// 	bgEff.alpha = 1;
+	//
+	// 	[UIApplication.sharedApplication setStatusBarStyle:self.origStyle];
+	// }
 }
 
 - (id)tableView:(id)tableView viewForHeaderInSection:(NSInteger)section {

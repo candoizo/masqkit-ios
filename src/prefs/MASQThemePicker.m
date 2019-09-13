@@ -20,6 +20,9 @@
 	UIBarButtonItem *right = [[UIBarButtonItem alloc] initWithCustomView:titleLabel];
 	self.navigationItem.rightBarButtonItem = right;
 
+	UIView * view = [[UIView alloc] init];
+	self.navigationItem.titleView = view;
+
 
 	self.selectedTheme = [self.prefs valueForKey:[self themeKey]];
   self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
@@ -124,12 +127,68 @@
 }
 
 -(id)fetchArtwork {
+	/*
+		Trying to get artwork notes:
+
+		MPMusicPlayerController
+		+(BOOL)_isPlayerInstalled; // check for third party!
+		// application stuff seems to crash
+
+		MRMediaRemoteServiceClient was accessible in Preferences
+		- has some good low level info about the app playing stuff
+
+		MRMediaRemoteService - above class refs this so its prolly better
+
+		in the MediaServices
+		MSVArtworkService seems related and has a shared instance
+
+
+
+
+		frida stuff
+
+		  9558 ms  -[MPCMediaRemoteController _playbackQueueChangedNotification:0x281f8aca0]
+	*/
+
 	// need to investigate how to support spotify artwork
 	// cont = [NSClassFromString(@"MPMusicPlayerController") applicationMusicPlayer] ?: [NSClassFromString(@"MPMusicPlayerController") systemMusicPlayer];
+	UIImage * art = nil;
+
 	MPMusicPlayerController * cont = [NSClassFromString(@"MPMusicPlayerController") systemMusicPlayer];
-	UIImage * art = [cont.nowPlayingItem.artwork imageWithSize:CGSizeMake(120,120)];
+	art = [cont.nowPlayingItem.artwork imageWithSize:CGSizeMake(120,120)];
 
 	return art;
+}
+
+// -(id)tester {
+// 	UIImage * img = nil;
+// 			  MRMediaRemoteGetNowPlayingInfo(
+// 			    dispatch_get_main_queue(), ^(CFDictionaryRef information) {
+// 			      NSDictionary *dict = (__bridge NSDictionary *)(information);
+// 						img = [UIImage imageWithData:dict[@"kMRMediaRemoteNowPlayingInfoArtworkData"]];
+// 						return img;
+// 			      // UIImage * img = [UIImage imageWithData:dict[@"kMRMediaRemoteNowPlayingInfoArtworkData"]];
+// 			      // if (img)
+// 						// return img;
+// 			      // art = img;
+// 			    }
+// 			  );
+// 				return nil;
+// }
+
+-(void)updateArtworkUgly {
+	if (self.artwork)
+	MRMediaRemoteGetNowPlayingInfo(
+		dispatch_get_main_queue(), ^(CFDictionaryRef information) {
+			NSDictionary *dict = (__bridge NSDictionary *)(information);
+			self.artwork.artworkImageView.image = [UIImage imageWithData:dict[@"kMRMediaRemoteNowPlayingInfoArtworkData"]];
+			// return img;
+				      // UIImage * img = [UIImage imageWithData:dict[@"kMRMediaRemoteNowPlayingInfoArtworkData"]];
+				      // if (img)
+							// return img;
+				      // art = img;
+				    }
+				  );
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -172,6 +231,7 @@
 		MASQArtworkView * view = [[NSClassFromString(@"MASQArtworkView") alloc] initWithThemeKey:[self themeKey] frameHost:contain imageHost:contain];
 		self.artwork = view;
 		[cell addSubview:view];
+		[self updateArtworkUgly];
 
 		return cell;
 	}
@@ -250,24 +310,25 @@
 - (void)viewWillAppear:(BOOL)animated {
 	 [super viewWillAppear:animated];
 
-	 	UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
-
-	 	UIView * myv = [[UIView alloc] initWithFrame:bg.bounds];
-	 	myv.tag = 6969;
-	 	myv.userInteractionEnabled = NO;
-
-	 	CAGradientLayer *gradient = [NSClassFromString(@"CAGradientLayer") layer];
-	 	gradient.frame = bg.bounds;
-	 	gradient.colors = @[(id)[UIColor colorWithRed:0.29 green:0.64 blue:1.00 alpha:1.0].CGColor, (id)[UIColor colorWithRed:1.00 green:0.29 blue:0.52 alpha:1.0].CGColor];
-	 	gradient.startPoint = CGPointMake(0.0,0.5);
-	 	gradient.endPoint = CGPointMake(1.0,1.0);
-	 	[bg addSubview:myv];
-	 	[myv.layer insertSublayer:gradient atIndex:0];
-	 	UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
-	 	bgEff.alpha = 0;
-
-
-	self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
+	[self wantsStyle:YES];
+	//  	UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
+	//
+	//  	UIView * myv = [[UIView alloc] initWithFrame:bg.bounds];
+	//  	myv.tag = 6969;
+	//  	myv.userInteractionEnabled = NO;
+	//
+	//  	CAGradientLayer *gradient = [NSClassFromString(@"CAGradientLayer") layer];
+	//  	gradient.frame = bg.bounds;
+	//  	gradient.colors = @[(id)[UIColor colorWithRed:0.29 green:0.64 blue:1.00 alpha:1.0].CGColor, (id)[UIColor colorWithRed:1.00 green:0.29 blue:0.52 alpha:1.0].CGColor];
+	//  	gradient.startPoint = CGPointMake(0.0,0.5);
+	//  	gradient.endPoint = CGPointMake(1.0,1.0);
+	//  	[bg addSubview:myv];
+	//  	[myv.layer insertSublayer:gradient atIndex:0];
+	//  	UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
+	//  	bgEff.alpha = 0;
+	//
+	//
+	// self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
 	// self.navigationController.navigationController.navigationBar.tintColor = [self themeTint];
 
 	 [self updateThemeList];
@@ -280,17 +341,18 @@
 	self.navigationController.navigationController.navigationBar.tintColor = nil;
 	[super viewWillDisappear:animated];
 
-		UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
-
-		if ([bg viewWithTag:6969])
-		{
-			[[bg viewWithTag:6969] removeFromSuperview];
-		}
-
-	  // [self.navigationController.navigationController.navigationBar _updateNavigationBarItemsForStyle:0];
-		self.navigationController.navigationController.navigationBar.barStyle = 0; // woot need this :D
-		UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
-		bgEff.alpha = 1;
+	[self wantsStyle:NO];
+		// UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
+		//
+		// if ([bg viewWithTag:6969])
+		// {
+		// 	[[bg viewWithTag:6969] removeFromSuperview];
+		// }
+		//
+	  // // [self.navigationController.navigationController.navigationBar _updateNavigationBarItemsForStyle:0];
+		// self.navigationController.navigationController.navigationBar.barStyle = 0; // woot need this :D
+		// UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
+		// bgEff.alpha = 1;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -350,8 +412,53 @@
 			[self presentViewController:alert animated:YES completion:nil];
 }
 
-- (UIStatusBarStyle)preferredStatusBarStyle
+-(void)wantsStyle:(BOOL)arg1
 {
-    return UIStatusBarStyleLightContent;
+	if (arg1)
+	{ // adding it to the header
+		// if (!self.origStyle)
+		// {
+		// 	self.origStyle = UIApplication.sharedApplication.statusBarStyle;
+		// 	[UIApplication.sharedApplication setStatusBarStyle:UIStatusBarStyleLightContent];
+		// }
+		self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
+
+
+		UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
+
+		UIView * myv = [[UIView alloc] initWithFrame:bg.bounds];
+		myv.tag = 6969;
+		myv.userInteractionEnabled = NO;
+
+		CAGradientLayer *gradient = [NSClassFromString(@"CAGradientLayer") layer];
+		gradient.frame = bg.bounds;
+		gradient.colors = @[(id)[UIColor colorWithRed:0.29 green:0.64 blue:1.00 alpha:1.0].CGColor, (id)[UIColor colorWithRed:1.00 green:0.29 blue:0.52 alpha:1.0].CGColor];
+		gradient.startPoint = CGPointMake(0.0,0.5);
+		gradient.endPoint = CGPointMake(1.0,1.0);
+
+		[bg addSubview:myv];
+		[myv.layer insertSublayer:gradient atIndex:0];
+
+		UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
+		bgEff.alpha = 0;
+	}
+	else
+	{ // removing it from the header
+			// if (self.origStyle > -1)
+			// { // reverting back to original
+				UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
+
+				if ([bg viewWithTag:6969])
+				[[bg viewWithTag:6969] removeFromSuperview];
+
+			  // [self.navigationController.navigationController.navigationBar _updateNavigationBarItemsForStyle:0];
+				self.navigationController.navigationController.navigationBar.barStyle = 0; // woot need this :D
+
+				UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
+				bgEff.alpha = 1;
+
+				// [UIApplication.sharedApplication setStatusBarStyle:self.origStyle];
+			// }
+	}
 }
 @end

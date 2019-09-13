@@ -34,4 +34,5 @@
 +(UIColor *)hexToRGB:(NSString *)arg1;
 
 -(void)popMissingAlert;
+-(void)wantsStyle:(BOOL)arg1;
 @end

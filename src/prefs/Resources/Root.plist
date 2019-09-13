@@ -9,6 +9,6 @@ items = (
 // },
 {
  cell = PSGroupCell;
- label = "Extensions:";
+ label = "Extensions";
 }
 );

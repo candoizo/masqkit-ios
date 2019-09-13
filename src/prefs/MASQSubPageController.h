@@ -2,4 +2,5 @@
 
 @interface MASQSubPageController : PSListController
 - (NSArray *)specifiers;
+-(void)wantsStyle:(BOOL)arg1;
 @end

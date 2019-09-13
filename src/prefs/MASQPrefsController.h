@@ -46,4 +46,5 @@
 - (CGFloat)tableView:(id)tableView heightForHeaderInSection:(NSInteger)section;
 - (NSArray *)specifiers;
 
+-(void)wantsStyle:(BOOL)arg1;
 @end

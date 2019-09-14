@@ -29,6 +29,23 @@
 
 			// self.title = @"";
 		}
+
+		NSString * info = [self.specifier propertyForKey:@"versionInfo"];
+		if (info)
+		{
+			UILabel * infoLabel = [[UILabel alloc] init];
+			infoLabel.text = info;
+			infoLabel.font = [infoLabel.font fontWithSize:10];
+			infoLabel.textColor = UIColor.darkGrayColor;
+			[infoLabel sizeToFit];
+			infoLabel.center = CGPointMake(infoLabel.center.x, infoLabel.center.y + 4);
+
+			if ([self valueForKey:@"_table"])
+			{
+				UITableView * table = [self valueForKey:@"_table"];
+				[table addSubview:self.infoLabel = infoLabel];
+			}
+		}
 }
 
 -(void)viewWillAppear:(BOOL)arg1 {
@@ -38,6 +55,12 @@
 	// self.navigationController.navigationController.navigationBar.barStyle = 0;
 
 	[self wantsStyle:YES];
+
+
+	if (self.infoLabel)
+	self.infoLabel.center = CGPointMake(self.view.center.x, self.infoLabel.center.y);
+	// {
+	// }
 	// UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
 	//
 	// UIView * myv = [[UIView alloc] initWithFrame:bg.bounds];

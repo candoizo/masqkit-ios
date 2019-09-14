@@ -125,36 +125,36 @@
 @end
 
 @implementation MASQSubPageLinkCell
--(id)initWithStyle:(UITableViewCellStyle)arg1 reuseIdentifier:(id)arg2 specifier:(id)arg3
-{
-	self = [super initWithStyle:arg1 reuseIdentifier:arg2 specifier:arg3];
-	if (self)
-	{
-				if ([arg3 propertyForKey:@"versionInfo"])	{
-					self.detailTextLabel.text = [arg3 propertyForKey:@"versionInfo"];
-					self.detailTextLabel.font = [self.detailTextLabel.font fontWithSize:9];
-				}
-	}
-	return self;
-}
-
--(id)detailTextLabel {
-	id orig = [super detailTextLabel];
-	if ([orig respondsToSelector:@selector(textAlignment)])
-	{
-		UILabel * label = orig;
-		label.textAlignment = 4;
-	}
-	return orig;
-}
-
--(void)layoutSubviews {
-	[super layoutSubviews];
-	int ex = 25;
-	self.textLabel.center = CGPointMake(self.textLabel.center.x, self.textLabel.center.y - 4);
-	self.detailTextLabel.frame = CGRectMake(self.textLabel.frame.origin.x, self.bounds.size.height - (self.detailTextLabel.bounds.size.height * 1.275), self.detailTextLabel.frame.size.width + ex, self.detailTextLabel.frame.size.height);
-	// self.detailTextLabel.center = CGPointMake(self.textLabel.center.x, self.textLabel.center.y + self.textLabel.bounds.size.height/2);
-}
+// -(id)initWithStyle:(UITableViewCellStyle)arg1 reuseIdentifier:(id)arg2 specifier:(id)arg3
+// {
+// 	self = [super initWithStyle:arg1 reuseIdentifier:arg2 specifier:arg3];
+// 	if (self)
+// 	{
+// 				if ([arg3 propertyForKey:@"versionInfo"])	{
+// 					self.detailTextLabel.text = [arg3 propertyForKey:@"versionInfo"];
+// 					self.detailTextLabel.font = [self.detailTextLabel.font fontWithSize:9];
+// 				}
+// 	}
+// 	return self;
+// }
+//
+// -(id)detailTextLabel {
+// 	id orig = [super detailTextLabel];
+// 	if ([orig respondsToSelector:@selector(textAlignment)])
+// 	{
+// 		UILabel * label = orig;
+// 		label.textAlignment = 4;
+// 	}
+// 	return orig;
+// }
+//
+// -(void)layoutSubviews {
+// 	[super layoutSubviews];
+// 	int ex = 25;
+// 	self.textLabel.center = CGPointMake(self.textLabel.center.x, self.textLabel.center.y - 4);
+// 	self.detailTextLabel.frame = CGRectMake(self.textLabel.frame.origin.x, self.bounds.size.height - (self.detailTextLabel.bounds.size.height * 1.275), self.detailTextLabel.frame.size.width + ex, self.detailTextLabel.frame.size.height);
+// 	// self.detailTextLabel.center = CGPointMake(self.textLabel.center.x, self.textLabel.center.y + self.textLabel.bounds.size.height/2);
+// }
 
 - (void)refreshCellContentsWithSpecifier:(id)arg1 {
 	[super refreshCellContentsWithSpecifier:arg1];

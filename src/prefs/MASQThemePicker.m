@@ -7,6 +7,11 @@
 - (void)flushCachesForAppIdentifier:(CFStringRef)arg1 user:(CFStringRef)arg2;
 @end
 
+@interface UIImage (Private)
++ (UIImage *)imageNamed:(id)img inBundle:(id)bndl;
++ (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)bundleIdentifier format:(int)format scale:(int)scale;
+@end
+
 @implementation MASQThemePicker
 - (void)viewDidLoad {
 	[super viewDidLoad];
@@ -19,8 +24,7 @@
 	[titleLabel sizeToFit];
 	UIBarButtonItem *right = [[UIBarButtonItem alloc] initWithCustomView:titleLabel];
 	self.navigationItem.rightBarButtonItem = right;
-
-	UIView * view = [[UIView alloc] init];
+	UIView * view = [[UIView alloc] init]; // hiding title permanently
 	self.navigationItem.titleView = view;
 
 
@@ -32,8 +36,6 @@
 	self.tableView.tintColor = [self themeTint];
 	[self.view addSubview:self.tableView];
 }
-
-// -(void)
 
 - (void)updateThemeList {
 	 // create the theme list, starting with the default theme
@@ -123,7 +125,7 @@
 	if (indexPath.section == 0)
 	return 135;
 	else
-	return 62.5f;
+	return 52.5f;
 }
 
 -(id)fetchArtwork {
@@ -181,21 +183,22 @@
 	MRMediaRemoteGetNowPlayingInfo(
 		dispatch_get_main_queue(), ^(CFDictionaryRef information) {
 			NSDictionary *dict = (__bridge NSDictionary *)(information);
-			self.artwork.artworkImageView.image = [UIImage imageWithData:dict[@"kMRMediaRemoteNowPlayingInfoArtworkData"]];
-			// return img;
-				      // UIImage * img = [UIImage imageWithData:dict[@"kMRMediaRemoteNowPlayingInfoArtworkData"]];
-				      // if (img)
-							// return img;
-				      // art = img;
-				    }
-				  );
+
+			UIImage * img = [UIImage imageWithData:dict[@"kMRMediaRemoteNowPlayingInfoArtworkData"]];
+			self.artwork.artworkImageView.image = img ?: [self imageFromPrefsWithName:@"Icon/Placeholder"];
+		}
+	);
+}
+
+-(UIImage *)imageFromPrefsWithName:(NSString *)n{
+	return [UIImage imageNamed:n inBundle:[NSBundle bundleWithPath:@"/Library/PreferenceBundles/MASQSettings.bundle"]];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 
 	if (indexPath.section == 0)
 	{ // theme previewer
-	  UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"ThemeCell"];
+	  UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"PreviewCell"];
 		cell.userInteractionEnabled = NO;
 		// cell.rowHeight = 120;
 	  cell.selectionStyle = UITableViewCellSelectionStyleNone;

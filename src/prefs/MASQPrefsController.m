@@ -1,9 +1,6 @@
 #import "MASQPrefsController.h"
 #import "MASQLocalizer.h"
-#import "MASQIntroView.h"
-#import "MASQHeaderView.h"
 #import "../MASQThemeManager.h"
-
 
 @implementation MASQPrefsController
 - (NSArray *)specifiers {
@@ -22,13 +19,9 @@
 	return _specifiers;
 }
 
--(NSString *)pluginPreferencePath {
-	return [NSString stringWithFormat:@"%@/Prefs/", self.bundle.bundlePath];
-}
-
 -(NSMutableArray *)buildForeignPrefs {
 
-	NSString * path = [self pluginPreferencePath];
+	NSString * path = [NSString stringWithFormat:@"%@/Prefs/", self.bundle.bundlePath];
 	NSMutableArray * plugins = [NSMutableArray new];
 
 	for (NSString * list in [NSFileManager.defaultManager contentsOfDirectoryAtPath:path error:nil])

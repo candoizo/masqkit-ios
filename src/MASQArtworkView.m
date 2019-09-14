@@ -1,5 +1,6 @@
 #import "MASQArtworkView.h"
 #import "MASQThemeManager.h"
+#import "MediaRemote/MediaRemote.h"
 
 @implementation MASQArtworkView
 -(id)initWithThemeKey:(NSString *)key
@@ -34,14 +35,47 @@
 
     }
     else [def addObserver:self selector:@selector(updateTheme)  name:UIApplicationDidBecomeActiveNotification object:nil];
+
+    [def addObserver:self selector:@selector(updatePlaybackState)  name:@"_MRMediaRemotePlayerPlaybackStateDidChangeNotification" object:nil];
+    // get initial state (or maybe I should do this after I set theme)
+    [self updatePlaybackState];
+
   }
   return self;
+}
+
+-(void)updatePlaybackState {
+  // self.hitTracker = 5;
+  if (NSClassFromString(@"SBMediaController"))
+  { // in springboard
+    // return SBMediaController.sharedInstance.
+    SBMediaController * sess = [NSClassFromString(@"SBMediaController") sharedInstance];
+    if (sess)
+    self.activeAudio = sess.playbackState == 1;
+  }
+  else if (NSClassFromString(@"AVAudioSession"))
+  { // in an app
+    AVAudioSession * sess = [NSClassFromString(@"AVAudioSession") sharedInstance];
+    if (sess)
+    self.activeAudio = [sess isOtherAudioPlaying];
+  }
+  else // use the hammer
+  MRMediaRemoteGetNowPlayingInfo(
+    dispatch_get_main_queue(), ^(CFDictionaryRef information) {
+
+      NSDictionary *dict = (__bridge NSDictionary *)(information);
+      NSString * state = dict[@"kMRMediaRemoteNowPlayingInfoPlaybackRate"];
+      if (state)
+      self.activeAudio = [state floatValue] != 0;
+    }
+  );
 }
 
 -(void)dealloc {
 
   NSNotificationCenter * def = NSNotificationCenter.defaultCenter;
   [def removeObserver:self name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
+  [def removeObserver:self name:@"_MRMediaRemotePlayerPlaybackStateDidChangeNotification" object:nil];
 
   if ([self.identifier rangeOfString:@"CC"].location != NSNotFound)
   [def removeObserver:self name:@"SBControlCenterControllerWillPresentNotification" object:nil];
@@ -296,4 +330,45 @@
   [UIImage imageWithContentsOfFile:[self.currentTheme pathForResource:@"Underlay" ofType:@"png"]]
   : nil;
 }
+
+/*
+// ios 13 exclusive https://developer.apple.com/documentation/mediaplayer/mpnowplayinginfocenter/2588243-playbackstate?language=objc
+ 20944 ms  -[NSNotificationCenter postNotificationName:_MRMediaRemotePlayerPlaybackStateDidChangeNotification object:0x0 userInfo:0x281694940]
+ 20947 ms  -[NSNotificationCenter postNotificationName:_kMRMediaRemotePlayerPlaybackStateDidChangeNotification object:0x0 userInfo:0x28169f660]
+
+
+one has a k, one does not hmm
+ _MRMediaRemotePlayerPlaybackStateDidChangeNotification
+_kMRMediaRemotePlayerPlaybackStateDidChangeNotification
+*/
+
+// -(int)playbackState {
+//   if (NSClassFromString(@"SBMediaController"))
+//   { // in springboard
+//     return SBMediaController.sharedInstance.
+//   }
+//   else
+//   { // in an app
+//
+//   }
+//
+//   return 0;
+// }
+
+// //rotation shit
+// -(void)animate {
+//   //check if already animating, if no then add one else resume
+//   HBLogWarn(@"Supposed to rotate");
+//   [self.artworkImageView rotate360WithDuration:2.0 repeatCount:0];
+//   [self.artworkImageView resumeAnimations];
+//   enable && themeAssets && [themeBundleName hasPrefix:@"🌀"] && arg2 ? [[self.artworkView valueForKey:@"_artworkImageView"] resumeAnimations] : [[self.artworkView valueForKey:@"_artworkImageView"] pauseAnimations];
+//   // }
+//
+// }
+// //
+// -(void)pauseIfAnimating {
+//   //if active animation > pause else do nothing
+// HBLogWarn(@"pause animations");
+//   [self.artworkImageView pauseAnimations];
+// }
 @end

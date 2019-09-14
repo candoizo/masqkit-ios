@@ -1,7 +1,7 @@
-#import <Preferences/PSListController.h>
+#import "MASQBaseController.h"
 
-@interface MASQSubPageController : PSListController
+@interface MASQSubPageController : MASQBaseController
 @property (nonatomic, retain) UILabel * infoLabel;
 - (NSArray *)specifiers;
--(void)wantsStyle:(BOOL)arg1;
+// -(void)wantsStyle:(BOOL)arg1;
 @end

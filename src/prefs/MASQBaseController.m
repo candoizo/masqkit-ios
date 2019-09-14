@@ -28,8 +28,6 @@
 
 -(void)viewDidLoad {
   [super viewDidLoad];
-
-
 }
 
 -(void)viewWillAppear:(BOOL)arg1 {
@@ -54,12 +52,18 @@
   UINavigationBar * bar = self.bar;
   UIView * bg = [bar valueForKey:@"_backgroundView"];
 
+  // if (![self isMemberOfClass:NSClassFromString(@"MASQPrefsController")])
+  // return;
   if (arg1)
   {
     if (self.barStyle > -1)
     {
       [UIApplication.sharedApplication setStatusBarStyle:UIStatusBarStyleLightContent];
     }
+
+    // has already been added by another
+    if ([bg viewWithTag:6969])
+    return;
 
     bar.tintColor = UIColor.whiteColor;
 
@@ -92,12 +96,4 @@
     ((UIView *)[bg valueForKey:@"_backgroundEffectView"]).alpha = 1;
   }
 }
-
-// -(BOOL)prefersStatusBarHidden {
-//   return YES;
-// }
-//
-// -(int)prefersStatusBarStyle {
-//   return UIStatusBarStyleLightContent;
-// }
 @end

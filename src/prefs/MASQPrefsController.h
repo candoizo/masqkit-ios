@@ -34,6 +34,5 @@
 // @property (nonatomic, assign) int origStyle;
 
 - (void)viewDidLoad;
-- (void)prepareBar;
 - (NSArray *)specifiers;
 @end

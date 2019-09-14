@@ -1,9 +1,10 @@
-#import <Preferences/PSListController.h>
+// #import <Preferences/PSListController.h>
+#import "MASQBaseController.h"
 
-@interface UIImage (Private)
-+ (UIImage *)imageNamed:(id)img inBundle:(id)bndl;
-+ (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)bundleIdentifier format:(int)format scale:(int)scale;
-@end
+// @interface UIImage (Private)
+// + (UIImage *)imageNamed:(id)img inBundle:(id)bndl;
+// + (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)bundleIdentifier format:(int)format scale:(int)scale;
+// @end
 
 @interface UIView (Private)
 -(BOOL)hasBackgroundEffect;
@@ -28,23 +29,11 @@
 -(UIBarButtonItem *)customRightItem;
 @end
 
-@interface MASQPrefsController : PSListController
-@property (nonatomic, assign) int origStyle;
-@property (nonatomic, assign) CAGradientLayer * origBar;
-@property (nonatomic) NSUserDefaults * prefs;
-+(void)clearPrefs;
-
-// -(UIBarButtonItem *)loveButton;
-// - (void)showLove;
--(UIImage *)imageFromPrefsWithName:(NSString *)n;
+@interface MASQPrefsController : MASQBaseController
+// @property (nonatomic) NSUserDefaults * prefs;
+// @property (nonatomic, assign) int origStyle;
 
 - (void)viewDidLoad;
 - (void)prepareBar;
-- (void)viewWillAppear:(BOOL)animated;
-- (void)viewWillDisappear:(BOOL)animated;
-- (id)tableView:(id)tableView viewForHeaderInSection:(NSInteger)section;
-- (CGFloat)tableView:(id)tableView heightForHeaderInSection:(NSInteger)section;
 - (NSArray *)specifiers;
-
--(void)wantsStyle:(BOOL)arg1;
 @end

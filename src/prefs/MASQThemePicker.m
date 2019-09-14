@@ -123,9 +123,9 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
 	if (indexPath.section == 0)
-	return 135;
+	return 140;
 	else
-	return 52.5f;
+	return 55;
 }
 
 -(id)fetchArtwork {
@@ -179,13 +179,20 @@
 // }
 
 -(void)updateArtworkUgly {
-	if (self.artwork)
+	if (self.artwork && self.artworkd)
 	MRMediaRemoteGetNowPlayingInfo(
 		dispatch_get_main_queue(), ^(CFDictionaryRef information) {
 			NSDictionary *dict = (__bridge NSDictionary *)(information);
 
 			UIImage * img = [UIImage imageWithData:dict[@"kMRMediaRemoteNowPlayingInfoArtworkData"]];
-			self.artwork.artworkImageView.image = img ?: [self imageFromPrefsWithName:@"Icon/Placeholder"];
+			if (!img)
+			img = [self imageFromPrefsWithName:@"Icon/Placeholder"];
+
+			self.artwork.artworkImageView.image = img;
+			self.artworkd.artworkImageView.image = img;
+
+			if (self.stylePreview)
+			self.stylePreview.image =  img;
 		}
 	);
 }
@@ -224,17 +231,54 @@
 		// [cell addSubview:v];
 
 		// a fake artwork view for positioning
-		UIImageView * contain = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,120,120)];
 		float rowHeight = [self tableView:tableView heightForRowAtIndexPath:indexPath];
-		contain.center = CGPointMake(tableView.center.x, rowHeight*0.5);
-		contain.image = [self fetchArtwork];
+		UIImageView * contain = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,120,120)];
+		contain.center = CGPointMake(tableView.center.x*1.5, rowHeight*0.5);
 		contain.hidden = YES;
 		[cell addSubview:contain];
 
-		MASQArtworkView * view = [[NSClassFromString(@"MASQArtworkView") alloc] initWithThemeKey:[self themeKey] frameHost:contain imageHost:contain];
-		self.artwork = view;
-		[cell addSubview:view];
+		MASQArtworkView * light = [[NSClassFromString(@"MASQArtworkView") alloc] initWithThemeKey:[self themeKey] frameHost:contain imageHost:contain];
+		self.artwork = light;
+		[cell addSubview:light];
+
+		UIImageView * containd = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,120,120)];
+		containd.center = CGPointMake(tableView.center.x/2, rowHeight*0.5);
+		containd.hidden = YES;
+		[cell addSubview:containd];
+
+		MASQArtworkView * dark = [[NSClassFromString(@"MASQArtworkView") alloc] initWithThemeKey:[self themeKey] frameHost:containd imageHost:contain];
+		self.artworkd = dark;
+		[cell addSubview:dark];
+
 		[self updateArtworkUgly];
+
+		UIImageView * lay = [[UIImageView alloc] initWithFrame:cell.frame];
+		self.stylePreview = lay;
+		lay.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+
+		UIVisualEffectView * v = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleLight]];
+		v.frame = CGRectMake(0,0,self.view.bounds.size.width/2, lay.bounds.size.height);
+		v.contentMode = UIViewContentModeScaleAspectFill;
+		v.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+		[lay addSubview:v];
+
+		UIVisualEffectView * d = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleDark]];
+		d.frame = CGRectMake(self.view.bounds.size.width/2,0,self.view.bounds.size.width/2, lay.bounds.size.height);
+		d.contentMode = UIViewContentModeScaleAspectFill;
+		d.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+		[lay addSubview:d];
+
+		// CAGradientLayer *gradient = [NSClassFromString(@"CAGradientLayer") layer];
+		// gradient.frame = CGRectMake(0,0,self.view.bounds.size.width, rowHeight);
+		// gradient.colors = @[(id)[UIColor colorWithRed:0.8 green:0.8 blue:0.8 alpha:1].CGColor, (id)UIColor.blackColor.CGColor];
+		// gradient.startPoint = CGPointMake(0.0,0.5);
+		// gradient.endPoint = CGPointMake(1.0,1.0);
+		//
+		// [lay.layer insertSublayer:gradient atIndex:0];
+
+
+
+		[cell insertSubview:lay atIndex:0];
 
 		return cell;
 	}
@@ -305,6 +349,8 @@
 
 		if (self.artwork)
 		[self.artwork updateTheme];
+		if (self.artworkd)
+		[self.artworkd updateTheme];
 	}
 }
 

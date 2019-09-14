@@ -1,14 +1,7 @@
 title = "";
 items = (
-// {
-//   cell = PSGroupCell; //header
-// },
-// {
-//  cell = PSGroupCell;
-//  label = "Installed:";
-// },
-{
- cell = PSGroupCell;
- label = "Extensions";
-}
+  {
+   cell = PSGroupCell;
+   label = "Extensions";
+  }
 );

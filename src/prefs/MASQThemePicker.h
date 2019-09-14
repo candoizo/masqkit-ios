@@ -22,7 +22,9 @@
 
 @interface MASQThemePicker : PSViewController <UITableViewDataSource, UITableViewDelegate>
 @property () NSUserDefaults * prefs;
+@property (nonatomic, retain) UIImageView * stylePreview;
 @property (nonatomic, retain) MASQArtworkView * artwork;
+@property (nonatomic, retain) MASQArtworkView * artworkd;
 @property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, retain) NSArray *themes;
 @property (nonatomic, retain) NSString *selectedTheme;

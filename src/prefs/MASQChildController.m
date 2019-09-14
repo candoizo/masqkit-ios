@@ -56,7 +56,7 @@
 			infoLabel.font = [infoLabel.font fontWithSize:10];
 			infoLabel.textColor = UIColor.darkGrayColor;
 			[infoLabel sizeToFit];
-			infoLabel.center = CGPointMake(infoLabel.center.x, infoLabel.center.y - 20);
+			infoLabel.center = CGPointMake(self.view.center.x, infoLabel.center.y - 20);
 
 			if ([self valueForKey:@"_table"])
 			{
@@ -65,7 +65,7 @@
 			}
 		}
 	}
-	else
-	self.infoLabel.center = CGPointMake(self.view.center.x, self.infoLabel.center.y);
+	// else
+	// self.infoLabel.center = CGPointMake(self.view.center.x, self.infoLabel.center.y);
 }
 @end

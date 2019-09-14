@@ -1,8 +1,8 @@
-#import "MASQPrefsController.h"
+#import "MASQRootController.h"
 #import "MASQLocalizer.h"
 #import "../MASQThemeManager.h"
 
-@implementation MASQPrefsController
+@implementation MASQRootController
 - (NSArray *)specifiers {
 
 	if (!_specifiers)

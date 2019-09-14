@@ -1,6 +1,6 @@
 #import "MASQBaseController.h"
 
-@interface MASQPrefsController : MASQBaseController
+@interface MASQRootController : MASQBaseController
 - (void)viewDidLoad;
 - (NSArray *)specifiers;
 @end

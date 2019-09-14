@@ -8,5 +8,5 @@
 	CFBundleSignature = "????";
 	CFBundleVersion = 1.0;
 	MinimumOSVersion = 3.0;
-	NSPrincipalClass = "MASQPrefsController";
+	NSPrincipalClass = "MASQRootController";
 }

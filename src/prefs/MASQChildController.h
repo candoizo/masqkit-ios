@@ -1,6 +1,6 @@
 #import "MASQBaseController.h"
 
-@interface MASQSubPageController : MASQBaseController
+@interface MASQChildController : MASQBaseController
 @property (nonatomic, retain) UILabel * infoLabel;
 - (NSArray *)specifiers;
 // -(void)wantsStyle:(BOOL)arg1;

@@ -1,8 +1,19 @@
 #import "Preferences/PSSpecifier.h"
 #import "MASQLocalizer.h"
-#import "MASQSubPageController.h"
+#import "MASQChildController.h"
+
+@interface MASQSubPageController : MASQChildController
++(NSString *)deprecationInfo;
+@end
 
 @implementation MASQSubPageController
+// wrapper around legacy class name
++(NSString *)deprecationInfo {
+	return @"This class name is deprecated, and exists to provide backwards compatibility.\n\n Please replace your references to this class with MASQChildController instead, thank you.";
+}
+@end
+
+@implementation MASQChildController
 - (NSArray *)specifiers {
 
 	if (!_specifiers)	{

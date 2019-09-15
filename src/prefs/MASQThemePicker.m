@@ -1,21 +1,6 @@
 #import "MASQThemePicker.h"
 #import "../MASQThemeManager.h"
 #import "MediaRemote/MediaRemote.h"
-// #import "CoreFoundation/CoreFoundation.h"
-// #include <sys/event.h>
-// static void KQCallback(CFFileDescriptorRef kqRef, CFOptionFlags callBackTypes, void *info)
-// {
-// 	// Pick up the object passed in the "info" member of the CFFileDescriptorContext passed to CFFileDescriptorCreate
-// 	MASQThemePicker* obj = (MASQThemePicker *)CFBridgingRelease(info);
-//
-// 	if ([obj isKindOfClass:[MASQThemePicker class]]		&&	// If we can call back to the proper sort of object ...
-// 	    (kqRef == obj.queue)					&&	// and the FD that issued the CB is the expected one ...
-// 	    (callBackTypes == kCFFileDescriptorReadCallBack)		)	// and we're processing the proper sort of CB ...
-// 	{
-// 		[obj kqueueFired];						// Invoke the instance's CB handler
-// 	}
-//
-// }
 
 @interface _CFXPreferences : NSObject
 + (_CFXPreferences *)copyDefaultPreferences;
@@ -27,9 +12,7 @@
 + (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)bundleIdentifier format:(int)format scale:(int)scale;
 @end
 
-
 @implementation MASQThemePicker
-
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
@@ -53,97 +36,7 @@
   // self.tableView.rowHeight = 65.0f;
 	self.tableView.tintColor = [self themeTint];
 	[self.view addSubview:self.tableView];
-
-	// [self startMonitor];
 }
-
-// -(void)startMonitor {
-// 	// Avoid extra calls
-// 	if (_queue != NULL) return;
-//
-// 	NSString* path = [self themePath];
-//
-// 	// Open an event-only file descriptor associated with the directory
-// 	int fd = open([path fileSystemRepresentation], O_EVTONLY);
-// 	if (fd < 0) return;
-//
-// 	// Create a new kernel event queue
-// 	int kq = kqueue();
-// 	if (kq < 0)
-// 	{
-// 		close(fd);
-// 		return;
-// 	}
-//
-// 	// Set up a kevent to monitor
-// 	struct kevent eventToAdd;			// Register an (ident, filter) pair with the kqueue
-// 	eventToAdd.ident  = fd;			// The object to watch (the directory FD)
-// 	eventToAdd.filter = EVFILT_VNODE;		// Watch for certain events on the VNODE spec'd by ident
-// 	eventToAdd.flags  = EV_ADD | EV_CLEAR;		// Add a resetting kevent
-// 	eventToAdd.fflags = NOTE_WRITE;			// The events to watch for on the VNODE spec'd by ident (writes)
-// 	eventToAdd.data   = 0;				// No filter-specific data
-// 	eventToAdd.udata  = NULL;			// No user data
-//
-// 	// Add a kevent to monitor
-// 	if (kevent(kq, &eventToAdd, 1, NULL, 0, NULL))
-// 	{
-// 		close(kq);
-// 		close(fd);
-// 		return;
-// 	}
-//
-// 	// Wrap a CFFileDescriptor around a native FD
-// 	CFFileDescriptorContext context = {0, (__bridge void *)self, NULL, NULL, NULL};
-// 	_queue = CFFileDescriptorCreate(NULL,		// Use the default allocator
-// 					kq,		// Wrap the kqueue
-// 					true,		// Close the CFFileDescriptor if kq is invalidated
-// 					KQCallback,	// Fxn to call on activity
-// 					&context);	// Supply a context to set the callback's "info" argument
-// 	if (_queue == NULL)
-// 	{
-// 		close(kq);
-// 		close(fd);
-// 		return;
-// 	}
-//
-// 	// Spin out a pluggable run loop source from the CFFileDescriptorRef
-// 	// Add it to the current run loop, then release it
-// 	CFRunLoopSourceRef rls = CFFileDescriptorCreateRunLoopSource(NULL, _queue, 0);
-// 	if (rls == NULL)
-// 	{
-// 		CFRelease(_queue); _queue = NULL;
-// 		close(kq);
-// 		close(fd);
-// 		return;
-// 	}
-// 	CFRunLoopAddSource(CFRunLoopGetCurrent(), rls, kCFRunLoopDefaultMode);
-// 	CFRelease(rls);
-//
-// 	// Store the directory FD for later closing
-// 	_fd = fd;
-//
-// 	// Enable a one-shot (the only kind) callback
-// 	CFFileDescriptorEnableCallBacks(_queue, kCFFileDescriptorReadCallBack);
-// }
-//
-// - (void)kqueueFired
-// {
-// 	// Pull the native FD around which the CFFileDescriptor was wrapped
-// 	int kq = CFFileDescriptorGetNativeDescriptor(_queue);
-// 	if (kq < 0) return;
-//
-// 	// If we pull a single available event out of the queue, assume the directory was updated
-// 	struct kevent event;
-// 	struct timespec timeout = {0, 0};
-// 	if (kevent(kq, NULL, 0, &event, 1, &timeout) == 1)
-// 	{
-// 		self.hah = @"Wow we did it";
-// 		[self updateThemeList];
-//   }
-//
-// 	// (Re-)Enable a one-shot (the only kind) callback
-// 	CFFileDescriptorEnableCallBacks(_queue, kCFFileDescriptorReadCallBack);
-// }
 
 - (void)updateThemeList {
 	 // create the theme list, starting with the default theme
@@ -190,15 +83,6 @@
 		}
 	}
 
-	//
-  // for (NSString * themeid in [NSFileManager.defaultManager contentsOfDirectoryAtPath:[self themePath] error:nil]) {
-  //     NSArray * theme = [themeid componentsSeparatedByString:@"@"];
-  //   	NSString *named = theme.firstObject;
-  //   	NSString *scaling = theme.lastObject;
-	// 		NSString *credit = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Credit.txt", [self themePath], themeid] encoding:NSUTF8StringEncoding error:nil];
-	// 		[themes addObject:@{ @"bundle":themeid, @"name":named, @"scale":scaling, @"author":credit ?: @""}];
-  // }
-
 	if (themes.count > 0)
 	{
 		NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES];
@@ -216,12 +100,7 @@
     switch (section) {
         case 0:
 					sectionName = @"Preview";
-          // sectionName = NSLocalizedString(@"mySectionName", @"mySectionName");
         break;
-        case 1:
-          // sectionName = NSLocalizedString(@"myOtherSectionName", @"myOtherSectionName");
-        break;
-        // ...
         default:
           sectionName = @"";
         break;
@@ -236,55 +115,6 @@
 	return 55;
 }
 
--(id)fetchArtwork {
-	/*
-		Trying to get artwork notes:
-
-		MPMusicPlayerController
-		+(BOOL)_isPlayerInstalled; // check for third party!
-		// application stuff seems to crash
-
-		MRMediaRemoteServiceClient was accessible in Preferences
-		- has some good low level info about the app playing stuff
-
-		MRMediaRemoteService - above class refs this so its prolly better
-
-		in the MediaServices
-		MSVArtworkService seems related and has a shared instance
-
-
-
-
-		frida stuff
-
-		  9558 ms  -[MPCMediaRemoteController _playbackQueueChangedNotification:0x281f8aca0]
-	*/
-
-	// need to investigate how to support spotify artwork
-	// cont = [NSClassFromString(@"MPMusicPlayerController") applicationMusicPlayer] ?: [NSClassFromString(@"MPMusicPlayerController") systemMusicPlayer];
-	UIImage * art = nil;
-
-	MPMusicPlayerController * cont = [NSClassFromString(@"MPMusicPlayerController") systemMusicPlayer];
-	art = [cont.nowPlayingItem.artwork imageWithSize:CGSizeMake(120,120)];
-
-	return art;
-}
-
-// -(id)tester {
-// 	UIImage * img = nil;
-// 			  MRMediaRemoteGetNowPlayingInfo(
-// 			    dispatch_get_main_queue(), ^(CFDictionaryRef information) {
-// 			      NSDictionary *dict = (__bridge NSDictionary *)(information);
-// 						img = [UIImage imageWithData:dict[@"kMRMediaRemoteNowPlayingInfoArtworkData"]];
-// 						return img;
-// 			      // UIImage * img = [UIImage imageWithData:dict[@"kMRMediaRemoteNowPlayingInfoArtworkData"]];
-// 			      // if (img)
-// 						// return img;
-// 			      // art = img;
-// 			    }
-// 			  );
-// 				return nil;
-// }
 
 -(void)updateArtworkUgly {
 	if (self.artwork && self.artworkd)
@@ -318,25 +148,6 @@
 		// cell.rowHeight = 120;
 	  cell.selectionStyle = UITableViewCellSelectionStyleNone;
 		cell.backgroundColor = nil;
-
-		// hide separator hack
-		// cell.separatorInset = UIEdgeInsetsMake(0, 10000, 0, 0);
-		// tableView.separatorColor = [UIColor clearColor];
-		// tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-		// int style = 2;
-  	// UIBlurEffect * eff; switch (style) {
-    // 	case 1: eff = [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight]; break;
-    // 	case 2: eff = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight]; break;
-    // 	case 3: eff = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark]; break;
-  	// }
-		//
-		// // blur to aid contrast
-		// UIVisualEffectView * v = [[UIVisualEffectView alloc] initWithEffect:eff];
-		// v.frame = CGRectMake(0,0,cell.bounds.size.width, cell.bounds.size.height);
-		// v.contentMode = UIViewContentModeScaleAspectFill;
-		// v.backgroundColor = UIColor.lightGrayColor;
-		// v.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-		// [cell addSubview:v];
 
 		// a fake artwork view for positioning
 		float rowHeight = [self tableView:tableView heightForRowAtIndexPath:indexPath];
@@ -376,16 +187,6 @@
 		d.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 		[lay addSubview:d];
 
-		// CAGradientLayer *gradient = [NSClassFromString(@"CAGradientLayer") layer];
-		// gradient.frame = CGRectMake(0,0,self.view.bounds.size.width, rowHeight);
-		// gradient.colors = @[(id)[UIColor colorWithRed:0.8 green:0.8 blue:0.8 alpha:1].CGColor, (id)UIColor.blackColor.CGColor];
-		// gradient.startPoint = CGPointMake(0.0,0.5);
-		// gradient.endPoint = CGPointMake(1.0,1.0);
-		//
-		// [lay.layer insertSublayer:gradient atIndex:0];
-
-
-
 		[cell insertSubview:lay atIndex:0];
 
 		return cell;
@@ -396,24 +197,6 @@
 
 	NSDictionary *themeInfo = self.themes[indexPath.row];
 	cell.textLabel.text = themeInfo[@"name"];
-
-
-	// cell.imageView.contentMode = UIViewContentModeScaleAspectFit;
-	//
-	// UIImageView * icon = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, cell.bounds.size.height/1.5, cell.bounds.size.height/1.5)];
-	//
-	// icon.contentMode = UIViewContentModeScaleAspectFit;
-	// [cell addSubview:icon];
-	//
-	// NSString *path = [themeInfo[@"name"] isEqualToString:@"Default"] ?
-	// @"/Library/PreferenceBundles/MASQPrefs.bundle/Default.png"
-	// :
-	// [NSString stringWithFormat:@"%@/%@/Icon.png", [self themePath], themeInfo[@"bundle"]];
-	// icon.image = [UIImage imageWithContentsOfFile:path];
-	// cell.imageView.image = icon.image;
-	// cell.imageView.alpha = 0;
-	// cell.imageView.bounds = CGRectMake(15, 5, 20, 20);
-	// icon.center = cell.imageView.center;
 
 	if (themeInfo[@"author"]) {
 		cell.detailTextLabel.text = themeInfo[@"author"];
@@ -458,48 +241,24 @@
 		if (self.artwork)
 		{
 			[self.artwork updateTheme];
-			[self.artwork __grrrr];
+			// [self.artwork __grrrr];
 		}
 		if (self.artworkd)
 		{
 			[self.artworkd updateTheme];
-			[self.artworkd __grrrr];
+			// [self.artworkd __grrrr]; // needs to go somewhere else, probably in the MASQArtworkView playbackState method
 		}
-
-
 	}
 }
 
-
-
 - (void)viewWillAppear:(BOOL)animated {
-	 [super viewWillAppear:animated];
+	[super viewWillAppear:animated];
 
 	[self wantsStyle:YES];
-	//  	UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
-	//
-	//  	UIView * myv = [[UIView alloc] initWithFrame:bg.bounds];
-	//  	myv.tag = 6969;
-	//  	myv.userInteractionEnabled = NO;
-	//
-	//  	CAGradientLayer *gradient = [NSClassFromString(@"CAGradientLayer") layer];
-	//  	gradient.frame = bg.bounds;
-	//  	gradient.colors = @[(id)[UIColor colorWithRed:0.29 green:0.64 blue:1.00 alpha:1.0].CGColor, (id)[UIColor colorWithRed:1.00 green:0.29 blue:0.52 alpha:1.0].CGColor];
-	//  	gradient.startPoint = CGPointMake(0.0,0.5);
-	//  	gradient.endPoint = CGPointMake(1.0,1.0);
-	//  	[bg addSubview:myv];
-	//  	[myv.layer insertSublayer:gradient atIndex:0];
-	//  	UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
-	//  	bgEff.alpha = 0;
-	//
-	//
-	// self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
-	// self.navigationController.navigationController.navigationBar.tintColor = [self themeTint];
 
-	 [self updateThemeList];
-
-	 if (self.themes.count <= 1)
-	 [self popMissingAlert];
+	[self updateThemeList];
+	if (self.themes.count <= 1)
+	[self popMissingAlert];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -507,17 +266,6 @@
 	[super viewWillDisappear:animated];
 
 	[self wantsStyle:NO];
-		// UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
-		//
-		// if ([bg viewWithTag:6969])
-		// {
-		// 	[[bg viewWithTag:6969] removeFromSuperview];
-		// }
-		//
-	  // // [self.navigationController.navigationController.navigationBar _updateNavigationBarItemsForStyle:0];
-		// self.navigationController.navigationController.navigationBar.barStyle = 0; // woot need this :D
-		// UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
-		// bgEff.alpha = 1;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -581,13 +329,7 @@
 {
 	if (arg1)
 	{ // adding it to the header
-		// if (!self.origStyle)
-		// {
-		// 	self.origStyle = UIApplication.sharedApplication.statusBarStyle;
-		// 	[UIApplication.sharedApplication setStatusBarStyle:UIStatusBarStyleLightContent];
-		// }
 		self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
-
 
 		UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
 
@@ -609,21 +351,16 @@
 	}
 	else
 	{ // removing it from the header
-			// if (self.origStyle > -1)
-			// { // reverting back to original
-				UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
 
-				if ([bg viewWithTag:6969])
-				[[bg viewWithTag:6969] removeFromSuperview];
+		UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
 
-			  // [self.navigationController.navigationController.navigationBar _updateNavigationBarItemsForStyle:0];
-				self.navigationController.navigationController.navigationBar.barStyle = 0; // woot need this :D
+		if ([bg viewWithTag:6969])
+		[[bg viewWithTag:6969] removeFromSuperview];
 
-				UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
-				bgEff.alpha = 1;
+		self.navigationController.navigationController.navigationBar.barStyle = 0; // woot need this :D
 
-				// [UIApplication.sharedApplication setStatusBarStyle:self.origStyle];
-			// }
+		UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
+		bgEff.alpha = 1;
 	}
 }
 @end

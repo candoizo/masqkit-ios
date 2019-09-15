@@ -1,7 +1,9 @@
 #import "Interfaces.h"
 
 @interface MASQArtworkView : UIView
-@property (nonatomic, assign) BOOL activeAudio;
+@property (nonatomic, assign) BOOL hasAnimation; // this marks if the imageview is dirty because ca frames break it
+@property (nonatomic, assign) BOOL isAnimating; // this keeps track if i'ts actually animating or not
+@property (nonatomic, assign) BOOL activeAudio; // this keeps track of if audio is playing or not
 @property (nonatomic, assign) NSString * identifier;
 @property (nonatomic, assign) NSBundle * currentTheme;
 @property (nonatomic, assign) unsigned long hashCache;

@@ -37,126 +37,13 @@
     }
     else [def addObserver:self selector:@selector(updateTheme)  name:UIApplicationDidBecomeActiveNotification object:nil];
 
+    // [self updatePlaybackState];
     [def addObserver:self selector:@selector(updatePlaybackState)  name:@"_MRMediaRemotePlayerPlaybackStateDidChangeNotification" object:nil];
     // get initial state (or maybe I should do this after I set theme)
-    [self updatePlaybackState];
+    // [self updatePlaybackState];
 
   }
   return self;
-}
-
--(void)updatePlaybackState {
-  // reminder: this works well ;P
-  if (NSClassFromString(@"SBMediaController"))
-  { // in springboard
-    // return SBMediaController.sharedInstance.
-    SBMediaController * sess = [NSClassFromString(@"SBMediaController") sharedInstance];
-    if (sess)
-    self.activeAudio = sess.isPlaying;
-  }
-  else if (NSClassFromString(@"AVAudioSession"))
-  { // in an app
-    AVAudioSession * sess = [NSClassFromString(@"AVAudioSession") sharedInstance];
-    if (sess)
-    self.activeAudio = [sess isOtherAudioPlaying];
-  }
-  else // use the hammer
-  MRMediaRemoteGetNowPlayingInfo(
-    dispatch_get_main_queue(), ^(CFDictionaryRef information) {
-
-      NSDictionary *dict = (__bridge NSDictionary *)(information);
-      NSString * state = dict[@"kMRMediaRemoteNowPlayingInfoPlaybackRate"];
-      if (state)
-      self.activeAudio = [state floatValue] != 0;
-    }
-  );
-
-  // if (self.artworkImageView.image)
-  // if ([self.currentTheme.bundlePath.lastPathComponent hasPrefix:@"🌀"])
-  // { // wants to animate
-  //   // if (self.activeAudio)
-  //   // [self animate];
-  //
-  //     dispatch_async(dispatch_get_main_queue(), ^{
-  //   if (self.activeAudio)
-  //   [self.artworkImageView __debug_rotate360WithDuration:2.0f repeatCount:0];
-  //   else
-  //   [self.artworkImageView __debug_pauseAnimations];
-  //     });
-  // }
-}
-
-// fail
--(void)tapAnimate {
-  // dispatch_async(dispatch_get_main_queue(), ^{
-    [self.artworkImageView __debug_rotate360WithDuration:2.0f repeatCount:0];
-  // });
-}
-
-// fail
--(void)__goAnimate {
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [self.artworkImageView __debug_rotate360WithDuration:2.0f repeatCount:0];
-  });
-}
-
-// fail
--(void)__grrrr {
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [self tapAnimate];
-  });
-}
-
--(void)__animate {
-
-  CABasicAnimation *fullRotation;
-  fullRotation = [CABasicAnimation animationWithKeyPath:@"transform.rotation"];
-  fullRotation.fromValue = @0;
-  fullRotation.toValue = @((360 * M_PI) / 180);
-  fullRotation.duration = 2;
-  fullRotation.repeatCount = MAXFLOAT;
-
-  // self.debuggg = fullRotation.description;
-  // if (![fullRotation description])
-  // self.debuggg = @"Failed?";
-
-
-  [CATransaction begin];
-  [self.artworkImageView.layer addAnimation:fullRotation forKey:@"360"];
-  [CATransaction commit];
-  // [self layoutSublayersOfLayer:self.artworkImageView.layer];
-  // [self.artworkImageView layoutSublayersOfLayer:self.artworkImageView.layer];
-  // [self.artworkImageView __debug_rotate360WithDuration:2.0f repeatCount:0];
-
-  // for (UIImageView * v in self.subviews)
-  // {
-  //   if ([v isMemberOfClass:NSClassFromString(@"UIImageView")])
-  //   [v __debug_rotate360WithDuration:2 repeatCount:0];
-  // }
-}
-
--(void)___fuck { //dafuq
-  // [self __animate];
-    [self __grrrr];
-      // [self __invokeHack];
-      //   [self tapAnimate];
-      //     [self __goAnimate];
-      //       [self __animate];
-}
-
-
-// fail
--(void)__invokeHack {
-  SEL sel = @selector(__debug_rotateImageView);
-  UIImageView * obj = self.artworkImageView;
-
-  NSMethodSignature *methodSignature = [obj methodSignatureForSelector:sel];
-  NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
-  [invocation setTarget:obj];
-  [invocation setSelector:sel];
-  [invocation retainArguments];
-
-  [invocation invoke];
 }
 
 -(void)dealloc {
@@ -216,6 +103,8 @@
     [_underlayView setBackgroundImage:[self underlayImage] forState:UIControlStateNormal];
 
     [self updateFrame];
+
+    [self updatePlaybackState];
   }
 }
 
@@ -274,6 +163,7 @@
 
 -(void)updateArtwork:(UIImage *)img
 {
+  // [self updatePlaybackState];
   if ([img isKindOfClass:NSClassFromString(@"UIImage")])
   {
     self.hashCache = img.hash;
@@ -365,6 +255,13 @@
 -(id)overlayView
 {
   _overlayView = [[UIButton alloc] initWithFrame:self.bounds];
+
+  if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.Preferences"])
+  {
+    [_overlayView addTarget:self action:@selector(tapAnimate) forControlEvents:UIControlEventTouchUpInside];
+    self.userInteractionEnabled = YES;
+  }
+  else
   [_overlayView addTarget:self action:@selector(tapArtwork:) forControlEvents:UIControlEventTouchUpInside];
   _overlayView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight; //resize to super width
   _overlayView.center = self.center;
@@ -459,4 +356,141 @@ _kMRMediaRemotePlayerPlaybackStateDidChangeNotification
 // HBLogWarn(@"pause animations");
 //   [self.artworkImageView pauseAnimations];
 // }
+
+-(void)updatePlaybackState {
+  HBLogWarn(@"\n\n\n%@ START OF CALL TO updatePlaybackState\nself.activeAudio = %d\nself.hasAnimation=%d\nself.isAnimating=%d", self.frame.origin.x == 0 ? @"UNDETECTABLE" : self.frame.origin.x > 100 ? @"RIGHT VIEW" : @"LEFT VIEW", self.activeAudio, self.hasAnimation,self.isAnimating);
+
+  // reminder: this works well ;P
+  if (NSClassFromString(@"SBMediaController"))
+  { // in springboard
+    // return SBMediaController.sharedInstance.
+    SBMediaController * sess = [NSClassFromString(@"SBMediaController") sharedInstance];
+    if (sess)
+    // this makes no sense wtf
+    self.activeAudio = !sess.isPlaying;
+  }
+  else if (NSClassFromString(@"AVAudioSession"))
+  { // in an app
+    AVAudioSession * sess = [NSClassFromString(@"AVAudioSession") sharedInstance];
+    if (sess)
+    self.activeAudio = [sess isOtherAudioPlaying];
+  }
+  else // use the hammer
+  MRMediaRemoteGetNowPlayingInfo(
+    dispatch_get_main_queue(), ^(CFDictionaryRef information) {
+
+      NSDictionary *dict = (__bridge NSDictionary *)(information);
+      NSString * state = dict[@"kMRMediaRemoteNowPlayingInfoPlaybackRate"];
+      if (state)
+      self.activeAudio = [state floatValue] != 0;
+    }
+  );
+
+
+  if ([self.currentTheme.bundlePath.lastPathComponent hasPrefix:@"🌀"])
+  [self tapAnimate];
+  else
+  { // if they dont have the animation marker anymore but do
+    if (self.hasAnimation)
+    HBLogWarn(@"This view has an animation and must be rebuilt for non-animated themes");
+  }
+
+  HBLogDebug(@"\n%@ END OF CALL TO updatePlaybackState\nself.activeAudio = %d\nself.hasAnimation=%d\nself.isAnimating=%d\n\n\n.", self.frame.origin.x == 0 ? @"UNDETECTABLE" : self.frame.origin.x > 100 ? @"RIGHT VIEW" : @"LEFT VIEW", self.activeAudio, self.hasAnimation,self.isAnimating);
+}
+
+// fail or not so much idk ffuck you apple
+-(void)tapAnimate {
+  // dispatch_async(dispatch_get_main_queue(), ^{
+
+  if (!self.hasAnimation)
+  { // if it has never animated
+    // and we actually want something playing before continuing
+    if (!self.activeAudio) return;
+
+    [self.artworkImageView __debug_rotate360WithDuration:2.0f repeatCount:0] ;
+
+    // now this imageview is practically unusable for other themes
+    // this will help us figure out when to reinit i
+    self.hasAnimation = YES;
+    self.isAnimating = YES;
+  }
+  // });
+  else
+  { // it has animation keys already so just pause if needed
+    if (self.activeAudio && self.hasAnimation)
+    {
+      [self.artworkImageView __debug_resumeAnimations];
+      self.isAnimating = YES;
+    }
+    else
+    {
+      [self.artworkImageView __debug_pauseAnimations];
+      self.isAnimating = NO;
+    }
+  }
+}
+
+// fail
+-(void)__goAnimate {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self.artworkImageView __debug_rotate360WithDuration:2.0f repeatCount:0];
+  });
+}
+
+// fail (or not wtf???)
+-(void)__grrrr {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self tapAnimate];
+  });
+}
+
+-(void)__animate {
+
+  CABasicAnimation *fullRotation;
+  fullRotation = [CABasicAnimation animationWithKeyPath:@"transform.rotation"];
+  fullRotation.fromValue = @0;
+  fullRotation.toValue = @((360 * M_PI) / 180);
+  fullRotation.duration = 2;
+  fullRotation.repeatCount = MAXFLOAT;
+
+  // self.debuggg = fullRotation.description;
+  // if (![fullRotation description])
+  // self.debuggg = @"Failed?";
+
+  [CATransaction begin];
+  [self.artworkImageView.layer addAnimation:fullRotation forKey:@"360"];
+  [CATransaction commit];
+  // [self layoutSublayersOfLayer:self.artworkImageView.layer];
+  // [self.artworkImageView layoutSublayersOfLayer:self.artworkImageView.layer];
+  // [self.artworkImageView __debug_rotate360WithDuration:2.0f repeatCount:0];
+
+  // for (UIImageView * v in self.subviews)
+  // {
+  //   if ([v isMemberOfClass:NSClassFromString(@"UIImageView")])
+  //   [v __debug_rotate360WithDuration:2 repeatCount:0];
+  // }
+}
+
+-(void)___fuck { //dafuq
+  // [self __animate];
+    [self __grrrr];
+      // [self __invokeHack];
+      //   [self tapAnimate];
+      //     [self __goAnimate];
+      //       [self __animate];
+}
+
+// fail
+-(void)__invokeHack {
+  SEL sel = @selector(__debug_rotateImageView);
+  UIImageView * obj = self.artworkImageView;
+
+  NSMethodSignature *methodSignature = [obj methodSignatureForSelector:sel];
+  NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
+  [invocation setTarget:obj];
+  [invocation setSelector:sel];
+  [invocation retainArguments];
+
+  [invocation invoke];
+}
 @end

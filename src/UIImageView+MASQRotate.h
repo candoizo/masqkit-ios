@@ -1,12 +1,4 @@
-//
-// Created by Alex Hajdu on 5/27/13.
-// Copyright (c) 2013 Mr.Fox and friends. All rights reserved.
-//
-// To change the template use AppCode | Preferences | File Templates.
-//
-
-
-#import <Foundation/Foundation.h>
+#import <QuartzCore/QuartzCore.h>
 
 @interface UIImageView (MASQRotate)
 - (void)__debug_rotateImageView;

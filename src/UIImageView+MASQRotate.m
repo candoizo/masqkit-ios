@@ -1,11 +1,3 @@
-//
-// Created by Alex Hajdu on 5/27/13.
-// Copyright (c) 2013 Mr.Fox and friends. All rights reserved.
-//
-// To change the template use AppCode | Preferences | File Templates.
-//
-
-#import <QuartzCore/QuartzCore.h>
 #import "UIImageView+MASQRotate.h"
 
 @implementation UIImageView (MASQRotate)
@@ -45,7 +37,13 @@
 	else
 		fullRotation.repeatCount = repeatCount;
 
+  // HBLogDebug(@"rotate 360 about to commit");
+  [CATransaction begin];
+// [self.artworkImageView.layer addAnimation:fullRotation forKey:@"360"];
 	[self.layer addAnimation:fullRotation forKey:@"360"];
+  [CATransaction commit];
+
+  // HBLogDebug(@"commit done?");
 }
 
 - (void)__debug_stopAllAnimations

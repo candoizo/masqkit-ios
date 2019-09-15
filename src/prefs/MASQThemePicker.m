@@ -1,16 +1,7 @@
 #import "MASQThemePicker.h"
 #import "../MASQThemeManager.h"
+#import "../UIColor+MASQColorUtil.h"
 #import "MediaRemote/MediaRemote.h"
-
-@interface _CFXPreferences : NSObject
-+ (_CFXPreferences *)copyDefaultPreferences;
-- (void)flushCachesForAppIdentifier:(CFStringRef)arg1 user:(CFStringRef)arg2;
-@end
-
-@interface UIImage (Private)
-+ (UIImage *)imageNamed:(id)img inBundle:(id)bndl;
-+ (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)bundleIdentifier format:(int)format scale:(int)scale;
-@end
 
 @implementation MASQThemePicker
 
@@ -36,6 +27,9 @@
   // self.tableView.rowHeight = 65.0f;
 	self.tableView.tintColor = [self themeTint];
 	[self.view addSubview:self.tableView];
+
+	NSNotificationCenter * def = NSNotificationCenter.defaultCenter;
+	[def addObserver:self selector:@selector(updateArtworkUgly)  name:@"_MRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
 }
 
 - (void)updateThemeList {
@@ -117,19 +111,19 @@
 
 
 -(void)updateArtworkUgly {
-	if (self.artwork && self.artworkd)
+	if (self.lightArtwork && self.darkArtwork)
 	MRMediaRemoteGetNowPlayingInfo(
 		dispatch_get_main_queue(), ^(CFDictionaryRef information) {
 			NSDictionary *dict = (__bridge NSDictionary *)(information);
 
 			UIImage * img = [UIImage imageWithData:dict[@"kMRMediaRemoteNowPlayingInfoArtworkData"]];
-			if (!img)
+			if (!img && !self.lightArtwork.activeAudio)
 			img = [self imageFromPrefsWithName:@"Icon/Placeholder"];
 
-			self.artwork.artworkImageView.image = img;
-			self.artworkd.artworkImageView.image = img;
+			self.lightArtwork.artworkImageView.image = img;
+			self.darkArtwork.artworkImageView.image = img;
 
-			if (self.stylePreview)
+			if (self.stylePreview && img)
 			self.stylePreview.image =  img;
 		}
 	);
@@ -157,7 +151,7 @@
 		[cell addSubview:contain];
 
 		MASQArtworkView * light = [[NSClassFromString(@"MASQArtworkView") alloc] initWithThemeKey:[self themeKey] frameHost:contain imageHost:contain];
-		self.artwork = light;
+		self.lightArtwork = light;
 		[cell addSubview:light];
 
 		UIImageView * containd = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,120,120)];
@@ -166,7 +160,7 @@
 		[cell addSubview:containd];
 
 		MASQArtworkView * dark = [[NSClassFromString(@"MASQArtworkView") alloc] initWithThemeKey:[self themeKey] frameHost:containd imageHost:contain];
-		self.artworkd = dark;
+		self.darkArtwork = dark;
 		[cell addSubview:dark];
 
 		[self updateArtworkUgly];
@@ -238,15 +232,15 @@
 		}
 		// }
 
-		if (self.artwork)
+		if (self.lightArtwork)
 		{
-			[self.artwork updateTheme];
-			// [self.artwork __grrrr];
+			[self.lightArtwork updateTheme];
+			// [self.lightArtwork __grrrr];
 		}
-		if (self.artworkd)
+		if (self.darkArtwork)
 		{
-			[self.artworkd updateTheme];
-			// [self.artworkd __grrrr]; // needs to go somewhere else, probably in the MASQArtworkView playbackState method
+			[self.darkArtwork updateTheme];
+			// [self.darkArtwork __grrrr]; // needs to go somewhere else, probably in the MASQArtworkView playbackState method
 		}
 	}
 }
@@ -293,18 +287,8 @@
 
 -(UIColor *)themeTint {
 	if ([self.specifier propertyForKey:@"tint"])
-	return [MASQThemePicker hexToRGB:[self.specifier propertyForKey:@"tint"]];
+	return [UIColor _masq_hexToRGB:[self.specifier propertyForKey:@"tint"]];
 	else return [UIColor colorWithRed:0.87 green:0.25 blue:0.40 alpha:1];
-}
-
-+(UIColor *)hexToRGB:(NSString *)hex {
-  const char *cStr = [hex cStringUsingEncoding:NSASCIIStringEncoding];
-  long x = strtol(cStr+1, NULL, 16);
-  unsigned char r, g, b;
-  b = x & 0xFF;
-  g = (x >> 8) & 0xFF;
-  r = (x >> 16) & 0xFF;
-  return [UIColor colorWithRed:(float)r/255.0f green:(float)g/255.0f blue:(float)b/255.0f alpha:1];
 }
 
 -(void)popMissingAlert {

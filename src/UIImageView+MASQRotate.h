@@ -9,9 +9,9 @@
 #import <Foundation/Foundation.h>
 
 @interface UIImageView (MASQRotate)
-- (void)rotateImageView;
-- (void)rotate360WithDuration:(CGFloat)duration repeatCount:(float)repeatCount;
-- (void)pauseAnimations;
-- (void)resumeAnimations;
-- (void)stopAllAnimations;
+- (void)__debug_rotateImageView;
+- (void)__debug_rotate360WithDuration:(CGFloat)duration repeatCount:(float)repeatCount;
+- (void)__debug_pauseAnimations;
+- (void)__debug_resumeAnimations;
+- (void)__debug_stopAllAnimations;
 @end

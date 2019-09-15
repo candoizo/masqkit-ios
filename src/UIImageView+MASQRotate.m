@@ -10,17 +10,29 @@
 
 @implementation UIImageView (MASQRotate)
 
-- (void)rotateImageView
+- (void)__debug_rotateImageView
 {
     [UIView animateWithDuration:0.7 delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
         [self setTransform:CGAffineTransformRotate(self.transform, M_PI_2)];
     }completion:^(BOOL finished){
         if (finished) {
-            [self rotateImageView];
+            [self __debug_rotateImageView];
         }
     }];
 }
-- (void)rotate360WithDuration:(CGFloat)duration repeatCount:(float)repeatCount
+
+-(void)invokeHack {
+  SEL sel = @selector(__debug_rotateImageView);
+  UIImageView * obj = self;
+
+  NSMethodSignature *methodSignature = [obj methodSignatureForSelector:sel];
+  NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
+  [invocation setSelector:sel];
+  [invocation setTarget:obj];
+  [invocation retainArguments];
+}
+
+- (void)__debug_rotate360WithDuration:(CGFloat)duration repeatCount:(float)repeatCount
 {
 
 	CABasicAnimation *fullRotation;
@@ -36,31 +48,31 @@
 	[self.layer addAnimation:fullRotation forKey:@"360"];
 }
 
-- (void)stopAllAnimations
+- (void)__debug_stopAllAnimations
 {
 
 	[self.layer removeAllAnimations];
 };
 
-- (void)pauseAnimations
+- (void)__debug_pauseAnimations
 {
-	[self pauseLayer:self.layer];
+	[self __debug_pauseLayer:self.layer];
 }
 
-- (void)resumeAnimations
+- (void)__debug_resumeAnimations
 {
 
-	[self resumeLayer:self.layer];
+	[self __debug_resumeLayer:self.layer];
 }
 
-- (void)pauseLayer:(CALayer *)layer
+- (void)__debug_pauseLayer:(CALayer *)layer
 {
 	CFTimeInterval pausedTime = [layer convertTime:CACurrentMediaTime() fromLayer:nil];
 	layer.speed = 0.0;
 	layer.timeOffset = pausedTime;
 }
 
-- (void)resumeLayer:(CALayer *)layer
+- (void)__debug_resumeLayer:(CALayer *)layer
 {
 	CFTimeInterval pausedTime = [layer timeOffset];
 	layer.speed = 1.0;

@@ -1,6 +1,7 @@
 #import "MASQArtworkView.h"
 #import "MASQThemeManager.h"
 #import "MediaRemote/MediaRemote.h"
+#import "UIImageView+MASQRotate.h"
 
 @implementation MASQArtworkView
 -(id)initWithThemeKey:(NSString *)key
@@ -45,13 +46,13 @@
 }
 
 -(void)updatePlaybackState {
-  // self.hitTracker = 5;
+  // reminder: this works well ;P
   if (NSClassFromString(@"SBMediaController"))
   { // in springboard
     // return SBMediaController.sharedInstance.
     SBMediaController * sess = [NSClassFromString(@"SBMediaController") sharedInstance];
     if (sess)
-    self.activeAudio = sess.playbackState == 1;
+    self.activeAudio = sess.isPlaying;
   }
   else if (NSClassFromString(@"AVAudioSession"))
   { // in an app
@@ -69,6 +70,93 @@
       self.activeAudio = [state floatValue] != 0;
     }
   );
+
+  // if (self.artworkImageView.image)
+  // if ([self.currentTheme.bundlePath.lastPathComponent hasPrefix:@"🌀"])
+  // { // wants to animate
+  //   // if (self.activeAudio)
+  //   // [self animate];
+  //
+  //     dispatch_async(dispatch_get_main_queue(), ^{
+  //   if (self.activeAudio)
+  //   [self.artworkImageView __debug_rotate360WithDuration:2.0f repeatCount:0];
+  //   else
+  //   [self.artworkImageView __debug_pauseAnimations];
+  //     });
+  // }
+}
+
+// fail
+-(void)tapAnimate {
+  // dispatch_async(dispatch_get_main_queue(), ^{
+    [self.artworkImageView __debug_rotate360WithDuration:2.0f repeatCount:0];
+  // });
+}
+
+// fail
+-(void)__goAnimate {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self.artworkImageView __debug_rotate360WithDuration:2.0f repeatCount:0];
+  });
+}
+
+// fail
+-(void)__grrrr {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self tapAnimate];
+  });
+}
+
+-(void)__animate {
+
+  CABasicAnimation *fullRotation;
+  fullRotation = [CABasicAnimation animationWithKeyPath:@"transform.rotation"];
+  fullRotation.fromValue = @0;
+  fullRotation.toValue = @((360 * M_PI) / 180);
+  fullRotation.duration = 2;
+  fullRotation.repeatCount = MAXFLOAT;
+
+  // self.debuggg = fullRotation.description;
+  // if (![fullRotation description])
+  // self.debuggg = @"Failed?";
+
+
+  [CATransaction begin];
+  [self.artworkImageView.layer addAnimation:fullRotation forKey:@"360"];
+  [CATransaction commit];
+  // [self layoutSublayersOfLayer:self.artworkImageView.layer];
+  // [self.artworkImageView layoutSublayersOfLayer:self.artworkImageView.layer];
+  // [self.artworkImageView __debug_rotate360WithDuration:2.0f repeatCount:0];
+
+  // for (UIImageView * v in self.subviews)
+  // {
+  //   if ([v isMemberOfClass:NSClassFromString(@"UIImageView")])
+  //   [v __debug_rotate360WithDuration:2 repeatCount:0];
+  // }
+}
+
+-(void)___fuck { //dafuq
+  // [self __animate];
+    [self __grrrr];
+      // [self __invokeHack];
+      //   [self tapAnimate];
+      //     [self __goAnimate];
+      //       [self __animate];
+}
+
+
+// fail
+-(void)__invokeHack {
+  SEL sel = @selector(__debug_rotateImageView);
+  UIImageView * obj = self.artworkImageView;
+
+  NSMethodSignature *methodSignature = [obj methodSignatureForSelector:sel];
+  NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
+  [invocation setTarget:obj];
+  [invocation setSelector:sel];
+  [invocation retainArguments];
+
+  [invocation invoke];
 }
 
 -(void)dealloc {

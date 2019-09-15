@@ -22,6 +22,9 @@
 
 @interface MASQThemePicker : PSViewController <UITableViewDataSource, UITableViewDelegate>
 @property () NSUserDefaults * prefs;
+@property (nonatomic, assign) NSString * hah;
+@property () CFFileDescriptorRef queue;
+@property (nonatomic, assign) int fd;
 @property (nonatomic, retain) UIImageView * stylePreview;
 @property (nonatomic, retain) MASQArtworkView * artwork;
 @property (nonatomic, retain) MASQArtworkView * artworkd;
@@ -37,4 +40,6 @@
 
 -(void)popMissingAlert;
 -(void)wantsStyle:(BOOL)arg1;
+
+// -(void)kqueueFired;
 @end

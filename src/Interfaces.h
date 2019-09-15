@@ -8,7 +8,7 @@
 +(SBMediaController *)sharedInstance;
 -(SBApplication *)nowPlayingApplication;
 -(BOOL)hasTrack;
--(int)playbackState;
+-(BOOL)isPlaying;
 @end
 
 @interface SBLockStateAggregator : NSObject

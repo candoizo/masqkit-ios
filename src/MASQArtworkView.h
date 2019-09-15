@@ -1,7 +1,8 @@
 #import "Interfaces.h"
 
 @interface MASQArtworkView : UIView
-@property (nonatomic, assign) NSString * identifier; //themeKey
+@property (nonatomic, assign) BOOL activeAudio;
+@property (nonatomic, assign) NSString * identifier;
 @property (nonatomic, assign) NSBundle * currentTheme;
 @property (nonatomic, assign) unsigned long hashCache;
 @property (nonatomic, retain) UIView * frameHost;
@@ -30,6 +31,5 @@
 -(id)underlayImage;
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context;
 
-
-@property (nonatomic, assign) BOOL activeAudio;
+-(void)__grrrr;
 @end

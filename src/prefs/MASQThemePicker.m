@@ -1,6 +1,21 @@
 #import "MASQThemePicker.h"
 #import "../MASQThemeManager.h"
 #import "MediaRemote/MediaRemote.h"
+// #import "CoreFoundation/CoreFoundation.h"
+// #include <sys/event.h>
+// static void KQCallback(CFFileDescriptorRef kqRef, CFOptionFlags callBackTypes, void *info)
+// {
+// 	// Pick up the object passed in the "info" member of the CFFileDescriptorContext passed to CFFileDescriptorCreate
+// 	MASQThemePicker* obj = (MASQThemePicker *)CFBridgingRelease(info);
+//
+// 	if ([obj isKindOfClass:[MASQThemePicker class]]		&&	// If we can call back to the proper sort of object ...
+// 	    (kqRef == obj.queue)					&&	// and the FD that issued the CB is the expected one ...
+// 	    (callBackTypes == kCFFileDescriptorReadCallBack)		)	// and we're processing the proper sort of CB ...
+// 	{
+// 		[obj kqueueFired];						// Invoke the instance's CB handler
+// 	}
+//
+// }
 
 @interface _CFXPreferences : NSObject
 + (_CFXPreferences *)copyDefaultPreferences;
@@ -12,7 +27,10 @@
 + (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)bundleIdentifier format:(int)format scale:(int)scale;
 @end
 
+
 @implementation MASQThemePicker
+
+
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	self.prefs = [NSClassFromString(@"MASQThemeManager") prefs];
@@ -35,7 +53,97 @@
   // self.tableView.rowHeight = 65.0f;
 	self.tableView.tintColor = [self themeTint];
 	[self.view addSubview:self.tableView];
+
+	// [self startMonitor];
 }
+
+// -(void)startMonitor {
+// 	// Avoid extra calls
+// 	if (_queue != NULL) return;
+//
+// 	NSString* path = [self themePath];
+//
+// 	// Open an event-only file descriptor associated with the directory
+// 	int fd = open([path fileSystemRepresentation], O_EVTONLY);
+// 	if (fd < 0) return;
+//
+// 	// Create a new kernel event queue
+// 	int kq = kqueue();
+// 	if (kq < 0)
+// 	{
+// 		close(fd);
+// 		return;
+// 	}
+//
+// 	// Set up a kevent to monitor
+// 	struct kevent eventToAdd;			// Register an (ident, filter) pair with the kqueue
+// 	eventToAdd.ident  = fd;			// The object to watch (the directory FD)
+// 	eventToAdd.filter = EVFILT_VNODE;		// Watch for certain events on the VNODE spec'd by ident
+// 	eventToAdd.flags  = EV_ADD | EV_CLEAR;		// Add a resetting kevent
+// 	eventToAdd.fflags = NOTE_WRITE;			// The events to watch for on the VNODE spec'd by ident (writes)
+// 	eventToAdd.data   = 0;				// No filter-specific data
+// 	eventToAdd.udata  = NULL;			// No user data
+//
+// 	// Add a kevent to monitor
+// 	if (kevent(kq, &eventToAdd, 1, NULL, 0, NULL))
+// 	{
+// 		close(kq);
+// 		close(fd);
+// 		return;
+// 	}
+//
+// 	// Wrap a CFFileDescriptor around a native FD
+// 	CFFileDescriptorContext context = {0, (__bridge void *)self, NULL, NULL, NULL};
+// 	_queue = CFFileDescriptorCreate(NULL,		// Use the default allocator
+// 					kq,		// Wrap the kqueue
+// 					true,		// Close the CFFileDescriptor if kq is invalidated
+// 					KQCallback,	// Fxn to call on activity
+// 					&context);	// Supply a context to set the callback's "info" argument
+// 	if (_queue == NULL)
+// 	{
+// 		close(kq);
+// 		close(fd);
+// 		return;
+// 	}
+//
+// 	// Spin out a pluggable run loop source from the CFFileDescriptorRef
+// 	// Add it to the current run loop, then release it
+// 	CFRunLoopSourceRef rls = CFFileDescriptorCreateRunLoopSource(NULL, _queue, 0);
+// 	if (rls == NULL)
+// 	{
+// 		CFRelease(_queue); _queue = NULL;
+// 		close(kq);
+// 		close(fd);
+// 		return;
+// 	}
+// 	CFRunLoopAddSource(CFRunLoopGetCurrent(), rls, kCFRunLoopDefaultMode);
+// 	CFRelease(rls);
+//
+// 	// Store the directory FD for later closing
+// 	_fd = fd;
+//
+// 	// Enable a one-shot (the only kind) callback
+// 	CFFileDescriptorEnableCallBacks(_queue, kCFFileDescriptorReadCallBack);
+// }
+//
+// - (void)kqueueFired
+// {
+// 	// Pull the native FD around which the CFFileDescriptor was wrapped
+// 	int kq = CFFileDescriptorGetNativeDescriptor(_queue);
+// 	if (kq < 0) return;
+//
+// 	// If we pull a single available event out of the queue, assume the directory was updated
+// 	struct kevent event;
+// 	struct timespec timeout = {0, 0};
+// 	if (kevent(kq, NULL, 0, &event, 1, &timeout) == 1)
+// 	{
+// 		self.hah = @"Wow we did it";
+// 		[self updateThemeList];
+//   }
+//
+// 	// (Re-)Enable a one-shot (the only kind) callback
+// 	CFFileDescriptorEnableCallBacks(_queue, kCFFileDescriptorReadCallBack);
+// }
 
 - (void)updateThemeList {
 	 // create the theme list, starting with the default theme
@@ -348,9 +456,17 @@
 		// }
 
 		if (self.artwork)
-		[self.artwork updateTheme];
+		{
+			[self.artwork updateTheme];
+			[self.artwork __grrrr];
+		}
 		if (self.artworkd)
-		[self.artworkd updateTheme];
+		{
+			[self.artworkd updateTheme];
+			[self.artworkd __grrrr];
+		}
+
+
 	}
 }
 

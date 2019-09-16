@@ -1,23 +1,35 @@
 #import "MASQThemePicker.h"
 #import "../MASQThemeManager.h"
-
-@interface _CFXPreferences : NSObject
-+ (_CFXPreferences *)copyDefaultPreferences;
-- (void)flushCachesForAppIdentifier:(CFStringRef)arg1 user:(CFStringRef)arg2;
-@end
+#import "../UIColor+MASQColorUtil.h"
+#import "MediaRemote/MediaRemote.h"
 
 @implementation MASQThemePicker
+
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	self.prefs = [NSClassFromString(@"MASQThemeManager") prefs];
-	self.title = @"Themes";
+	// self.title = @"Themes";
+
+	UILabel *titleLabel = [[UILabel alloc] init];
+	titleLabel.text = @"Themes";
+	titleLabel.textColor = UIColor.whiteColor;
+	[titleLabel sizeToFit];
+	UIBarButtonItem *right = [[UIBarButtonItem alloc] initWithCustomView:titleLabel];
+	self.navigationItem.rightBarButtonItem = right;
+	UIView * view = [[UIView alloc] init]; // hiding title permanently
+	self.navigationItem.titleView = view;
+
+
 	self.selectedTheme = [self.prefs valueForKey:[self themeKey]];
   self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
   self.tableView.delegate = self;
   self.tableView.dataSource = self;
-  self.tableView.rowHeight = 65.0f;
+  // self.tableView.rowHeight = 65.0f;
 	self.tableView.tintColor = [self themeTint];
 	[self.view addSubview:self.tableView];
+
+	NSNotificationCenter * def = NSNotificationCenter.defaultCenter;
+	[def addObserver:self selector:@selector(updateArtworkUgly)  name:@"_MRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
 }
 
 - (void)updateThemeList {
@@ -25,6 +37,7 @@
 	// NSMutableArray *themes = [@[@{@"bundle":@"Disabled@100", @"name":@"Disabled", @"scale":@"100"}] mutableCopy];
 	NSMutableArray * themes = [NSMutableArray new];
 	NSString * themePath = [self themePath];
+	NSDictionary * defaultTheme = nil;
 	// HBLogDebug(@"Theme path: %@", [self themePath]);
 	// for all the installed bundles in /Application Support/MASQ/Themes/x.bundle
 	for (NSString * bundles in [NSFileManager.defaultManager contentsOfDirectoryAtPath:themePath error:nil])
@@ -55,7 +68,7 @@
 				else {
 					// no credit exists
 					if ([bthemeId isEqualToString:@"Default.bundle/Default@100"])
-					[themes insertObject:@{ @"bundle":bthemeId, @"name":name, @"scale":scale, @"author":@""} atIndex:0];
+					defaultTheme = @{ @"bundle":bthemeId, @"name":name, @"scale":scale, @"author":@""};
 
 					else //if not the default add normally
 					[themes addObject:@{ @"bundle":bthemeId, @"name":name, @"scale":scale, @"author":@""}];
@@ -64,41 +77,123 @@
 		}
 	}
 
-	//
-  // for (NSString * themeid in [NSFileManager.defaultManager contentsOfDirectoryAtPath:[self themePath] error:nil]) {
-  //     NSArray * theme = [themeid componentsSeparatedByString:@"@"];
-  //   	NSString *named = theme.firstObject;
-  //   	NSString *scaling = theme.lastObject;
-	// 		NSString *credit = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Credit.txt", [self themePath], themeid] encoding:NSUTF8StringEncoding error:nil];
-	// 		[themes addObject:@{ @"bundle":themeid, @"name":named, @"scale":scaling, @"author":credit ?: @""}];
-  // }
+	if (themes.count > 0)
+	{
+		NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES];
+		[themes sortUsingDescriptors:[NSArray arrayWithObject:sort]];
+		if (defaultTheme)
+		[themes insertObject:defaultTheme atIndex:0];
+		// [root addObjectsFromArray:subprefs];
+	}
 	self.themes = themes;
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+
+    NSString *sectionName;
+    switch (section) {
+        case 0:
+					sectionName = @"Preview";
+        break;
+        default:
+          sectionName = @"";
+        break;
+    }
+    return sectionName;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+	if (indexPath.section == 0)
+	return 140;
+	else
+	return 55;
+}
+
+
+-(void)updateArtworkUgly {
+	if (self.lightArtwork && self.darkArtwork)
+	MRMediaRemoteGetNowPlayingInfo(
+		dispatch_get_main_queue(), ^(CFDictionaryRef information) {
+			NSDictionary *dict = (__bridge NSDictionary *)(information);
+
+			UIImage * img = [UIImage imageWithData:dict[@"kMRMediaRemoteNowPlayingInfoArtworkData"]];
+			if (!img && !self.lightArtwork.activeAudio)
+			img = [self imageFromPrefsWithName:@"Icon/Placeholder"];
+			else if (!img && self.lightArtwork.activeAudio)
+			// if there is no image ready but audio is playing we would rather wait for the image
+			return;
+
+			self.lightArtwork.artworkImageView.image = img;
+			self.darkArtwork.artworkImageView.image = img;
+
+			if (self.stylePreview && img)
+			self.stylePreview.image =  img;
+		}
+	);
+}
+
+-(UIImage *)imageFromPrefsWithName:(NSString *)n{
+	return [UIImage imageNamed:n inBundle:[NSBundle bundleWithPath:@"/Library/PreferenceBundles/MASQSettings.bundle"]];
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+
+	if (indexPath.section == 0)
+	{ // theme previewer
+	  UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"PreviewCell"];
+		cell.userInteractionEnabled = NO;
+		// cell.rowHeight = 120;
+	  cell.selectionStyle = UITableViewCellSelectionStyleNone;
+		cell.backgroundColor = nil;
+
+		// a fake artwork view for positioning
+		float rowHeight = [self tableView:tableView heightForRowAtIndexPath:indexPath];
+		UIImageView * contain = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,120,120)];
+		contain.center = CGPointMake(tableView.center.x*1.5, rowHeight*0.5);
+		contain.hidden = YES;
+		[cell addSubview:contain];
+
+		MASQArtworkView * light = [[NSClassFromString(@"MASQArtworkView") alloc] initWithThemeKey:[self themeKey] frameHost:contain imageHost:contain];
+		self.lightArtwork = light;
+		[cell addSubview:light];
+
+		UIImageView * containd = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,120,120)];
+		containd.center = CGPointMake(tableView.center.x/2, rowHeight*0.5);
+		containd.hidden = YES;
+		[cell addSubview:containd];
+
+		MASQArtworkView * dark = [[NSClassFromString(@"MASQArtworkView") alloc] initWithThemeKey:[self themeKey] frameHost:containd imageHost:contain];
+		self.darkArtwork = dark;
+		[cell addSubview:dark];
+
+		[self updateArtworkUgly];
+
+		UIImageView * lay = [[UIImageView alloc] initWithFrame:cell.frame];
+		self.stylePreview = lay;
+		lay.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+
+		UIVisualEffectView * v = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleLight]];
+		v.frame = CGRectMake(0,0,self.view.bounds.size.width/2, lay.bounds.size.height);
+		v.contentMode = UIViewContentModeScaleAspectFill;
+		v.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+		[lay addSubview:v];
+
+		UIVisualEffectView * d = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleDark]];
+		d.frame = CGRectMake(self.view.bounds.size.width/2,0,self.view.bounds.size.width/2, lay.bounds.size.height);
+		d.contentMode = UIViewContentModeScaleAspectFill;
+		d.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+		[lay addSubview:d];
+
+		[cell insertSubview:lay atIndex:0];
+
+		return cell;
+	}
+
   UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"ThemeCell"];
   cell.selectionStyle = UITableViewCellSelectionStyleNone;
 
 	NSDictionary *themeInfo = self.themes[indexPath.row];
 	cell.textLabel.text = themeInfo[@"name"];
-
-
-	// cell.imageView.contentMode = UIViewContentModeScaleAspectFit;
-	//
-	// UIImageView * icon = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, cell.bounds.size.height/1.5, cell.bounds.size.height/1.5)];
-	//
-	// icon.contentMode = UIViewContentModeScaleAspectFit;
-	// [cell addSubview:icon];
-	//
-	// NSString *path = [themeInfo[@"name"] isEqualToString:@"Default"] ?
-	// @"/Library/PreferenceBundles/MASQPrefs.bundle/Default.png"
-	// :
-	// [NSString stringWithFormat:@"%@/%@/Icon.png", [self themePath], themeInfo[@"bundle"]];
-	// icon.image = [UIImage imageWithContentsOfFile:path];
-	// cell.imageView.image = icon.image;
-	// cell.imageView.alpha = 0;
-	// cell.imageView.bounds = CGRectMake(15, 5, 20, 20);
-	// icon.center = cell.imageView.center;
 
 	if (themeInfo[@"author"]) {
 		cell.detailTextLabel.text = themeInfo[@"author"];
@@ -139,29 +234,50 @@
 			[prefs flushCachesForAppIdentifier:(__bridge CFStringRef)@"ca.ndoizo.masqkit" user:(__bridge CFStringRef)@"/User"];
 		}
 		// }
+
+		if (self.lightArtwork)
+		{
+			[self.lightArtwork updateTheme];
+			// [self.lightArtwork __grrrr];
+		}
+		if (self.darkArtwork)
+		{
+			[self.darkArtwork updateTheme];
+			// [self.darkArtwork __grrrr]; // needs to go somewhere else, probably in the MASQArtworkView playbackState method
+		}
 	}
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-	 [super viewWillAppear:animated];
-	 self.navigationController.navigationController.navigationBar.tintColor = [self themeTint];
-	 [self updateThemeList];
+	[super viewWillAppear:animated];
 
-	 if (self.themes.count <= 1)
-	 [self popMissingAlert];
+	[self wantsStyle:YES];
+
+	[self updateThemeList];
+	if (self.themes.count <= 1)
+	[self popMissingAlert];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
 	self.navigationController.navigationController.navigationBar.tintColor = nil;
 	[super viewWillDisappear:animated];
+
+	[self wantsStyle:NO];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-	return 1;
+	// one for the preview, one for the theme rows
+	return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+
+	if (section == 0)
+	return 1;
+	else if (section == 1)
 	return self.themes.count;
+	else
+	return 0;
 }
 
 -(NSString *)themeKey {
@@ -174,18 +290,8 @@
 
 -(UIColor *)themeTint {
 	if ([self.specifier propertyForKey:@"tint"])
-	return [MASQThemePicker hexToRGB:[self.specifier propertyForKey:@"tint"]];
+	return [UIColor _masq_hexToRGB:[self.specifier propertyForKey:@"tint"]];
 	else return [UIColor colorWithRed:0.87 green:0.25 blue:0.40 alpha:1];
-}
-
-+(UIColor *)hexToRGB:(NSString *)hex {
-  const char *cStr = [hex cStringUsingEncoding:NSASCIIStringEncoding];
-  long x = strtol(cStr+1, NULL, 16);
-  unsigned char r, g, b;
-  b = x & 0xFF;
-  g = (x >> 8) & 0xFF;
-  r = (x >> 16) & 0xFF;
-  return [UIColor colorWithRed:(float)r/255.0f green:(float)g/255.0f blue:(float)b/255.0f alpha:1];
 }
 
 -(void)popMissingAlert {
@@ -204,5 +310,44 @@
 			[alert addAction:repo];
 			[alert addAction:cancel];
 			[self presentViewController:alert animated:YES completion:nil];
+}
+
+-(void)wantsStyle:(BOOL)arg1
+{
+	if (arg1)
+	{ // adding it to the header
+		self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
+
+		UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
+
+		UIView * myv = [[UIView alloc] initWithFrame:bg.bounds];
+		myv.tag = 6969;
+		myv.userInteractionEnabled = NO;
+
+		CAGradientLayer *gradient = [NSClassFromString(@"CAGradientLayer") layer];
+		gradient.frame = bg.bounds;
+		gradient.colors = @[(id)[UIColor colorWithRed:0.29 green:0.64 blue:1.00 alpha:1.0].CGColor, (id)[UIColor colorWithRed:1.00 green:0.29 blue:0.52 alpha:1.0].CGColor];
+		gradient.startPoint = CGPointMake(0.0,0.5);
+		gradient.endPoint = CGPointMake(1.0,1.0);
+
+		[bg addSubview:myv];
+		[myv.layer insertSublayer:gradient atIndex:0];
+
+		UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
+		bgEff.alpha = 0;
+	}
+	else
+	{ // removing it from the header
+
+		UIView * bg = [self.navigationController.navigationController.navigationBar valueForKey:@"_backgroundView"];
+
+		if ([bg viewWithTag:6969])
+		[[bg viewWithTag:6969] removeFromSuperview];
+
+		self.navigationController.navigationController.navigationBar.barStyle = 0; // woot need this :D
+
+		UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
+		bgEff.alpha = 1;
+	}
 }
 @end

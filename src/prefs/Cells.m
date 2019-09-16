@@ -1,18 +1,25 @@
-#import <Preferences/PSSpecifier.h>
-#import <Preferences/PSSwitchTableCell.h>
-// #import <Preferences/PSSegmentTableCell.h>
 #import "../MASQThemeManager.h"
-#import "MASQThemePicker.h"
-
+#import "../UIColor+MASQColorUtil.h"
+#import "../Interfaces.h"
+#import "Cells.h"
 #define kMasqTint(x) [UIColor colorWithRed:0.87 green:0.25 blue:0.40 alpha:x]
 
-@interface PSSegmentTableCell : NSObject
-@property (nonatomic) UIColor * tintColor;
-- (id)initWithStyle:(int)arg1 reuseIdentifier:(id)arg2 specifier:(PSSpecifier *)arg3;
+
+@implementation MASQSegmentCell
+- (id)initWithStyle:(UITableViewCellStyle)arg1 reuseIdentifier:(id)arg2 specifier:(PSSpecifier *)arg3 {
+	self = [super initWithStyle:arg1 reuseIdentifier:arg2 specifier:arg3];
+	if (self) {
+
+		NSString * tintHex = [arg3 propertyForKey:@"tint"];
+		if (tintHex) self.tintColor = [UIColor _masq_hexToRGB:tintHex];
+		else self.tintColor = kMasqTint(0.8);
+	}
+	return self;
+}
+
+
 @end
 
-@interface MASQSwitchCell : PSSwitchTableCell
-@end
 
 @implementation MASQSwitchCell
 - (id)initWithStyle:(UITableViewCellStyle)arg1 reuseIdentifier:(id)arg2 specifier:(PSSpecifier *)arg3 {
@@ -20,7 +27,7 @@
 	if (self) {
 
 		NSString * tintHex = [arg3 propertyForKey:@"tint"];
-		if (tintHex) [((UISwitch *)[self control]) setOnTintColor:[NSClassFromString(@"MASQThemePicker") hexToRGB:tintHex]];
+		if (tintHex) [((UISwitch *)[self control]) setOnTintColor:[UIColor _masq_hexToRGB:tintHex]];
 		else [((UISwitch *)[self control]) setOnTintColor:kMasqTint(0.8)]; //?TODO
 
 		if ([arg3 propertyForKey:@"hint"])	{
@@ -28,7 +35,7 @@
 			self.detailTextLabel.textAlignment = 4;
 			self.detailTextLabel.font = [self.detailTextLabel.font fontWithSize:12];
 			if (tintHex) {
-				self.detailTextLabel.textColor = [[NSClassFromString(@"MASQThemePicker") hexToRGB:tintHex] colorWithAlphaComponent:0.7];
+				self.detailTextLabel.textColor = [[UIColor _masq_hexToRGB:tintHex] colorWithAlphaComponent:0.7];
 			}
 			else self.detailTextLabel.textColor = kMasqTint(0.7);
 		}
@@ -46,8 +53,6 @@
 }
 @end
 
-@interface MASQThemeLinkCell : PSTableCell
-@end
 
 @implementation MASQThemeLinkCell
 - (void)refreshCellContentsWithSpecifier:(id)arg1 {
@@ -55,7 +60,7 @@
 
 	self.detailTextLabel.font = [self.detailTextLabel.font fontWithSize:12];
 	NSString * tintHex = [arg1 propertyForKey:@"tint"];
-	if (tintHex) self.detailTextLabel.textColor = [[NSClassFromString(@"MASQThemePicker") hexToRGB:tintHex] colorWithAlphaComponent:0.7];
+	if (tintHex) self.detailTextLabel.textColor = [[UIColor _masq_hexToRGB:tintHex] colorWithAlphaComponent:0.7];
 	else self.detailTextLabel.textColor = kMasqTint(0.7);
 }
 
@@ -74,88 +79,17 @@
 }
 @end
 
-
-@interface MASQSegmentCell : PSSegmentTableCell //PSSegmentCell
-@end
-
-@interface _CFXPreferences : NSObject
-+ (_CFXPreferences *)copyDefaultPreferences;
-- (void)flushCachesForAppIdentifier:(CFStringRef)arg1 user:(CFStringRef)arg2;
-@end
-
-@implementation MASQSegmentCell
-- (id)initWithStyle:(int)arg1 reuseIdentifier:(id)arg2 specifier:(PSSpecifier *)arg3 {
-	self = [super initWithStyle:arg1 reuseIdentifier:arg2 specifier:arg3];
-	if (self) {
-
-		NSString * tintHex = [arg3 propertyForKey:@"tint"];
-		if (tintHex) self.tintColor = [NSClassFromString(@"MASQThemePicker") hexToRGB:tintHex];
-		else self.tintColor = kMasqTint(0.8);
-	}
-	return self;
-}
-// -(void)controlChanged:(id)arg1 {
-// 	// [super controlChanged:arg1];
-// 	Class _cfx = NSClassFromString(@"_CFXPreferences");
-// 		// basically this if statement actually fucks us up
-// 		// the like one milisecond delay makes it not update intime for 3rd party apps
-// 		// if (/[_cfx respondsToSelector:@selector(flushCachesForAppIdentifier:user:)])
-// 		// but the version doesnt cause the same problem :D
-// 		// if (UIDevice.currentDevice.systemVersion.doubleValue > 11)
-// 		// { //basically this check was making it not update fast enough on ios 11.0.2 :o
-// 		if (_cfx)
-// 		{
-// 			_CFXPreferences *prefs = [_cfx copyDefaultPreferences];
-// 			[prefs flushCachesForAppIdentifier:(__bridge CFStringRef)@"ca.ndoizo.masqkit" user:(__bridge CFStringRef)@"/User"];
-// 		}
-// }
-// // - (void)setProperty:(id)property forKey:(NSString *)key
-// // 	[super setProperty:property forKey:key];
-// //
-// //
-// // }
-@end
-
-@interface MASQSubPageLinkCell : PSTableCell
-@end
-
-@interface UIImage (Private)
-+ (id)_applicationIconImageForBundleIdentifier:(id)arg1 format:(int)arg2 scale:(CGFloat)arg3;
-+(id)imageNamed:(id)arg1 inBundle:(id)arg2;
+@interface MASQSubPageLinkCell : MASQChildLinkCell
 @end
 
 @implementation MASQSubPageLinkCell
--(id)initWithStyle:(UITableViewCellStyle)arg1 reuseIdentifier:(id)arg2 specifier:(id)arg3
-{
-	self = [super initWithStyle:arg1 reuseIdentifier:arg2 specifier:arg3];
-	if (self)
-	{
-				if ([arg3 propertyForKey:@"versionInfo"])	{
-					self.detailTextLabel.text = [arg3 propertyForKey:@"versionInfo"];
-					self.detailTextLabel.font = [self.detailTextLabel.font fontWithSize:9];
-				}
-	}
-	return self;
++(NSString *)deprecationInfo {
+	return @"This class is being deprecated in favour of MASQChildLinkCell. \n\nPlease avoid referenceing this class as it will be removed at a future date.";
 }
+@end
 
--(id)detailTextLabel {
-	id orig = [super detailTextLabel];
-	if ([orig respondsToSelector:@selector(textAlignment)])
-	{
-		UILabel * label = orig;
-		label.textAlignment = 4;
-	}
-	return orig;
-}
 
--(void)layoutSubviews {
-	[super layoutSubviews];
-	int ex = 25;
-	self.textLabel.center = CGPointMake(self.textLabel.center.x, self.textLabel.center.y - 4);
-	self.detailTextLabel.frame = CGRectMake(self.textLabel.frame.origin.x, self.bounds.size.height - (self.detailTextLabel.bounds.size.height * 1.275), self.detailTextLabel.frame.size.width + ex, self.detailTextLabel.frame.size.height);
-	// self.detailTextLabel.center = CGPointMake(self.textLabel.center.x, self.textLabel.center.y + self.textLabel.bounds.size.height/2);
-}
-
+@implementation MASQChildLinkCell
 - (void)refreshCellContentsWithSpecifier:(id)arg1 {
 	[super refreshCellContentsWithSpecifier:arg1];
 

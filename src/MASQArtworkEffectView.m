@@ -21,8 +21,7 @@
   NSNotificationCenter * def = NSNotificationCenter.defaultCenter;
   [def removeObserver:self
     name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
-    
-    
+
   if ([self.identifier rangeOfString:@"CC"].location != NSNotFound)
   [def removeObserver:self name:@"SBControlCenterControllerWillPresentNotification" object:nil];
 
@@ -108,10 +107,10 @@
 
   if (arg1)
   {
-    
+
     [self updateEffect];
     [self updateArtwork:nil];
-    
+
     NSNotificationCenter * def = NSNotificationCenter.defaultCenter;
     NSString * key = arg1;
     if (NSClassFromString(@"SBMediaController"))
@@ -130,7 +129,7 @@
 
     }
     else [def addObserver:self selector:@selector(updateAppearance)  name:UIApplicationDidBecomeActiveNotification object:nil];
-    
+
   }
 }
 

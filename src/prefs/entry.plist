@@ -2,7 +2,7 @@
    entry = {
      bundle = MASQSettings;
      cell = PSLinkCell;
-     detail = MASQPrefsController;
+     detail = MASQRootController;
      icon = "/Library/PreferenceBundles/MASQSettings.bundle/Icon/SetIcon.png";
      isController = 1;
      label = MASQKit;

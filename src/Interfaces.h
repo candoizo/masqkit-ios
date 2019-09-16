@@ -8,6 +8,7 @@
 +(SBMediaController *)sharedInstance;
 -(SBApplication *)nowPlayingApplication;
 -(BOOL)hasTrack;
+-(BOOL)isPlaying;
 @end
 
 @interface SBLockStateAggregator : NSObject
@@ -19,4 +20,9 @@
 +(id)sharedInstance;
 -(BOOL)isVisible;
 -(void)setCoverSheetPresented:(BOOL)arg1 animated:(BOOL)arg2 withCompletion:(id)arg3;
+@end
+
+@interface AVAudioSession : NSObject
++(instancetype)sharedInstance;
+-(BOOL)isOtherAudioPlaying;
 @end

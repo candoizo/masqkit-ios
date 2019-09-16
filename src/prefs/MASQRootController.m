@@ -52,7 +52,8 @@
 
 	UIAlertAction* repo = [NSClassFromString(@"UIAlertAction") actionWithTitle:@"Open in Cydia" style:UIAlertActionStyleCancel handler:^(UIAlertAction * action)
 	{
-		[UIApplication.sharedApplication openURL:[NSURL URLWithString:@"cydia://url/https://cydia.saurik.com/api/share#?source=https://ndoizo.ca"]];
+		NSURL * url = [NSURL URLWithString:@"cydia://url/https://cydia.saurik.com/api/share#?source=https://ndoizo.ca"];
+		[UIApplication.sharedApplication openURL:url];
 	}];
 
 	[alert addAction:repo];

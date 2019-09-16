@@ -4,9 +4,8 @@ include $(THEOS)/makefiles/common.mk
 BUNDLE_NAME = MASQSettings
 MASQSettings_FILES = $(wildcard *.m)
 MASQSettings_INSTALL_PATH = /Library/PreferenceBundles
-MASQSettings_FRAMEWORKS = UIKit CoreGraphics MediaRemote#\
-
-MASQSettings_PRIVATE_FRAMEWORKS = Preferences Social
+MASQSettings_FRAMEWORKS = UIKit CoreGraphics
+MASQSettings_PRIVATE_FRAMEWORKS = Preferences MediaRemote
 MASQSettings_EXTRA_LIBRARIES = MASQKit
 MASQSettings_CFLAGS = -fobjc-arc
 

@@ -1,5 +1,9 @@
 #import "UIImageView+MASQRotate.h"
 
+@interface CABasicAnimation (Private)
+// -(void)setRemovedOnCompletion:(BOOL)arg1;
+@end
+
 @implementation UIImageView (MASQRotate)
 
 - (void)__debug_rotateImageView
@@ -24,26 +28,40 @@
   [invocation retainArguments];
 }
 
+#define SBLog(x) if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.springboard"]) HBLogDebug(x)
+
 - (void)__debug_rotate360WithDuration:(CGFloat)duration repeatCount:(float)repeatCount
 {
-
+  SBLog(@"rotateDebug is here");
 	CABasicAnimation *fullRotation;
 	fullRotation = [CABasicAnimation animationWithKeyPath:@"transform.rotation"];
 	fullRotation.fromValue = [NSNumber numberWithFloat:0];
 	fullRotation.toValue = [NSNumber numberWithFloat:((360 * M_PI) / 180)];
 	fullRotation.duration = duration;
+  // fullRotation.removedOnCompletion = false; makes the thing not so good
+
 	if (repeatCount == 0)
 		fullRotation.repeatCount = MAXFLOAT;
 	else
 		fullRotation.repeatCount = repeatCount;
 
   // HBLogDebug(@"rotate 360 about to commit");
-  [CATransaction begin];
+  if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.springboard"])
+  {
+    [self __debug_rotateImageView];
+    // [self.layer addAnimation:fullRotation forKey:@"360"];
+  }
+  else
+  {
+  // [CATransaction begin];
 // [self.artworkImageView.layer addAnimation:fullRotation forKey:@"360"];
 	[self.layer addAnimation:fullRotation forKey:@"360"];
-  [CATransaction commit];
 
-  // HBLogDebug(@"commit done?");
+  // SBLog(@"animation should be commit next");
+  // [CATransaction commit];
+
+  // SBLog(@"commit done?");
+  }
 }
 
 - (void)__debug_stopAllAnimations
@@ -59,7 +77,7 @@
 
 - (void)__debug_resumeAnimations
 {
-
+  SBLog(@"animation should resume.");
 	[self __debug_resumeLayer:self.layer];
 }
 
@@ -73,7 +91,7 @@
 - (void)__debug_resumeLayer:(CALayer *)layer
 {
 	CFTimeInterval pausedTime = [layer timeOffset];
-	layer.speed = 1.0;
+	layer.speed = 1.0;//
 	layer.timeOffset = 0.0;
 	layer.beginTime = 0.0;
 	CFTimeInterval timeSincePause = [layer convertTime:CACurrentMediaTime() fromLayer:nil] - pausedTime;

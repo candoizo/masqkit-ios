@@ -1,3 +1,11 @@
+ifeq ($(FINALPACKAGE), 1)
+export ARCHS = arm64 arm64e
+export FINALPACKAGE=1
+export DEBUG=0
+else
+export ARCHS = arm64
+endif
+
 TWEAK_NAME = MASQKit
 SUBPROJECTS += prefs
 
@@ -12,4 +20,4 @@ include $(THEOS_MAKE_PATH)/tweak.mk
 include $(THEOS_MAKE_PATH)/aggregate.mk
 
 after-install::
-	install.exec "killall -9 Preferences"
+	install.exec "killall -9 Preferences SpringBoard"

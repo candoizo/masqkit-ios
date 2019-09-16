@@ -119,6 +119,9 @@
 			UIImage * img = [UIImage imageWithData:dict[@"kMRMediaRemoteNowPlayingInfoArtworkData"]];
 			if (!img && !self.lightArtwork.activeAudio)
 			img = [self imageFromPrefsWithName:@"Icon/Placeholder"];
+			else if (!img && self.lightArtwork.activeAudio)
+			// if there is no image ready but audio is playing we would rather wait for the image
+			return;
 
 			self.lightArtwork.artworkImageView.image = img;
 			self.darkArtwork.artworkImageView.image = img;

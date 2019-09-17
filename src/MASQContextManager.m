@@ -19,32 +19,82 @@ static MASQContextManager * shared;
   return shared;
 }
 
+-(void)updatePlayback {
+  if (NSClassFromString(@"AVAudioSession"))
+  {
+    AVAudioSession * audio = (AVAudioSession *)[NSClassFromString(@"AVAudioSession") sharedInstance];
+    if (audio)
+    { // we recieve our notication just before AVAudioSession is aware
+      // to workaround this we flip the value
+      BOOL isPlaying = [audio isOtherAudioPlaying];
+      if (self.activeAudio == nil && !isPlaying)
+      { // if it has never been sent but we are getting this notifcation
+        // then the audio must have just begun playing
+        // the problem is only AVAudioSession has not seen that yet
+        // but since we know it has to have started playing we force YES
+        self.activeAudio = @(YES);
+        self.justSet = YES;
+      }
+      else if (self.justSet && !isPlaying && self.activeAudio)
+      { // it would reset it to off but
+        // so this notif is posted multiple times
+        // and ios usually tricks us by finally sending a good one at the end
+        // so we catch it this way
+        self.activeAudio = @(isPlaying);
+        self.justSet = NO;
+      }
+      else
+      self.activeAudio = @(isPlaying);
+    }
+  }
+}
+
 -(void)registerObservers {
   NSNotificationCenter * def = NSNotificationCenter.defaultCenter;
-  [def addObserver:shared selector:@selector(updateThemes) name:UIApplicationDidBecomeActiveNotification object:nil];
+
+  [def addObserver:self selector:@selector(updatePlayback)  name:@"_MRMediaRemotePlayerPlaybackStateDidChangeNotification" object:nil];
 
   if (NSClassFromString(@"SBMediaController"))
-  { // context is in SpringBoard
-
+  { // context is in SpringBoard, track LS/CC
     [def addObserver:self selector:@selector(updateTheme:)  name:@"SBControlCenterControllerWillPresentNotification" object:nil];
-
     [def addObserver:self selector:@selector(updateTheme:)  name:@"SBCoverSheetWillPresentNotification" object:nil];
   }
+  else // probably in an app so update theme on open
+  // [def addObserver:shared selector:@selector(updateThemes) name:UIApplicationDidBecomeActiveNotification object:nil];
+  [def addObserver:self selector:@selector(updateThemes) name:UIApplicationWillEnterForegroundNotification object:nil];
+
+  [def addObserver:self selector:@selector(removeObservers) name:UIApplicationWillTerminateNotification object:nil];
+}
+
+-(void)removeObservers {
+  NSNotificationCenter * def = NSNotificationCenter.defaultCenter;
+
+  [def removeObserver:self name:@"_MRMediaRemotePlayerPlaybackStateDidChangeNotification" object:nil];
+
+  if (NSClassFromString(@"SBMediaController"))
+  {
+    [def removeObserver:self name:@"SBControlCenterControllerWillPresentNotification" object:nil];
+    [def removeObserver:self name:@"SBCoverSheetWillPresentNotification" object:nil];
+  }
+  else
+  [def removeObserver:self name:UIApplicationWillEnterForegroundNotification object:nil];
+
+  [def removeObserver:self name:UIApplicationWillTerminateNotification object:nil];
 }
 
 -(void)updateTheme:(id)sender {
   NSString * poster = [sender name];
-  // HBLogWarn(@"sender: %@", poster);
+  NSMapTable * themes = self.themes;
   if ([poster isEqualToString:@"SBCoverSheetWillPresentNotification"])
   {
     // HBLogWarn(@"sender: %@", poster);
     NSString * identifier = @"LS";
     NSBundle * theme = [MASQThemeManager themeBundleForKey:identifier];
-    if (theme != shared.themes[identifier])
-    shared.themes[identifier] = theme;
-    [shared updateIdentity:identifier];
-    // so I do want to
-    // [self updateThemes];
+    if (theme != themes[identifier])
+    {
+      themes[identifier] = theme;
+      [self updateIdentity:identifier];
+    }
   }
 
   else if ([poster isEqualToString:@"SBControlCenterControllerWillPresentNotification"])
@@ -52,23 +102,22 @@ static MASQContextManager * shared;
     // HBLogWarn(@"sender: %@", poster);
     NSString * identifier = @"CC";
     NSBundle * theme = [MASQThemeManager themeBundleForKey:identifier];
-    if (theme != shared.themes[identifier])
-    shared.themes[identifier] = theme;
-    [shared updateIdentity:identifier];
-    // [self updateThemes];
+    if (theme != themes[identifier])
+    {
+    themes[identifier] = theme;
+    [self updateIdentity:identifier];
+    }
   }
 }
 
 -(void)updateIdentity:(NSString *)arg1 {
-
-  for (id test in shared.keyMap)
+  NSMapTable * keyMap = self.keyMap;
+  for (id test in keyMap)
   { // for all views assigned a key
-    NSString * val = shared.keyMap[test];
+    NSString * val = keyMap[test];
 
     if ([val isEqualToString:arg1])
     { // if the value of the test object is one that wants updating
-      if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.springboard"])
-      HBLogWarn(@"I believe I want to update! %@", test);
       [test updateTheme];
     }
   }
@@ -76,63 +125,30 @@ static MASQContextManager * shared;
 
 -(void)updateThemes {
 
-  for (NSString * identifier in shared.identities)
+  for (NSString * identifier in self.identities)
   { // for all identities being tracked
     NSBundle * theme = [MASQThemeManager themeBundleForKey:identifier];
-    if (theme != shared.themes[identifier])
+    if (theme != self.themes[identifier])
     { // theme set in prefs is not equal to the last tracked one
-      shared.themes[identifier] = theme;
-
-      [shared updateIdentity:identifier];
-      // if the active key is not marked as dirty we add it
-      // if (![shared.dirtyKeys containsObject:identifier])
-      // [shared.dirtyKeys addObject:identifier];
-
-
-      // or maybe I can just avoid extra for loops
-
-      // for every view traking the dirty key
-      // for (id test in shared.keyMap)
-      // { // for all views assigned a key
-      //   NSString * val = shared.keyMap[test];
-      //   if ([val isEqualToString:identifier])
-      //   { // if the value of the test object is one that wants updating
-      //     HBLogWarn(@"I believe I want to update!");
-      //     [test updateTheme];
-      //   }
-      // }
-      // well we update the theme and
+      self.themes[identifier] = theme;
+      [self updateIdentity:identifier];
     }
-
   }
-
-  // for (NSString * key in shared.dirtyKeys)
-  // { // for themes that need updating
-  //   for (id test in shared.keyMap)
-  //   { // for all views assigned a key
-  //     NSString * val = shared.keyMap[test];
-  //     if ([val isEqualToString:key])
-  //     { // if the value of the test object is one that wants updating
-  //       HBLogWarn(@"I believe I want to update!");
-  //       [test updateTheme];
-  //     }
-  //   }
-  //   [shared.dirtyKeys removeObject:key];
-  // }
 }
 
 -(void)registerView:(id)arg1 {
 
-  if (arg1 && shared.keyMap)
+  if (arg1 && self.keyMap)
   {
     if ([arg1 respondsToSelector:@selector(identifier)])
     {
       NSString * identifier = [arg1 identifier];
       if (identifier)
       {
-        if (![shared.identities containsObject:identifier])
+        NSMutableArray * identities = self.identities;
+        if (![identities containsObject:identifier])
         {
-          [shared.identities addObject:identifier];
+          [identities addObject:identifier];
 
           // wasnt here earlier so lets preload this
           NSBundle * theme = [MASQThemeManager themeBundleForKey:identifier];
@@ -142,7 +158,7 @@ static MASQContextManager * shared;
         // [shared.managedViews addObject:arg1];
         // NSString * addr = [NSString stringWithFormat:@"%p",arg1];
         // HBLogWarn(@"%p %@", arg1,addr);
-        [shared.keyMap setObject:identifier forKey:arg1];
+        [self.keyMap setObject:identifier forKey:arg1];
         // preload the theme while the otheer view inits
         // [self.themes addObject:theme];
         // self.
@@ -150,9 +166,5 @@ static MASQContextManager * shared;
       }
     }
   }
-}
-
--(void)updateIdentities {
-  // if ()
 }
 @end

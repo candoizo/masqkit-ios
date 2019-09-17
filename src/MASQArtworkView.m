@@ -16,54 +16,19 @@
     [self addSubview:[self underlayView]];
     [self addSubview:[self containerView]];
     [self addSubview:[self overlayView]];
-    [self updateTheme]; // works well but I want to see
 
+    [self updateTheme]; // works
     NSNotificationCenter * def = NSNotificationCenter.defaultCenter;
     [def addObserver:self selector:@selector(updateArtwork:)  name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
-
-    if (NSClassFromString(@"SBMediaController"))
-    { // this artwork is in springboard
-
-      // control center
-      if ([key rangeOfString:@"CC"].location != NSNotFound)
-      [def addObserver:self selector:@selector(updateTheme)  name:@"SBControlCenterControllerWillPresentNotification" object:nil];
-
-      // lock screen
-      else if ([key rangeOfString:@"LS"].location != NSNotFound)
-      [def addObserver:self selector:@selector(updateTheme)  name:@"SBCoverSheetWillPresentNotification" object:nil];
-
-      else // fallback incase of weird views
-      [def addObserver:self selector:@selector(updateTheme) name:UIApplicationDidBecomeActiveNotification object:nil];
-
-    }
-    else
-    [def addObserver:self selector:@selector(updateTheme) name:UIApplicationDidBecomeActiveNotification object:nil];
-
-    // [self updatePlaybackState];
     [def addObserver:self selector:@selector(updatePlaybackState)  name:@"_MRMediaRemotePlayerPlaybackStateDidChangeNotification" object:nil];
-    // get initial state (or maybe I should do this after I set theme)
-    // [self updatePlaybackState];
-
   }
   return self;
 }
 
 -(void)dealloc {
-
   NSNotificationCenter * def = NSNotificationCenter.defaultCenter;
   [def removeObserver:self name:@"_kMRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
   [def removeObserver:self name:@"_MRMediaRemotePlayerPlaybackStateDidChangeNotification" object:nil];
-
-  NSString * ident = self.identifier;
-  if ([ident rangeOfString:@"CC"].location != NSNotFound)
-  [def removeObserver:self name:@"SBControlCenterControllerWillPresentNotification" object:nil];
-
-  else if ([ident rangeOfString:@"LS"].location != NSNotFound)
-  [def removeObserver:self name:@"SBCoverSheetWillPresentNotification" object:nil];
-
-  else
-  [def removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
-
 }
 
 -(id)initWithThemeKey:(NSString *)arg1 frameHost:(id)arg2 imageHost:(id)arg3
@@ -71,29 +36,45 @@
   if (self = [self initWithThemeKey:arg1])
   {
     self.frameHost = arg2;
+    // [self updateTheme]; // not perciptibly worse than in initWithThemeKey
     self.imageHost = arg3;
-    // [self updateTheme];
   }
   return self;
 }
 
+// -(void)setActiveAudio:(BOOL)arg1 {
+//   _activeAudio = arg1;
+//
+//   if (self.hasAnimation && self.wantsAnimation)
+//   { // update for the state
+//     if (arg1)
+//     {
+//
+//     }
+//     else
+//     {
+//
+//     }
+//   }
+//
+// }
+
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 
   if ([keyPath isEqualToString:@"frame"])
-  {
-    // if ours isnt already matching the frame host, update it!
+  { // if ours isnt already matching the frame host, update it!
     if (!CGRectEqualToRect(self.frameHost.frame, self.frame))
     [self updateFrame];
   }
 
   else if ([keyPath isEqualToString:@"image"])
   {
-    UIImageView * imageHost = self.imageHost;
-    if ([imageHost respondsToSelector:@selector(image)])
+    // UIImageView * imageHost = self.imageHost;
+    // if ([imageHost respondsToSelector:@selector(image)]) // check when the image hosts is set
     [self updateArtwork:nil];
   }
 
-  else if (self.centerHost && [keyPath isEqualToString:@"center"])
+  else if (/*self.centerHost && */[keyPath isEqualToString:@"center"])
   {
     [self updateCenter];
   }
@@ -148,12 +129,13 @@ if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.springboar
     // NSBundle * active = shared.themes[ident];
     // HBLogDebug(@"Hello, %@ %@", self.currentTheme, (id)shared.themes[ident]);
     // NSBundle * currentTheme = [MASQThemeManager themeBundleForKey:ident];
-    if (currentTheme == self.currentTheme && self.hasAnimation && [self wantsAnimation] == NO)
+    if (currentTheme == self.currentTheme && self.hasAnimation /* && [self wantsAnimation] == NO*/)
     { // for some reason even just checking this broke everything , so i guess heres the alternative
+
       [self.artworkImageView.layer removeAllAnimations];
       self.hasAnimation = NO;
       self.isAnimating = NO;
-      [self updatePlaybackState];
+      // [self updatePlaybackState];
       return;
     }
 
@@ -228,6 +210,12 @@ if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.springboar
     }
   }
   else HBLogError(@"imageHost is not type UIImageView, and no UIImage was offered so artwork is NOT being updated, perhaps you want a different imageHost?");
+
+  // if we have artwork and activeTrack still reads nil we probably have missed the track
+  if (self.hashCache && self.activeTrack == nil)
+  // [self updatePlaybackState];
+  self.activeTrack = @YES;
+
 }
 
 -(void)setImageHost:(id)arg1 {
@@ -235,6 +223,7 @@ if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.springboar
   if (_imageHost)
   {
     [_imageHost addObserver:self forKeyPath:@"frame" options:NSKeyValueObservingOptionNew context:nil];
+    if ([_imageHost respondsToSelector:@selector(image)])
     [_imageHost addObserver:self forKeyPath:@"image" options:NSKeyValueObservingOptionNew context:nil];
     [self updateArtwork:nil];
   }
@@ -293,16 +282,8 @@ if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.springboar
   return _underlayView = u;
 }
 
--(id)overlayView
-{
+-(id)overlayView {
   _overlayView = [[UIButton alloc] initWithFrame:self.bounds];
-
-  if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.Preferences"])
-  {
-    [_overlayView addTarget:self action:@selector(tapAnimate) forControlEvents:UIControlEventTouchUpInside];
-    self.userInteractionEnabled = YES;
-  }
-  else
   [_overlayView addTarget:self action:@selector(tapArtwork:) forControlEvents:UIControlEventTouchUpInside];
   _overlayView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight; //resize to super width
   _overlayView.center = self.center;
@@ -319,13 +300,8 @@ if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.springboar
       if (NSClassFromString(@"SBCoverSheetPresentationManager"))
       { // dismiss notification center ios 11.x - 12.x
         SBCoverSheetPresentationManager * nc = [NSClassFromString(@"SBCoverSheetPresentationManager") sharedInstance];
-        // BOOL deviceUnlocked = ((SBLockStateAggregator *)[NSClassFromString(@"SBLockStateAggregator") sharedInstance]).lockState == 2;
-        // @TODO uhh wtf is this now = 1
-        // literally it makes no sense how that could be possible it was legit working with ==2 for so long but idfk
-
         BOOL deviceUnlocked = ((SBLockStateAggregator *)[NSClassFromString(@"SBLockStateAggregator") sharedInstance]).lockState == 1;
         if (nc.isVisible && deviceUnlocked)
-        // if (nc.isVisible)
         [nc setCoverSheetPresented:NO animated:YES withCompletion:nil];
       }
 
@@ -337,9 +313,10 @@ if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.springboar
 
 /// images
 -(UIImage *)maskImage
-{
+{ // tries to load it efficiently and fallsback to old behaviour if not possible
   NSBundle * theme = self.currentTheme;
   return theme ?
+  [UIImage imageNamed:@"Mask" inBundle:theme compatibleWithTraitCollection:nil] ?:
   [UIImage imageWithContentsOfFile:[theme pathForResource:@"Mask" ofType:@"png"]]
   : nil;
 }
@@ -348,6 +325,7 @@ if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.springboar
 {
   NSBundle * theme = self.currentTheme;
   return theme ?
+  [UIImage imageNamed:@"Overlay" inBundle:theme compatibleWithTraitCollection:nil] ?:
   [UIImage imageWithContentsOfFile:[theme pathForResource:@"Overlay" ofType:@"png"]]
   : nil;
 }
@@ -356,6 +334,7 @@ if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.springboar
 {
   NSBundle * theme = self.currentTheme;
   return theme ?
+  [UIImage imageNamed:@"Underlay" inBundle:theme compatibleWithTraitCollection:nil] ?:
   [UIImage imageWithContentsOfFile:[theme pathForResource:@"Underlay" ofType:@"png"]]
   : nil;
 }
@@ -402,53 +381,10 @@ _kMRMediaRemotePlayerPlaybackStateDidChangeNotification
 // }
 
 -(void)updatePlaybackState {
-
-  // HBLogWarn(@"Playback state notification recieved.");
-  // HBLogWarn(@"\n\n\n%@ START OF CALL TO updatePlaybackState\nself.activeAudio = %d\nself.hasAnimation=%d\nself.isAnimating=%d", self.frame.origin.x == 0 ? @"UNDETECTABLE" : self.frame.origin.x > 100 ? @"RIGHT VIEW" : @"LEFT VIEW", self.activeAudio, self.hasAnimation,self.isAnimating);
-  // reminder: this works well ;P
-/* this one seems to be causing particular problems
-  if (NSClassFromString(@"SBMediaController"))
-  { // in springboard
-    // return SBMediaController.sharedInstance.
-    SBMediaController * sess = [NSClassFromString(@"SBMediaController") sharedInstance];
-    if (sess)
-    // this makes no sense wtf
-    self.activeAudio = sess.isPlaying;
-  }
-  else if (NSClassFromString(@"AVAudioSession"))
-  { // in an app
-    AVAudioSession * sess = [NSClassFromString(@"AVAudioSession") sharedInstance];
-    if (sess)
-    self.activeAudio = [sess isOtherAudioPlaying];
-  }
-  // else // use the hammer
-  // MRMediaRemoteGetNowPlayingInfo(
-  //   dispatch_get_main_queue(), ^(CFDictionaryRef information) {
-  //
-  //     NSDictionary *dict = (__bridge NSDictionary *)(information);
-  //     NSString * state = dict[@"kMRMediaRemoteNowPlayingInfoPlaybackRate"];
-  //     SBLog(@"state %@", state);
-  //     if (state)
-  //     self.activeAudio = [state floatValue] != 0;
-  //   }
-  // );
-  */
-  if (NSClassFromString(@"AVAudioSession"))
-  { // in an app
-    AVAudioSession * sess = [NSClassFromString(@"AVAudioSession") sharedInstance];
-    if (sess)
-    self.activeAudio = [sess isOtherAudioPlaying];
-  }
+  self.activeAudio = [MASQContextManager sharedInstance].activeAudio.boolValue;
 
   if ([self wantsAnimation])
   [self tapAnimate];
-  // else
-  // { // if they dont have the animation marker anymore but do
-  //   if (self.hasAnimation) // maybe not needed after above change to themeUpdating
-  //   HBLogWarn(@"This view has an animation and must be rebuilt for non-animated themes");
-  // }
-
-  // HBLogDebug(@"\n%@ END OF CALL TO updatePlaybackState\nself.activeAudio = %d\nself.hasAnimation=%d\nself.isAnimating=%d\n\n\n.", self.frame.origin.x == 0 ? @"UNDETECTABLE" : self.frame.origin.x > 100 ? @"RIGHT VIEW" : @"LEFT VIEW", self.activeAudio, self.hasAnimation,self.isAnimating);
 }
 
 // fail or not so much idk ffuck you apple
@@ -528,6 +464,39 @@ _kMRMediaRemotePlayerPlaybackStateDidChangeNotification
 //   while (co < 1000) {
 //     NSBundle * currentTheme = [MASQThemeManager themeBundleForKey:ident];
 //     if (currentTheme != nil)
+//     co++;
+//   }
+//   methodFinish = [NSDate date];
+//   executionTime = [methodFinish timeIntervalSinceDate:methodStart];
+//   NSLog(@"1000x old executionTime = %f", executionTime);
+// }
+//
+// -(void)__test_compareLoader {
+// // damn 500% faster ...
+// // Sep 17 10:12:53 X SpringBoard[10968] <Warning>: 1000x new executionTime = 0.053621
+// // Sep 17 10:12:53 X SpringBoard[10968] <Warning>: 1000x old executionTime = 0.271982
+//
+//   MASQContextManager * shared = [MASQContextManager sharedInstance];
+//   NSString * ident = self.identifier;
+//   NSBundle * active = shared.themes[ident];
+//   int co = 0;
+//
+//   NSDate *methodStart = [NSDate date];
+//   while (co < 1000) {
+//     UIImage * img =  [UIImage imageNamed:@"Mask" inBundle:active compatibleWithTraitCollection:nil];
+//     if (img != nil)
+//     co++;
+//   }
+//   NSDate *methodFinish = [NSDate date];
+//   NSTimeInterval executionTime = [methodFinish timeIntervalSinceDate:methodStart];
+//   NSLog(@"1000x new executionTime = %f", executionTime);
+//
+//   co = 0;
+//   methodStart = [NSDate date];
+//   while (co < 1000) {
+//     UIImage * img = [self maskImage];
+//     // NSBundle * currentTheme = [MASQThemeManager themeBundleForKey:ident];
+//     if (img != nil)
 //     co++;
 //   }
 //   methodFinish = [NSDate date];

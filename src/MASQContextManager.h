@@ -1,6 +1,8 @@
 #import "NSMapTable+MASQSubscript.h"
 
 @interface MASQContextManager : NSObject
+@property (nonatomic, assign) BOOL justSet;
+@property (nonatomic, assign) NSNumber * activeAudio;
 @property (nonatomic, retain) NSMapTable * themes;
 @property (nonatomic, retain) NSMapTable * keyMap;
 // @property (nonatomic, retain) NSHashTable * managedViews;
@@ -28,4 +30,5 @@
 */
 
 -(void)updateThemes;
+-(void)updatePlayback;
 @end

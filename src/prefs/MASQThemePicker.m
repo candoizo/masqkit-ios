@@ -8,6 +8,7 @@
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
+	[[NSClassFromString(@"MASQContextManager") sharedInstance] updatePlayback];
 	self.prefs = [NSClassFromString(@"MASQThemeManager") prefs];
 	// self.title = @"Themes";
 

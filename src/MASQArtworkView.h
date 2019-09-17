@@ -33,6 +33,6 @@
 -(id)underlayImage;
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context;
 
-
 @property (nonatomic, assign) BOOL debugged;
+@property (nonatomic, assign) BOOL neverAnimate;
 @end

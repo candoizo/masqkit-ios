@@ -2,6 +2,7 @@
 #import "MASQThemeManager.h"
 #import "MediaRemote/MediaRemote.h"
 #import "UIImageView+MASQRotate.h"
+#import "MASQContextManager.h"
 #define SBLog(x) if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.springboard"]) HBLogDebug(x)
 
 @implementation MASQArtworkView
@@ -10,6 +11,7 @@
   if (self = [super init])
   {
     _identifier = key;
+    [MASQContextManager.sharedInstance registerView:self];
     self.userInteractionEnabled = [NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.springboard"];
     [self addSubview:[self underlayView]];
     [self addSubview:[self containerView]];
@@ -109,7 +111,8 @@
 -(void)themeUpdating {
   if (self.currentTheme)
   {
-    SBLog(@"themeUpdating");
+    MASQContextManager * shared = [MASQContextManager sharedInstance];
+    // SBLog(@"themeUpdating");
     // so I need to check if it has self.hasAnimation set and use that to redo the uiimageview if so
     if (self.hasAnimation && ![self wantsAnimation])
     { // somehow I need to remove the animation to avoid it breaking the updateFrame stuff
@@ -117,13 +120,18 @@
       [self.artworkImageView.layer removeAllAnimations];
       self.hasAnimation = NO;
       self.isAnimating = NO;
+      // if (self.neverAnimate) return;
     }
     // [self updatePlaybackState];
+if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.springboard"])
+    HBLogDebug(@"%@ themeUpdating, %@ %@", self.identifier, self.currentTheme.bundlePath.lastPathComponent, ((NSBundle *)shared.themes[self.identifier]).bundlePath.lastPathComponent);
 
     ((UIImageView *)_containerView.maskView).image = [self maskImage];
     [_overlayView setBackgroundImage:[self overlayImage] forState:UIControlStateNormal];
     [_underlayView setBackgroundImage:[self underlayImage] forState:UIControlStateNormal];
 
+if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.springboard"])
+    SBLog(@"theme should have updated now?");
     [self updateFrame];
 
     [self updatePlaybackState];
@@ -135,8 +143,12 @@
   NSString * ident = self.identifier;
   if (ident)
   {
-    NSBundle * currentTheme = [MASQThemeManager themeBundleForKey:ident];
-    if (currentTheme == self.currentTheme)
+    MASQContextManager * shared = [MASQContextManager sharedInstance];
+    NSBundle * currentTheme = shared.themes[ident];
+    // NSBundle * active = shared.themes[ident];
+    // HBLogDebug(@"Hello, %@ %@", self.currentTheme, (id)shared.themes[ident]);
+    // NSBundle * currentTheme = [MASQThemeManager themeBundleForKey:ident];
+    if (currentTheme == self.currentTheme && self.hasAnimation && [self wantsAnimation] == NO)
     { // for some reason even just checking this broke everything , so i guess heres the alternative
       [self.artworkImageView.layer removeAllAnimations];
       self.hasAnimation = NO;
@@ -490,67 +502,36 @@ _kMRMediaRemotePlayerPlaybackStateDidChangeNotification
   }
 }
 
-// // fail
-// -(void)__goAnimate {
-//   dispatch_async(dispatch_get_main_queue(), ^{
-//     [self.artworkImageView __debug_rotate360WithDuration:2.0f repeatCount:0];
-//   });
-// }
+
+// -(void)__test_compareLookup {
+// // Sep 16 21:35:12 X Preferences[9376] <Warning>: 1000x hash lookup executionTime = 0.000637
+// // Sep 16 21:35:12 X Preferences[9376] <Warning>: 1000x old executionTime = 0.100794
+// // Sep 16 21:36:01 X Preferences[9376] <Warning>: 1000x hash lookup executionTime = 0.000627
+// // Sep 16 21:36:01 X Preferences[9376] <Warning>: 1000x old executionTime = 0.105350
 //
-// // fail (or not wtf???)
-// -(void)__grrrr {
-//   dispatch_async(dispatch_get_main_queue(), ^{
-//     [self tapAnimate];
-//   });
-// }
+//   MASQContextManager * shared = [MASQContextManager sharedInstance];
+//   NSString * ident = self.identifier;
+//   int co = 0;
 //
-// -(void)__animate {
+//   NSDate *methodStart = [NSDate date];
+//   while (co < 1000) {
+//     NSBundle * active = shared.themes[ident];
+//     if (active != nil)
+//     co++;
+//   }
+//   NSDate *methodFinish = [NSDate date];
+//   NSTimeInterval executionTime = [methodFinish timeIntervalSinceDate:methodStart];
+//   NSLog(@"1000x hash lookup executionTime = %f", executionTime);
 //
-//   CABasicAnimation *fullRotation;
-//   fullRotation = [CABasicAnimation animationWithKeyPath:@"transform.rotation"];
-//   fullRotation.fromValue = @0;
-//   fullRotation.toValue = @((360 * M_PI) / 180);
-//   fullRotation.duration = 2;
-//   fullRotation.repeatCount = MAXFLOAT;
-//
-//   // self.debuggg = fullRotation.description;
-//   // if (![fullRotation description])
-//   // self.debuggg = @"Failed?";
-//
-//   [CATransaction begin];
-//   [self.artworkImageView.layer addAnimation:fullRotation forKey:@"360"];
-//   [CATransaction commit];
-//   // [self layoutSublayersOfLayer:self.artworkImageView.layer];
-//   // [self.artworkImageView layoutSublayersOfLayer:self.artworkImageView.layer];
-//   // [self.artworkImageView __debug_rotate360WithDuration:2.0f repeatCount:0];
-//
-//   // for (UIImageView * v in self.subviews)
-//   // {
-//   //   if ([v isMemberOfClass:NSClassFromString(@"UIImageView")])
-//   //   [v __debug_rotate360WithDuration:2 repeatCount:0];
-//   // }
-// }
-//
-// -(void)___fuck { //dafuq
-//   // [self __animate];
-//     [self __grrrr];
-//       // [self __invokeHack];
-//       //   [self tapAnimate];
-//       //     [self __goAnimate];
-//       //       [self __animate];
-// }
-//
-// // fail
-// -(void)__invokeHack {
-//   SEL sel = @selector(__debug_rotateImageView);
-//   UIImageView * obj = self.artworkImageView;
-//
-//   NSMethodSignature *methodSignature = [obj methodSignatureForSelector:sel];
-//   NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
-//   [invocation setTarget:obj];
-//   [invocation setSelector:sel];
-//   [invocation retainArguments];
-//
-//   [invocation invoke];
+//   co = 0;
+//   methodStart = [NSDate date];
+//   while (co < 1000) {
+//     NSBundle * currentTheme = [MASQThemeManager themeBundleForKey:ident];
+//     if (currentTheme != nil)
+//     co++;
+//   }
+//   methodFinish = [NSDate date];
+//   executionTime = [methodFinish timeIntervalSinceDate:methodStart];
+//   NSLog(@"1000x old executionTime = %f", executionTime);
 // }
 @end

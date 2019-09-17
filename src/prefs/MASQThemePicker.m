@@ -1,5 +1,6 @@
 #import "MASQThemePicker.h"
 #import "../MASQThemeManager.h"
+#import "../MASQContextManager.h"
 #import "../UIColor+MASQColorUtil.h"
 #import "MediaRemote/MediaRemote.h"
 
@@ -235,16 +236,17 @@
 		}
 		// }
 
-		if (self.lightArtwork)
-		{
-			[self.lightArtwork updateTheme];
-			// [self.lightArtwork __grrrr];
-		}
-		if (self.darkArtwork)
-		{
-			[self.darkArtwork updateTheme];
-			// [self.darkArtwork __grrrr]; // needs to go somewhere else, probably in the MASQArtworkView playbackState method
-		}
+		[[NSClassFromString(@"MASQContextManager") sharedInstance] updateThemes];
+		// if (self.lightArtwork)
+		// {
+		// 	[self.lightArtwork updateTheme];
+		// 	// [self.lightArtwork __grrrr];
+		// }
+		// if (self.darkArtwork)
+		// {
+		// 	[self.darkArtwork updateTheme];
+		// 	// [self.darkArtwork __grrrr]; // needs to go somewhere else, probably in the MASQArtworkView playbackState method
+		// }
 	}
 }
 

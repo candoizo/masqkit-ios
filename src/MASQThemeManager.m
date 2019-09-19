@@ -1,9 +1,4 @@
 #import "MASQThemeManager.h"
-// #import "MASQHousekeeper.h"
-
-// @interface UIApplication (Private)
-// -(NSString *)bundleIdentifier;
-// @end
 
 @implementation MASQThemeManager
 +(id)prefs {

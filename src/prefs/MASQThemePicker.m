@@ -8,45 +8,61 @@
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	[[NSClassFromString(@"MASQContextManager") sharedInstance] updatePlayback];
-	self.prefs = [NSClassFromString(@"MASQThemeManager") prefs];
-	// self.title = @"Themes";
 
+	self.prefs = [NSClassFromString(@"MASQThemeManager") prefs];
+	self.navigationItem.titleView = [[UIView alloc] init]; // hiding ugly title with imperceptible view
+
+	// set the new pretty title
 	UILabel *titleLabel = [[UILabel alloc] init];
 	titleLabel.text = @"Themes";
 	titleLabel.textColor = UIColor.whiteColor;
 	[titleLabel sizeToFit];
 	UIBarButtonItem *right = [[UIBarButtonItem alloc] initWithCustomView:titleLabel];
 	self.navigationItem.rightBarButtonItem = right;
-	UIView * view = [[UIView alloc] init]; // hiding title permanently
-	self.navigationItem.titleView = view;
-
 
 	self.selectedTheme = [self.prefs valueForKey:[self themeKey]];
-  self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
-  self.tableView.delegate = self;
-  self.tableView.dataSource = self;
-  // self.tableView.rowHeight = 65.0f;
-	self.tableView.tintColor = [self themeTint];
-	[self.view addSubview:self.tableView];
+	// add theme picker table
+	[self.view addSubview:[self tableView]];
 
+	// watch for track changes to update the preview
+	// this one is great it catches the artwork changes!
 	NSNotificationCenter * def = NSNotificationCenter.defaultCenter;
-	[def addObserver:self selector:@selector(updateArtworkUgly)  name:@"_MRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
+	[def addObserver:self selector:@selector(__testArtwork:) name:@"_kMRNowPlayingPlaybackQueueChangedNotification" object:nil];
+
+	// new test! seems to be successful and registers a second sooner
+	// very good because it catches the play/pause :)
+	[def addObserver:self selector:@selector(__testPlayback:) name:@"_MRMediaRemotePlayerIsPlayingDidChangeNotification" object:nil];
+
+
+}
+
+-(void)__testArtwork:(id)arg1 {
+
+}
+
+-(void)__testPlayback:(id)arg1 {
+
+}
+
+-(id)tableView {
+
+	  _tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
+	  _tableView.delegate = self;
+	  _tableView.dataSource = self;
+		_tableView.tintColor = [self themeTint];
+		return _tableView;
 }
 
 - (void)updateThemeList {
-	 // create the theme list, starting with the default theme
-	// NSMutableArray *themes = [@[@{@"bundle":@"Disabled@100", @"name":@"Disabled", @"scale":@"100"}] mutableCopy];
+
 	NSMutableArray * themes = [NSMutableArray new];
 	NSString * themePath = [self themePath];
 	NSDictionary * defaultTheme = nil;
-	// HBLogDebug(@"Theme path: %@", [self themePath]);
-	// for all the installed bundles in /Application Support/MASQ/Themes/x.bundle
 	for (NSString * bundles in [NSFileManager.defaultManager contentsOfDirectoryAtPath:themePath error:nil])
 	{
 		if ([bundles hasSuffix:@".bundle"])
 		{
-		// Path to theme bundle
+			// Path to theme bundle
 			NSString * tbPath = [NSString stringWithFormat:@"%@/%@", themePath, bundles];
 			// HBLogDebug(@"tbPath: %@", tbPath);
 			// for all themes or theme installed in the bundle
@@ -111,22 +127,28 @@
 	return 55;
 }
 
-
 -(void)updateArtworkUgly {
+	[[NSClassFromString(@"MASQContextManager") sharedInstance] updatePlayback];
+
 	if (self.lightArtwork && self.darkArtwork)
 	MRMediaRemoteGetNowPlayingInfo(
 		dispatch_get_main_queue(), ^(CFDictionaryRef information) {
 			NSDictionary *dict = (__bridge NSDictionary *)(information);
+			// HBLogDebug(@"dict %@", dict);
+			// self.info = dict;
+			MASQContextManager * share = [NSClassFromString(@"MASQContextManager") sharedInstance];
+			BOOL active = [[share activeAudio] boolValue];
+
 
 			UIImage * img = [UIImage imageWithData:dict[@"kMRMediaRemoteNowPlayingInfoArtworkData"]];
-			if (!img && !self.lightArtwork.activeAudio)
+			if (!img && !active)
 			img = [self imageFromPrefsWithName:@"Icon/Placeholder"];
-			else if (!img && self.lightArtwork.activeAudio)
+			else if (!img && active)
 			// if there is no image ready but audio is playing we would rather wait for the image
 			return;
 
-			self.lightArtwork.artworkImageView.image = img;
-			self.darkArtwork.artworkImageView.image = img;
+			[self.lightArtwork updateArtwork:img];
+			[self.darkArtwork updateArtwork:img];
 
 			if (self.stylePreview && img)
 			self.stylePreview.image =  img;
@@ -191,6 +213,7 @@
 		return cell;
 	}
 
+	HBLogError(@"uhh where are you?");
   UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"ThemeCell"];
   cell.selectionStyle = UITableViewCellSelectionStyleNone;
 
@@ -202,6 +225,7 @@
 		cell.detailTextLabel.textColor = UIColor.darkGrayColor;
 	}
 
+	HBLogDebug(@"self.checkedIndexPath: %@ \n themeInfo: %@ \n self.selectedTheme: %@", self.checkedIndexPath, themeInfo[@"bundle"],  self.selectedTheme);
   if (!self.checkedIndexPath && [themeInfo[@"bundle"] isEqualToString:self.selectedTheme]) self.checkedIndexPath = indexPath;
 	cell.accessoryType = (indexPath == self.checkedIndexPath) ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
 

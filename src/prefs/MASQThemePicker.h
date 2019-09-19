@@ -27,6 +27,7 @@
 
 
 @interface MASQThemePicker : PSViewController <UITableViewDataSource, UITableViewDelegate>
+@property (nonatomic, retain) NSDictionary * info;
 @property () NSUserDefaults * prefs;
 @property (nonatomic, assign) NSString * hah;
 @property () CFFileDescriptorRef queue;

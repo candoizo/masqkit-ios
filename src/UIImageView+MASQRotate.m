@@ -32,13 +32,11 @@
 
 - (void)__debug_rotate360WithDuration:(CGFloat)duration repeatCount:(float)repeatCount
 {
-  SBLog(@"rotateDebug is here");
 	CABasicAnimation *fullRotation;
 	fullRotation = [CABasicAnimation animationWithKeyPath:@"transform.rotation"];
 	fullRotation.fromValue = [NSNumber numberWithFloat:0];
 	fullRotation.toValue = [NSNumber numberWithFloat:((360 * M_PI) / 180)];
 	fullRotation.duration = duration;
-  // fullRotation.removedOnCompletion = false; makes the thing not so good
 
 	if (repeatCount == 0)
 		fullRotation.repeatCount = MAXFLOAT;
@@ -64,34 +62,27 @@
   }
 }
 
-- (void)__debug_stopAllAnimations
-{
-
+- (void)__debug_stopAllAnimations {
 	[self.layer removeAllAnimations];
-};
+}
 
-- (void)__debug_pauseAnimations
-{
+- (void)__debug_pauseAnimations {
 	[self __debug_pauseLayer:self.layer];
 }
 
-- (void)__debug_resumeAnimations
-{
-  SBLog(@"animation should resume.");
+- (void)__debug_resumeAnimations {
 	[self __debug_resumeLayer:self.layer];
 }
 
-- (void)__debug_pauseLayer:(CALayer *)layer
-{
+- (void)__debug_pauseLayer:(CALayer *)layer {
 	CFTimeInterval pausedTime = [layer convertTime:CACurrentMediaTime() fromLayer:nil];
 	layer.speed = 0.0;
 	layer.timeOffset = pausedTime;
 }
 
-- (void)__debug_resumeLayer:(CALayer *)layer
-{
+- (void)__debug_resumeLayer:(CALayer *)layer {
 	CFTimeInterval pausedTime = [layer timeOffset];
-	layer.speed = 1.0;//
+	layer.speed = 1.0;
 	layer.timeOffset = 0.0;
 	layer.beginTime = 0.0;
 	CFTimeInterval timeSincePause = [layer convertTime:CACurrentMediaTime() fromLayer:nil] - pausedTime;

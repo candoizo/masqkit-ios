@@ -4,7 +4,8 @@
 @property (nonatomic, assign) BOOL hasAnimation; // this marks if the imageview is dirty because ca frames break it
 @property (nonatomic, assign) BOOL isAnimating; // this keeps track if i'ts actually animating or not
 @property (nonatomic, assign) BOOL activeAudio; // this keeps track of if audio is playing or not
-@property (nonatomic, assign) NSNumber * activeTrack;
+@property (nonatomic, assign) BOOL wantsAnimation;
+// @property (nonatomic, assign) NSNumber * activeTrack;
 @property (nonatomic, assign) NSString * identifier;
 @property (nonatomic, assign) NSBundle * currentTheme;
 @property (nonatomic, assign) unsigned long hashCache;
@@ -15,6 +16,7 @@
 @property (nonatomic, retain) UIButton * overlayView;
 @property (nonatomic, retain) UIButton * underlayView;
 @property (nonatomic, retain) UIView * containerView;
+@property (nonatomic, assign) float ratio;
 -(id)initWithThemeKey:(NSString *)arg1;
 -(id)initWithThemeKey:(NSString *)arg1 frameHost:(id)arg2 imageHost:(id)arg3;
 
@@ -22,8 +24,9 @@
 -(void)updateTheme;
 -(void)updateFrame;
 -(void)updateArtwork:(UIImage *)img;
+-(void)tapAnimate;
 
--(float)ratio;
+// -(float)ratio;
 
 -(UIView *)containerView;
 -(UIButton *)overlayView;
@@ -34,6 +37,6 @@
 -(id)underlayImage;
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context;
 
-@property (nonatomic, assign) BOOL debugged;
+// @property (nonatomic, assign) BOOL debugged;
 @property (nonatomic, assign) BOOL neverAnimate;
 @end

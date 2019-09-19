@@ -27,3 +27,7 @@
 + (id)_applicationIconImageForBundleIdentifier:(id)arg1 format:(int)arg2 scale:(CGFloat)arg3;
 +(id)imageNamed:(id)arg1 inBundle:(id)arg2;
 @end
+
+@interface NSObject (Private)
+-(NSString *)_ivarDescription;
+@end

@@ -1,5 +1,10 @@
-# for osx compile -TARGET = iphone:clang:11
-ARCHS = arm64 #arm64e needed for xs but no linux tc yet?
+ifeq ($(FINALPACKAGE), 1)
+export ARCHS = arm64 arm64e
+export FINALPACKAGE=1
+export DEBUG=0
+else
+export ARCHS = arm64
+endif
 
 include $(THEOS)/makefiles/common.mk
 

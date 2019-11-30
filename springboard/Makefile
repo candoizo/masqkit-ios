@@ -2,7 +2,7 @@ ifeq ($(FINALPACKAGE), 1)
 export ARCHS = arm64 arm64e
 export FINALPACKAGE=1
 export DEBUG=0
-export TARGET= iphone:clang:11
+export TARGET= iphone:clang:latest
 else
 export ARCHS = arm64
 endif

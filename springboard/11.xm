@@ -7,6 +7,7 @@
   dlopen("/Library/MobileSubstrate/DynamicLibraries/MASQKit.dylib", RTLD_NOW);
 }
 
+// iOS 11-12.1.2
 %hook MediaControlsPanelViewController
 
 -(id)headerView {
@@ -65,7 +66,7 @@
 
 %end
 
-// ios 12.2-4? .4 fosho
+// ios 12.2 - 12.4 - 13.2.3
 %hook MRPlatterViewController
 
 -(id)nowPlayingHeaderView {
@@ -73,8 +74,11 @@
 
   if ([orig artworkView] && !orig.masqArtwork)
   { //assign our view when the host is ready and there is none
+    int ver = [NSClassFromString(@"UIDevice") currentDevice].systemVersion.doubleValue;
+    // ls is diff on ios 13
+    Class ls = NSClassFromString( ver < 13 ? @"SBDashBoardMediaControlsViewController" : @"CSMediaControlsViewController");
+
     Class cc = %c(MediaControlsEndpointsViewController);
-    Class ls = %c(SBDashBoardMediaControlsViewController);
     NSString * key;// assign the key based on where it's from
     if ([self.delegate isKindOfClass:cc])
     key = kControlCenterKey;
@@ -111,7 +115,7 @@
 
 %end
 
-// ios 11 - 12, hide extra stuff
+// ios 11 - 13, hide extra stuff
 %hook MediaControlsHeaderView
 %property (nonatomic, retain) MASQArtworkView * masqArtwork;
 

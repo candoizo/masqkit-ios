@@ -356,20 +356,20 @@
 	else return [UIColor colorWithRed:0.87 green:0.25 blue:0.40 alpha:1];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 -(void)popMissingAlert {
 			UIAlertController * alert=   [UIAlertController alertControllerWithTitle:@"No Themes!"
 			message:@"MASQKit found no themes installed on your device, and therefore has no choices to offer you, yet: \n\n https://ndoizo.ca ← Visit the repo to find some!"
 			preferredStyle:UIAlertControllerStyleAlert];
 
 			UIAlertAction* cancel = [NSClassFromString(@"UIAlertAction") actionWithTitle:@"Dismiss" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * action){
-																[alert dismissViewControllerAnimated:YES completion:nil];
-															}];
+					[alert dismissViewControllerAnimated:YES completion:nil];}];
 
 			UIAlertAction* repo = [NSClassFromString(@"UIAlertAction") actionWithTitle:@"Open in Cydia" style:UIAlertActionStyleCancel handler:^(UIAlertAction * action){
-		#pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wdeprecated-implementations"
+
 		[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"cydia://url/https://cydia.saurik.com/api/share#?source=https://ndoizo.ca"]];
-    #pragma clang diagnostic pop
+
 
 															}
 													];
@@ -378,6 +378,7 @@
 			[alert addAction:cancel];
 			[self presentViewController:alert animated:YES completion:nil];
 }
+#pragma clang diagnostic pop
 
 -(void)wantsStyle:(BOOL)arg1
 {

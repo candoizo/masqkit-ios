@@ -74,9 +74,12 @@
 
   if ([orig artworkView] && !orig.masqArtwork)
   { //assign our view when the host is ready and there is none
-    int ver = [NSClassFromString(@"UIDevice") currentDevice].systemVersion.doubleValue;
+    // int ver = [NSClassFromString(@"UIDevice") currentDevice].systemVersion.doubleValue;
+    // NSLog(@"ver %d", ver);
     // ls is diff on ios 13
-    Class ls = NSClassFromString( ver < 13 ? @"SBDashBoardMediaControlsViewController" : @"CSMediaControlsViewController");
+    // Class ls = NSClassFromString( ver =< 13 ? @"SBDashBoardMediaControlsViewController" : @"CSMediaControlsViewController" );
+    // Class ls = NSClassFromString(ver < 13 ? @"SBDashBoardMediaControlsViewController" : @"CSMediaControlsViewController" );
+    Class ls = %c(SBDashBoardMediaControlsViewController) ?: %c(CSMediaControlsViewController);
 
     Class cc = %c(MediaControlsEndpointsViewController);
     NSString * key;// assign the key based on where it's from

@@ -1,5 +1,6 @@
 #import "MASQBaseController.h"
 #import "../MASQThemeManager.h"
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 @implementation MASQBaseController
 +(void)clearPrefs {

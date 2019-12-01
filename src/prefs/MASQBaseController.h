@@ -1,5 +1,3 @@
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-
 #import "Preferences/PSListController.h"
 #import "../Private.h"
 

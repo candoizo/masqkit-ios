@@ -3,6 +3,7 @@
 
 @interface PSSegmentTableCell : NSObject
 @property (nonatomic, assign) UIColor * tintColor;
+-(UIControl *)control;
 - (id)initWithStyle:(UITableViewCellStyle)arg1 reuseIdentifier:(id)arg2 specifier:(PSSpecifier *)arg3;
 @end
 

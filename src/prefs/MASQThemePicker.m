@@ -27,21 +27,64 @@
 	// watch for track changes to update the preview
 	// this one is great it catches the artwork changes!
 	NSNotificationCenter * def = NSNotificationCenter.defaultCenter;
-	[def addObserver:self selector:@selector(__testArtwork:) name:@"_kMRNowPlayingPlaybackQueueChangedNotification" object:nil];
+	// [def addObserver:self selector:@selector(__testArtwork:) name:@"_kMRNowPlayingPlaybackQueueChangedNotification" object:nil];
+
+	[def addObserver:self selector:@selector(__testArtwork:) name:@"_MRMediaRemotePlayerNowPlayingInfoDidChangeNotification" object:nil];
 
 	// new test! seems to be successful and registers a second sooner
 	// very good because it catches the play/pause :)
-	[def addObserver:self selector:@selector(__testPlayback:) name:@"_MRMediaRemotePlayerIsPlayingDidChangeNotification" object:nil];
+	// [def addObserver:self selector:@selector(__testPlayback:) name:@"_MRMediaRemotePlayerIsPlayingDidChangeNotification" object:nil];
+
+
 
 
 }
 
 -(void)__testArtwork:(id)arg1 {
+	// [self updateArtworkUgly];
 
+	MRMediaRemoteGetNowPlayingInfo(
+		dispatch_get_main_queue(), ^(CFDictionaryRef information) {
+			NSDictionary *dict = (__bridge NSDictionary *)(information);
+			self.info = dict;
+		}
+	);
+}
+
+-(void)setInfo:(NSDictionary *)arg1 {
+	_info = arg1;
+
+	if (arg1[@"kMRMediaRemoteNowPlayingInfoArtworkData"])
+	{
+			if (self.lightArtwork && self.darkArtwork && self.stylePreview)
+			{
+				UIImage * img = [UIImage imageWithData:self.info[@"kMRMediaRemoteNowPlayingInfoArtworkData"]];
+
+				if (!img)
+				img = [self imageFromPrefsWithName:@"Icon/Placeholder"];
+
+				[self.lightArtwork updateArtwork:img];
+				[self.darkArtwork updateArtwork:img];
+				self.stylePreview.image = img;
+			}
+	}
+	else if (arg1)
+	{ // dict is playing but doesnt have artwork data
+		// so just wait for the next billion times this gets called! /`(<_<)
+		return;
+	}
+	else
+	{
+		UIImage * img = [self imageFromPrefsWithName:@"Icon/Placeholder"];
+
+		[self.lightArtwork updateArtwork:img];
+		[self.darkArtwork updateArtwork:img];
+		self.stylePreview.image = img;
+	}
 }
 
 -(void)__testPlayback:(id)arg1 {
-
+	// [self updateArtworkUgly];
 }
 
 -(id)tableView {
@@ -134,23 +177,17 @@
 	MRMediaRemoteGetNowPlayingInfo(
 		dispatch_get_main_queue(), ^(CFDictionaryRef information) {
 			NSDictionary *dict = (__bridge NSDictionary *)(information);
-			// HBLogDebug(@"dict %@", dict);
-			// self.info = dict;
-			MASQContextManager * share = [NSClassFromString(@"MASQContextManager") sharedInstance];
-			BOOL active = [[share activeAudio] boolValue];
-
-
+			self.info = dict;
 			UIImage * img = [UIImage imageWithData:dict[@"kMRMediaRemoteNowPlayingInfoArtworkData"]];
-			if (!img && !active)
-			img = [self imageFromPrefsWithName:@"Icon/Placeholder"];
-			else if (!img && active)
-			// if there is no image ready but audio is playing we would rather wait for the image
+			if (!img && !dict[@"kMRMediaRemoteNowPlayingInfoAlbum"])
 			return;
+			else if (!img)
+			img = [self imageFromPrefsWithName:@"Icon/Placeholder"];
 
 			[self.lightArtwork updateArtwork:img];
 			[self.darkArtwork updateArtwork:img];
 
-			if (self.stylePreview && img)
+			if (img)
 			self.stylePreview.image =  img;
 		}
 	);
@@ -177,14 +214,14 @@
 		contain.hidden = YES;
 		[cell addSubview:contain];
 
-		MASQArtworkView * light = [[NSClassFromString(@"MASQArtworkView") alloc] initWithThemeKey:[self themeKey] frameHost:contain imageHost:contain];
-		self.lightArtwork = light;
-		[cell addSubview:light];
-
 		UIImageView * containd = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,120,120)];
 		containd.center = CGPointMake(tableView.center.x/2, rowHeight*0.5);
 		containd.hidden = YES;
 		[cell addSubview:containd];
+
+		MASQArtworkView * light = [[NSClassFromString(@"MASQArtworkView") alloc] initWithThemeKey:[self themeKey] frameHost:contain imageHost:contain];
+		self.lightArtwork = light;
+		[cell addSubview:light];
 
 		MASQArtworkView * dark = [[NSClassFromString(@"MASQArtworkView") alloc] initWithThemeKey:[self themeKey] frameHost:containd imageHost:contain];
 		self.darkArtwork = dark;
@@ -213,7 +250,6 @@
 		return cell;
 	}
 
-	HBLogError(@"uhh where are you?");
   UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"ThemeCell"];
   cell.selectionStyle = UITableViewCellSelectionStyleNone;
 
@@ -225,7 +261,6 @@
 		cell.detailTextLabel.textColor = UIColor.darkGrayColor;
 	}
 
-	HBLogDebug(@"self.checkedIndexPath: %@ \n themeInfo: %@ \n self.selectedTheme: %@", self.checkedIndexPath, themeInfo[@"bundle"],  self.selectedTheme);
   if (!self.checkedIndexPath && [themeInfo[@"bundle"] isEqualToString:self.selectedTheme]) self.checkedIndexPath = indexPath;
 	cell.accessoryType = (indexPath == self.checkedIndexPath) ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
 
@@ -341,6 +376,8 @@
 
 -(void)wantsStyle:(BOOL)arg1
 {
+	int ver = UIDevice.currentDevice.systemVersion.doubleValue;
+
 	if (arg1)
 	{ // adding it to the header
 		self.navigationController.navigationController.navigationBar.tintColor = UIColor.whiteColor;
@@ -360,8 +397,11 @@
 		[bg addSubview:myv];
 		[myv.layer insertSublayer:gradient atIndex:0];
 
-		UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
-		bgEff.alpha = 0;
+		if (ver < 13)
+		{
+			UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
+			bgEff.alpha = 0;
+		}
 	}
 	else
 	{ // removing it from the header
@@ -373,8 +413,11 @@
 
 		self.navigationController.navigationController.navigationBar.barStyle = 0; // woot need this :D
 
-		UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
-		bgEff.alpha = 1;
+		if (ver < 13)
+		{
+			UIView * bgEff = [bg valueForKey:@"_backgroundEffectView"];
+			bgEff.alpha = 1;
+		}
 	}
 }
 @end

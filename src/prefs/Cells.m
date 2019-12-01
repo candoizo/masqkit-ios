@@ -1,9 +1,30 @@
+#import "MASQChildController.h"
 #import "../MASQThemeManager.h"
 #import "../UIColor+MASQColorUtil.h"
 #import "../Interfaces.h"
 #import "Cells.h"
 #define kMasqTint(x) [UIColor colorWithRed:0.87 green:0.25 blue:0.40 alpha:x]
 
+
+@interface PSSegmentTableCell(priv)
+-(void)_setSelectionStyle:(int)arg1 selectionTintColor:(UIColor *)arg2;
+-(void)refreshCellContentsWithSpecifier:(PSSpecifier *)arg1;
+-(int)selectionStyle;
+-(void)layoutSubviews;
+-(PSSpecifier *)specifier;
+-(UISegmentedControl *)newControl;
+@end
+
+@interface UISegmentedControl (prov)
+@property (nonatomic, assign) UIColor * selectedSegmentTintColor;
+-(MASQChildController *)_viewControllerForAncestor;
+-(void)_setInteractionTintColor:(UIColor *)arg1;
+@end
+
+@interface UIControl (Priv)
+@property (nonatomic, assign) UIColor * selectedSegmentTintColor;
+// -(void)_setSele
+@end
 
 @implementation MASQSegmentCell
 - (id)initWithStyle:(UITableViewCellStyle)arg1 reuseIdentifier:(id)arg2 specifier:(PSSpecifier *)arg3 {
@@ -17,7 +38,14 @@
 	return self;
 }
 
+-(BOOL)_definesDynamicTintColor {
+	return YES;
+}
 
+-(void)layoutSubviews {
+	[super layoutSubviews];
+	self.control.selectedSegmentTintColor = self.tintColor;
+}
 @end
 
 
@@ -67,14 +95,21 @@
 -(void)layoutSubviews {
 	[super layoutSubviews];
 
-	if ([self.specifier propertyForKey:@"themeKey"]) {
+	NSString * themeKey = [self.specifier propertyForKey:@"themeKey"];
+
+	if (themeKey) {
 		UIView * acc = [self valueForKey:@"_accessoryView"];
-   	self.detailTextLabel.center = CGPointMake(self.detailTextLabel.center.x, acc.center.y);
+
+		int ver = UIDevice.currentDevice.systemVersion.doubleValue;
+		// ios 13 this is off center for some reason
+		// @TODO see if backwards compatible
+		int yVal = ver < 13 ? acc.center.y : self.titleLabel.center.y;
+		self.detailTextLabel.center = CGPointMake(self.detailTextLabel.center.x, yVal);
 	}
 
-	if ([[NSClassFromString(@"MASQThemeManager") prefs] valueForKey:[self.specifier propertyForKey:@"themeKey"]])	{
-		NSString * tname = [[[NSClassFromString(@"MASQThemeManager") prefs] valueForKey:[self.specifier propertyForKey:@"themeKey"]] componentsSeparatedByString:@"@"].firstObject;
-		self.detailTextLabel.text = tname;
+	if ([[NSClassFromString(@"MASQThemeManager") prefs] valueForKey:themeKey])	{
+		NSString * tlabel = [[[NSClassFromString(@"MASQThemeManager") prefs] valueForKey:themeKey] componentsSeparatedByString:@"@"].firstObject;
+		self.detailTextLabel.text = tlabel;
 	}
 }
 @end
@@ -84,7 +119,7 @@
 
 @implementation MASQSubPageLinkCell
 +(NSString *)deprecationInfo {
-	return @"This class is being deprecated in favour of MASQChildLinkCell. \n\nPlease avoid referenceing this class as it will be removed at a future date.";
+	return @"This class is being deprecated in favour of MASQChildLinkCell. \n\nPlease avoid referenceing this class as it could be removed at a future major version change.";
 }
 @end
 

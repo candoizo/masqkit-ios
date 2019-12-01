@@ -51,7 +51,8 @@
 -(void)wantsStyle:(BOOL)arg1 {
   UINavigationBar * bar = self.bar;
   UIView * bg = [bar valueForKey:@"_backgroundView"];
-
+	if (!bg) return;
+	int ver = UIDevice.currentDevice.systemVersion.doubleValue;
   // if (![self isMemberOfClass:NSClassFromString(@"MASQPrefsController")])
   // return;
   if (arg1)
@@ -67,6 +68,7 @@
 
     bar.tintColor = UIColor.whiteColor;
 
+		if (ver < 13) // not allowed on ios 13
     ((UIView *)[bg valueForKey:@"_backgroundEffectView"]).alpha = 0;
 
     UIView * myv = [[UIView alloc] initWithFrame:bg.bounds];
@@ -93,6 +95,7 @@
     [[bg viewWithTag:6969] removeFromSuperview];
 
     bar.barStyle = 0;
+		if (ver < 13)
     ((UIView *)[bg valueForKey:@"_backgroundEffectView"]).alpha = 1;
   }
 }

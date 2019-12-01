@@ -366,8 +366,13 @@
 															}];
 
 			UIAlertAction* repo = [NSClassFromString(@"UIAlertAction") actionWithTitle:@"Open in Cydia" style:UIAlertActionStyleCancel handler:^(UIAlertAction * action){
-															[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"cydia://url/https://cydia.saurik.com/api/share#?source=https://ndoizo.ca"]];
-															}];
+		#pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wdeprecated-implementations"
+		[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"cydia://url/https://cydia.saurik.com/api/share#?source=https://ndoizo.ca"]];
+    #pragma clang diagnostic pop
+
+															}
+													];
 
 			[alert addAction:repo];
 			[alert addAction:cancel];

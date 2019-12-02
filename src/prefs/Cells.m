@@ -44,6 +44,7 @@
 
 -(void)layoutSubviews {
 	[super layoutSubviews];
+	if ([self.control respondsToSelector:@selector(setSelectedSegmentTintColor:)])
 	self.control.selectedSegmentTintColor = self.tintColor;
 }
 @end

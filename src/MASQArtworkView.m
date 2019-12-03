@@ -324,20 +324,41 @@
 
 -(UIImage *)overlayImage
 {
+  //
   NSBundle * theme = self.currentTheme;
-  return theme ?
-  [UIImage imageNamed:@"Overlay" inBundle:theme compatibleWithTraitCollection:nil] ?:
+
+  return theme ? //theme exists
+  NSClassFromString(@"SBMediaController") || NSClassFromString(@"PreferencesAppController") ?
+  // in springboad/prefs use faster way
+  [UIImage imageNamed:@"Overlay" inBundle:theme compatibleWithTraitCollection:nil] :
+  // use old way since app sandbox is messed
   [UIImage imageWithContentsOfFile:[theme pathForResource:@"Overlay" ofType:@"png"]]
   : nil;
+
+
+  // return theme ?
+  // [UIImage imageNamed:@"Overlay" inBundle:theme compatibleWithTraitCollection:nil] ?:
+  // [UIImage imageWithContentsOfFile:[theme pathForResource:@"Overlay" ofType:@"png"]]
+  // : nil;
 }
 
 -(UIImage *)underlayImage
 {
   NSBundle * theme = self.currentTheme;
-  return theme ?
-  [UIImage imageNamed:@"Underlay" inBundle:theme compatibleWithTraitCollection:nil] ?:
+
+
+  return theme ? //theme exists
+  NSClassFromString(@"SBMediaController") || NSClassFromString(@"PreferencesAppController") ?
+  // in springboad/prefs use faster way
+  [UIImage imageNamed:@"Underlay" inBundle:theme compatibleWithTraitCollection:nil] :
+  // use old way since app sandbox is messed
   [UIImage imageWithContentsOfFile:[theme pathForResource:@"Underlay" ofType:@"png"]]
   : nil;
+
+  // return theme ?
+  // [UIImage imageNamed:@"Underlay" inBundle:theme compatibleWithTraitCollection:nil] ?:
+  // [UIImage imageWithContentsOfFile:[theme pathForResource:@"Underlay" ofType:@"png"]]
+  // : nil;
 }
 
 -(void)updatePlaybackState {

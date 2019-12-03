@@ -3,8 +3,16 @@
 #import "MediaRemote/MediaRemote.h"
 #import "UIImageView+MASQRotate.h"
 #import "MASQContextManager.h"
+#import "MASQThemeContext.h"
 
 @implementation MASQArtworkView
+-(MASQThemeContext *)contextResult {
+
+  MASQThemeContext * con = [[MASQThemeContext alloc] initWithBundle:self.currentTheme];
+
+  return con;
+}
+
 -(id)init {
   self = [super init];
   self.userInteractionEnabled = [NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.springboard"];
@@ -324,17 +332,26 @@
 
 -(UIImage *)overlayImage
 {
-  //
   NSBundle * theme = self.currentTheme;
 
-  return theme ? //theme exists
-  NSClassFromString(@"SBMediaController") || NSClassFromString(@"PreferencesAppController") ?
-  // in springboad/prefs use faster way
-  [UIImage imageNamed:@"Overlay" inBundle:theme compatibleWithTraitCollection:nil] :
-  // use old way since app sandbox is messed
-  [UIImage imageWithContentsOfFile:[theme pathForResource:@"Overlay" ofType:@"png"]]
-  : nil;
+  UIImage * overlay = [UIImage imageNamed:@"Overlay" inBundle:theme compatibleWithTraitCollection:nil];
 
+  if (!overlay)
+  overlay = [UIImage imageWithContentsOfFile:[theme pathForResource:@"Overlay" ofType:@"png"]];
+
+  return overlay ?: nil;
+
+  // BOOL rootApp = NSClassFromString(@"SBMediaController") || NSClassFromString(@"PreferencesAppController");
+  // if (theme)
+  // return rootApp ? [UIImage imageNamed:@"Overlay" inBundle:theme compatibleWithTraitCollection:nil] : [UIImage imageWithContentsOfFile:[theme pathForResource:@"Overlay" ofType:@"png"]];
+  // else return nil;
+  // return theme ? //theme exists
+  // NSClassFromString(@"SBMediaController") || NSClassFromString(@"PreferencesAppController") ?
+  // // in springboad/prefs use faster way
+  // [UIImage imageNamed:@"Overlay" inBundle:theme compatibleWithTraitCollection:nil] :
+  // // use old way since app sandbox is messed
+  // [UIImage imageWithContentsOfFile:[theme pathForResource:@"Overlay" ofType:@"png"]]
+  // : nil;
 
   // return theme ?
   // [UIImage imageNamed:@"Overlay" inBundle:theme compatibleWithTraitCollection:nil] ?:
@@ -346,14 +363,20 @@
 {
   NSBundle * theme = self.currentTheme;
 
+  UIImage * image = [UIImage imageNamed:@"Underlay" inBundle:theme compatibleWithTraitCollection:nil];
 
-  return theme ? //theme exists
-  NSClassFromString(@"SBMediaController") || NSClassFromString(@"PreferencesAppController") ?
-  // in springboad/prefs use faster way
-  [UIImage imageNamed:@"Underlay" inBundle:theme compatibleWithTraitCollection:nil] :
-  // use old way since app sandbox is messed
-  [UIImage imageWithContentsOfFile:[theme pathForResource:@"Underlay" ofType:@"png"]]
-  : nil;
+  if (!image)
+  image = [UIImage imageWithContentsOfFile:[theme pathForResource:@"Underlay" ofType:@"png"]];
+
+  return image ?: nil;
+
+  // return theme ? //theme exists
+  // NSClassFromString(@"SBMediaController") || NSClassFromString(@"PreferencesAppController") ?
+  // // in springboad/prefs use faster way
+  // [UIImage imageNamed:@"Underlay" inBundle:theme compatibleWithTraitCollection:nil] :
+  // // use old way since app sandbox is messed
+  // [UIImage imageWithContentsOfFile:[theme pathForResource:@"Underlay" ofType:@"png"]]
+  // : nil;
 
   // return theme ?
   // [UIImage imageNamed:@"Underlay" inBundle:theme compatibleWithTraitCollection:nil] ?:
@@ -504,15 +527,22 @@
 //
 // -(void)__test_compareLoader {
 // // damn 500% faster ...
-// // Sep 17 10:12:53 X SpringBoard[10968] <Warning>: 1000x new executionTime = 0.053621
-// // Sep 17 10:12:53 X SpringBoard[10968] <Warning>: 1000x old executionTime = 0.271982
-//
+
+// ContextManager Stress Test ()
+// Loading a new theme 1000x times.
+// // Sep 17 10:12:53 X SpringBoard[10968] <Warning>: new executionTime = 0.053621
+// // Sep 17 10:12:53 X SpringBoard[10968] <Warning>: old executionTime = 0.271982
+
+
+
 //   MASQContextManager * shared = [MASQContextManager sharedInstance];
 //   NSString * ident = self.identifier;
 //   NSBundle * active = shared.themes[ident];
 //   int co = 0;
 //
 //   NSDate *methodStart = [NSDate date];
+
+
 //   while (co < 1000) {
 //     UIImage * img =  [UIImage imageNamed:@"Mask" inBundle:active compatibleWithTraitCollection:nil];
 //     if (img != nil)
